@@ -192,7 +192,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                         editor.putString("encryptedPassword", encryptedPassword);
 
                         if (editor.commit()) {
-                            Intent intent = new Intent(RegisterActivity.this, UserActivity.class);
+                            Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
                             startActivity(intent);
                             finish();
                         } else {

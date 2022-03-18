@@ -153,7 +153,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                         editor.putString("encryptedPassword", encryptedPassword);
 
                         if (editor.commit()) {
-                            Intent login_to_main = new Intent(LoginActivity.this, UserActivity.class);
+                            Intent login_to_main = new Intent(LoginActivity.this, MainActivity.class);
                             startActivity(login_to_main);
                             finish();
                         } else {

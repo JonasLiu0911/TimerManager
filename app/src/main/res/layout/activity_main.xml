@@ -31,15 +31,6 @@
         android:textSize="20dp">
     </TextView>
 
-    <ListView
-        android:id="@+id/location_nearby"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginTop="450dp"
-        android:layout_marginBottom="120dp"></ListView>
-
 
     <Button
         android:id="@+id/start_log"

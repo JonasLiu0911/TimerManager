@@ -6,9 +6,14 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -27,12 +32,15 @@ import com.baidu.location.Poi;
 import com.baidu.location.PoiRegion;
 import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
+import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
+import com.baidu.mapapi.map.Polyline;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.utils.poi.BaiduMapPoiSearch;
 
@@ -41,21 +49,45 @@ import java.util.List;
 
 public class MainActivity extends BaseActivity {
 
+    // 位置经纬度信息
     TextView locationInfo;
 
     private final String TAG = "MainActivity";
 
-    public LocationClient mLocationClient;    // 定位对象
+    // 定位对象
+    public LocationClient mLocationClient;
+//    public MyLocationListenner myListener = new MyLocationListenner();
+    private MyLocationConfiguration.LocationMode mCurrentMode;
+    BitmapDescriptor mCurrentMarker;
 
     MapView mMapView;
-    BaiduMap mBaiduMap = null;
+    BaiduMap mBaiduMap;
 
-    boolean isFirstLocated = true;
+//    private SensorManager mSensorManager;
+//    double degree = 0;
+
+    boolean isFirstLocated = true;   // 是否首次定位
 
     ImageView loginImg;
     Button startBtn;
     Button stopBtn;
-    ListView locationsNearby;
+
+    /**
+    // 轨迹相关
+    boolean trace = false;
+    boolean isFirstTrace = true;
+
+    // 起点图标
+    BitmapDescriptor startBD;
+    // 终点图标
+    BitmapDescriptor stopBD;
+    // 位置点集合
+    List<LatLng> points = new ArrayList<LatLng>();
+    // 运动轨迹图层
+    Polyline mPolyline;
+    // 上一个定位点
+    LatLng last = new LatLng(0, 0);
+     */
 
 
 
@@ -68,38 +100,32 @@ public class MainActivity extends BaseActivity {
         fullScreenConfig();
         setContentView(R.layout.activity_main);
 
-        locationInfo = findViewById(R.id.location_info);
-
-        // 对象初始化,声明LocationClient类
-        mLocationClient = new LocationClient(getApplicationContext());
-        // 注册监听函数
-        mLocationClient.registerLocationListener(new MyLocationListener());
-
-
-        mMapView = findViewById(R.id.bd_map_view);
-        mBaiduMap = mMapView.getMap();
-
-        mBaiduMap.setMapType(BaiduMap.MAP_TYPE_NORMAL);
-        mBaiduMap.setMyLocationEnabled(true);
-
         // 头像按钮
         loginImg = findViewById(R.id.go_to_login);
         OnClickHead onClick = new OnClickHead();
         loginImg.setOnClickListener(onClick);
 
-        // 开始行程记录按钮
-        startBtn = findViewById(R.id.start_log);
-        OnClickStart onClickStart = new OnClickStart();
-        startBtn.setOnClickListener(onClickStart);
 
         // 结束行程记录按钮
         stopBtn = findViewById(R.id.stop_log);
         OnClickStop onClickStop = new OnClickStop();
         stopBtn.setOnClickListener(onClickStop);
 
-        // 周边POI列表
-        locationsNearby = findViewById(R.id.location_nearby);
+        // 地理位置信息初始化
+        locationInfo = findViewById(R.id.location_info);
+        locationInfo.setVisibility(View.INVISIBLE);
 
+
+        // 地图初始化
+        mMapView = findViewById(R.id.bd_map_view);
+        mBaiduMap = mMapView.getMap();
+        mBaiduMap.setMapType(BaiduMap.MAP_TYPE_NORMAL);
+        mBaiduMap.setMyLocationEnabled(true);
+
+        // 定位初始化
+        mLocationClient = new LocationClient(getApplicationContext());
+        // 注册监听函数
+        mLocationClient.registerLocationListener(new MyLocationListener());
 
         // 权限请求
         List<String> permissionList = new ArrayList<String>();
@@ -112,12 +138,20 @@ public class MainActivity extends BaseActivity {
         if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             permissionList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         }
+
         if (!permissionList.isEmpty()) {
             String [] permissions = permissionList.toArray(new String[permissionList.size()]);
             ActivityCompat.requestPermissions(MainActivity.this, permissions, 1);
         } else {
-            // 调用LocationClient的start()方法，发起请求
-            requestLocation();
+            initLocation();
+            mLocationClient.start();
+
+
+            // 开始行程记录按钮        // 轨迹
+            startBtn = findViewById(R.id.start_log);
+            OnClickStart onClickStart = new OnClickStart();
+            startBtn.setOnClickListener(onClickStart);
+
         }
 
     }
@@ -164,12 +198,61 @@ public class MainActivity extends BaseActivity {
                     Toast.makeText(MainActivity.this, "当前按钮无效", Toast.LENGTH_SHORT).show();
                 }
             } else {
+                loginImg.setVisibility(View.INVISIBLE);
+                locationInfo.setVisibility(View.VISIBLE);
                 Toast.makeText(MainActivity.this, "开始行程记录", Toast.LENGTH_SHORT).show();
+
+                /**
+                if (isFirstTrace) {
+                    points.clear();
+                    last = new LatLng(0, 0);
+                    return;
+                }
+
+                // 地图标记覆盖物参数配置类
+                MarkerOptions oStop = new MarkerOptions();
+                oStop.position(points.get(points.size() - 1));
+                oStop.icon(stopBD);
+                mBaiduMap.addOverlay(oStop);
+
+                points.clear();
+                last = new LatLng(0, 0);
+                isFirstTrace = true;
+                 */
             }
         }
     }
 
-    // 点击结束记录，停止行程记录（判断是否登录）
+    /**
+    private SensorEventListener listener = new SensorEventListener() {
+
+        float[] accelerometerValues = new float[3];
+        float[] magneticValues = new float[3];
+
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+
+            // 判断当前是加速度传感器还是地磁传感器
+            if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+                accelerometerValues = event.values.clone();
+            } else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+                magneticValues = event.values.clone();
+            }
+            float[] R = new float[9];
+            float[] values = new float[3];
+            SensorManager.getRotationMatrix(R, null, accelerometerValues, magneticValues);
+            SensorManager.getOrientation(R, values);
+            degree = Math.toDegrees(values[0]);
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+        }
+    };
+     */
+
+    // 点击结束记录，结束行程记录（判断是否登录）
     private class OnClickStop implements View.OnClickListener {
 
         @Override
@@ -185,6 +268,8 @@ public class MainActivity extends BaseActivity {
                     Toast.makeText(MainActivity.this, "当前按钮无效", Toast.LENGTH_SHORT).show();
                 }
             } else {
+                loginImg.setVisibility(View.VISIBLE);
+                locationInfo.setVisibility(View.INVISIBLE);
                 Toast.makeText(MainActivity.this, "结束行程记录", Toast.LENGTH_SHORT).show();
             }
         }
@@ -203,18 +288,14 @@ public class MainActivity extends BaseActivity {
                             return;
                         }
                     }
-                    requestLocation();
+                    initLocation();
+                    mLocationClient.start();
                 } else {
                     Toast.makeText(this, "发生未知错误", Toast.LENGTH_SHORT).show();
                     finish();
                 }
                 break;
         }
-    }
-
-    private void requestLocation() {
-        initLocation();
-        mLocationClient.start();
     }
 
     private void initLocation() {
@@ -275,19 +356,6 @@ public class MainActivity extends BaseActivity {
                 return;
             }
 
-            Poi poi = bdLocation.getPoiList().get(0);
-            String poiName = poi.getName();  // 获取poi名称
-            String poiTags = poi.getTags();  // 获取poi类型
-            String poiAddr = poi.getAddr();  // 获取poi地址 获取周边poi信息
-            Log.d(TAG, poiName + "   " + poiTags + "   " + poiAddr);
-
-            PoiRegion poiRegion = bdLocation.getPoiRegion();
-            String poiDerectionDesc = poiRegion.getDerectionDesc();   // 获取poiRegion位置关系
-            String poiRegionName = poiRegion.getName();               // 获取PoiRegion名称
-            String poiRegionTags = poiRegion.getTags();               // 获取PoiRegion类型
-            Log.d(TAG, poiDerectionDesc + "/" + poiRegionName + "/" + poiRegionTags);
-
-
             navigateTo(bdLocation);
 
             StringBuilder currentPosition = new StringBuilder();
@@ -303,7 +371,7 @@ public class MainActivity extends BaseActivity {
             MapStatusUpdate update = MapStatusUpdateFactory.newLatLng(ll);
             mBaiduMap.animateMapStatus(update);
 
-            update = MapStatusUpdateFactory.zoomTo(20f);
+            update = MapStatusUpdateFactory.zoomTo(19.0f);
             mBaiduMap.animateMapStatus(update);
 
             if (mBaiduMap.getLocationData() != null) {
