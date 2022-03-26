@@ -53,6 +53,10 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
+    implementation'com.amap.api:3dmap:latest.integration'
+    implementation'com.amap.api:location:latest.integration'
+    implementation'com.amap.api:search:latest.integration'
+
     // XHttp2
     implementation project(':xhttp2-lib')
 

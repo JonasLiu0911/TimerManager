@@ -8,8 +8,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
-import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 
 import com.xuexiang.xhttp2.XHttp;
@@ -35,6 +33,7 @@ public class CountDownActivity extends BaseActivity {
         }
 
         fullScreenConfig();
+        getSupportActionBar().hide();
         // 去除状态栏，如 电量、Wifi信号等
 //        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 //                WindowManager.LayoutParams.FLAG_FULLSCREEN);

@@ -1,18 +1,14 @@
 package cn.xtu.lhj.timermanager;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.Window;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.xuexiang.xhttp2.XHttp;
@@ -40,6 +36,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         fullScreenConfig();
+        getSupportActionBar().hide();
 
         loginBinding = DataBindingUtil.setContentView(this, R.layout.activity_login);
         setOnClickListener();
@@ -54,10 +51,12 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         loginBinding.btLogin.setOnClickListener(this);
         loginBinding.tvToRegister.setOnClickListener(this);
         loginBinding.tvForgetPassword.setOnClickListener(this);
+        /*
         loginBinding.tvServiceAgreement.setOnClickListener(this);
         loginBinding.ivThirdMethod1.setOnClickListener(this);
         loginBinding.ivThirdMethod2.setOnClickListener(this);
         loginBinding.ivThirdMethod3.setOnClickListener(this);
+         */
     }
 
     //校验账号、密码的合法性
@@ -117,6 +116,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
             case R.id.tv_forget_password:
                 break;
 
+                /*
             // 点击查看用户协议
             case R.id.tv_service_agreement:
                 break;
@@ -132,6 +132,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
             // 跳转第三方方式3
             case R.id.iv_third_method3:
                 break;
+
+                 */
         }
     }
 

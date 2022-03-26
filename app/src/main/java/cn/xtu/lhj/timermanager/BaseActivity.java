@@ -7,6 +7,7 @@ import android.view.Window;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class BaseActivity extends AppCompatActivity {
@@ -22,7 +23,6 @@ public class BaseActivity extends AppCompatActivity {
     protected void fullScreenConfig() {
         // 去除ActionBar
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getSupportActionBar().hide();
     }
 
     // 实现在子线程中显示Toast

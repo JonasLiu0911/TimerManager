@@ -1,103 +1,66 @@
 package cn.xtu.lhj.timermanager;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
-import android.location.Location;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.baidu.location.BDAbstractLocationListener;
 import com.baidu.location.BDLocation;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
-import com.baidu.location.Poi;
-import com.baidu.location.PoiRegion;
 import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
-import com.baidu.mapapi.map.BitmapDescriptor;
-import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
-import com.baidu.mapapi.map.MarkerOptions;
-import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
-import com.baidu.mapapi.map.Polyline;
 import com.baidu.mapapi.model.LatLng;
-import com.baidu.mapapi.utils.poi.BaiduMapPoiSearch;
+
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends BaseActivity {
 
-    // 位置经纬度信息
-    TextView locationInfo;
-
     private final String TAG = "MainActivity";
 
     // 定位对象
     public LocationClient mLocationClient;
-//    public MyLocationListenner myListener = new MyLocationListenner();
-    private MyLocationConfiguration.LocationMode mCurrentMode;
-    BitmapDescriptor mCurrentMarker;
+
+    boolean isFirstLocated = true;                               // 是否首次定位
 
     MapView mMapView;
     BaiduMap mBaiduMap;
 
-//    private SensorManager mSensorManager;
-//    double degree = 0;
-
-    boolean isFirstLocated = true;   // 是否首次定位
-
+    // 相关按钮
     ImageView loginImg;
-    Button startBtn;
-    Button stopBtn;
-
-    /**
-    // 轨迹相关
-    boolean trace = false;
-    boolean isFirstTrace = true;
-
-    // 起点图标
-    BitmapDescriptor startBD;
-    // 终点图标
-    BitmapDescriptor stopBD;
-    // 位置点集合
-    List<LatLng> points = new ArrayList<LatLng>();
-    // 运动轨迹图层
-    Polyline mPolyline;
-    // 上一个定位点
-    LatLng last = new LatLng(0, 0);
-     */
+    ImageView toListPage;
+    Button logBtn;
 
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
 
         SDKInitializer.initialize(getApplicationContext());
 
         fullScreenConfig();
+
         setContentView(R.layout.activity_main);
 
         // 头像按钮
@@ -105,27 +68,20 @@ public class MainActivity extends BaseActivity {
         OnClickHead onClick = new OnClickHead();
         loginImg.setOnClickListener(onClick);
 
+        // 事项列表按钮
+        toListPage = findViewById(R.id.go_to_list);
+        OnClickList onClickList = new OnClickList();
+        toListPage.setOnClickListener(onClickList);
 
-        // 结束行程记录按钮
-        stopBtn = findViewById(R.id.stop_log);
-        OnClickStop onClickStop = new OnClickStop();
-        stopBtn.setOnClickListener(onClickStop);
-
-        // 地理位置信息初始化
-        locationInfo = findViewById(R.id.location_info);
-        locationInfo.setVisibility(View.INVISIBLE);
+        // 行程记录按钮
+        logBtn = findViewById(R.id.log);
+        OnClickLog onClickLog = new OnClickLog();
+        logBtn.setOnClickListener(onClickLog);
 
 
         // 地图初始化
         mMapView = findViewById(R.id.bd_map_view);
         mBaiduMap = mMapView.getMap();
-        mBaiduMap.setMapType(BaiduMap.MAP_TYPE_NORMAL);
-        mBaiduMap.setMyLocationEnabled(true);
-
-        // 定位初始化
-        mLocationClient = new LocationClient(getApplicationContext());
-        // 注册监听函数
-        mLocationClient.registerLocationListener(new MyLocationListener());
 
         // 权限请求
         List<String> permissionList = new ArrayList<String>();
@@ -145,13 +101,6 @@ public class MainActivity extends BaseActivity {
         } else {
             initLocation();
             mLocationClient.start();
-
-
-            // 开始行程记录按钮        // 轨迹
-            startBtn = findViewById(R.id.start_log);
-            OnClickStart onClickStart = new OnClickStart();
-            startBtn.setOnClickListener(onClickStart);
-
         }
 
     }
@@ -182,15 +131,14 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    // 点击开始记录，记录行程（判断是否登录）
-    private class OnClickStart implements View.OnClickListener {
+    // 点击事项列表
+    private class OnClickList implements View.OnClickListener {
 
         @Override
         public void onClick(View v) {
             SharedPreferences sharedPreferences = getSharedPreferences("login_info", MODE_PRIVATE);
 
             if (sharedPreferences.getString("telephone", "") == "") {
-                Toast.makeText(MainActivity.this, "请先登录", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                 if (intent != null) {
                     startActivity(intent);
@@ -198,62 +146,19 @@ public class MainActivity extends BaseActivity {
                     Toast.makeText(MainActivity.this, "当前按钮无效", Toast.LENGTH_SHORT).show();
                 }
             } else {
-                loginImg.setVisibility(View.INVISIBLE);
-                locationInfo.setVisibility(View.VISIBLE);
-                Toast.makeText(MainActivity.this, "开始行程记录", Toast.LENGTH_SHORT).show();
-
-                /**
-                if (isFirstTrace) {
-                    points.clear();
-                    last = new LatLng(0, 0);
-                    return;
+                Intent intent = new Intent(MainActivity.this, ToDoListActivity.class);
+                if (intent != null) {
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(MainActivity.this, "当前按钮无效", Toast.LENGTH_SHORT).show();
                 }
-
-                // 地图标记覆盖物参数配置类
-                MarkerOptions oStop = new MarkerOptions();
-                oStop.position(points.get(points.size() - 1));
-                oStop.icon(stopBD);
-                mBaiduMap.addOverlay(oStop);
-
-                points.clear();
-                last = new LatLng(0, 0);
-                isFirstTrace = true;
-                 */
             }
+
         }
     }
 
-    /**
-    private SensorEventListener listener = new SensorEventListener() {
-
-        float[] accelerometerValues = new float[3];
-        float[] magneticValues = new float[3];
-
-        @Override
-        public void onSensorChanged(SensorEvent event) {
-
-            // 判断当前是加速度传感器还是地磁传感器
-            if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-                accelerometerValues = event.values.clone();
-            } else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
-                magneticValues = event.values.clone();
-            }
-            float[] R = new float[9];
-            float[] values = new float[3];
-            SensorManager.getRotationMatrix(R, null, accelerometerValues, magneticValues);
-            SensorManager.getOrientation(R, values);
-            degree = Math.toDegrees(values[0]);
-        }
-
-        @Override
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-        }
-    };
-     */
-
-    // 点击结束记录，结束行程记录（判断是否登录）
-    private class OnClickStop implements View.OnClickListener {
+    // 新建行程（判断是否登录）
+    private class OnClickLog implements View.OnClickListener {
 
         @Override
         public void onClick(View v) {
@@ -268,9 +173,9 @@ public class MainActivity extends BaseActivity {
                     Toast.makeText(MainActivity.this, "当前按钮无效", Toast.LENGTH_SHORT).show();
                 }
             } else {
-                loginImg.setVisibility(View.VISIBLE);
-                locationInfo.setVisibility(View.INVISIBLE);
-                Toast.makeText(MainActivity.this, "结束行程记录", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "行程记录", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(MainActivity.this, ToDoListActivity.class);
+                startActivity(intent);
             }
         }
     }
@@ -299,6 +204,14 @@ public class MainActivity extends BaseActivity {
     }
 
     private void initLocation() {
+
+        mBaiduMap.setMyLocationEnabled(true);
+
+        // 定位初始化
+        mLocationClient = new LocationClient(getApplicationContext());
+        // 注册监听函数
+        mLocationClient.registerLocationListener(new MyLocationListener());
+
         LocationClientOption option = new LocationClientOption();
 
         // 可选，设置定位模式，默认高精度（Hight_Accuracy）
@@ -313,7 +226,7 @@ public class MainActivity extends BaseActivity {
         // 可选，设置发起定位请求的间隔，int类型，单位ms
         // 若设置为0，则代表单次定位，即仅定位一次，默认为0
         // 若设置非0，需设置1000ms以上才有效
-        option.setScanSpan(1000);
+        option.setScanSpan(2000);
 
         // 可选，设置是否使用gps，默认false
         // 使用高精度和仅用设备两种定位模式的，参数必须设置为true
@@ -339,6 +252,9 @@ public class MainActivity extends BaseActivity {
         // 设置是否需要地址信息
         option.setIsNeedAddress(true);
 
+        // 设置返回结果包含手机方向
+        option.setNeedDeviceDirect(true);
+
         // 设置是否需要位置语义化结果
         option.setIsNeedLocationDescribe(true);
 
@@ -358,10 +274,6 @@ public class MainActivity extends BaseActivity {
 
             navigateTo(bdLocation);
 
-            StringBuilder currentPosition = new StringBuilder();
-            currentPosition.append("经度：").append(bdLocation.getLongitude()).append("\n");
-            currentPosition.append("纬度：").append(bdLocation.getLatitude()).append("\n");
-            locationInfo.setText(currentPosition);
         }
     }
 

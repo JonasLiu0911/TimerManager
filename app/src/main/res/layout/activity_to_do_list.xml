@@ -4,19 +4,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".UserActivity">
+    tools:context=".ToDoListActivity">
 
-    <Button
-        android:id="@+id/bt_logout"
-        android:layout_width="200dp"
+    <TextView
+        android:id="@+id/hello"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="48dp"
-        android:text="退出登录"
-        android:textSize="20sp"
+        android:text="helllo"
+        android:textSize="40sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent">
-    </Button>
+        app:layout_constraintStart_toStartOf="parent"></TextView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

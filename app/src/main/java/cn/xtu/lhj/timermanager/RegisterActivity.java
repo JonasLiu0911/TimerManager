@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.view.Window;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -35,6 +34,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         fullScreenConfig();
+        getSupportActionBar().hide();
 
         registerBinding = DataBindingUtil.setContentView(this, R.layout.activity_register);
 //        setContentView(R.layout.activity_register);

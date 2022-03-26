@@ -101,6 +101,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/et_password" />
 
+
         <View
             android:id="@+id/tv_vertical_line"
             android:layout_width="1dp"
@@ -210,4 +211,5 @@
             app:layout_constraintVertical_bias="1.0" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </layout>
