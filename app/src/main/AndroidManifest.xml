@@ -26,8 +26,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TimerManager">
         <activity
+            android:name=".InfoChangeActivity"
+            android:exported="true" />
+        <activity
             android:name=".CountDownActivity"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/app_welcome_theme">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <action android:name="android.intent.action.MAIN" />

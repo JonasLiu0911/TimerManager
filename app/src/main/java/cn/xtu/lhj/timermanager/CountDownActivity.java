@@ -10,6 +10,7 @@ import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.WindowManager;
 
+import com.google.android.filament.View;
 import com.xuexiang.xhttp2.XHttp;
 import com.xuexiang.xhttp2.callback.SimpleCallBack;
 import com.xuexiang.xhttp2.exception.ApiException;
@@ -33,10 +34,6 @@ public class CountDownActivity extends BaseActivity {
         }
 
         fullScreenConfig();
-        getSupportActionBar().hide();
-        // 去除状态栏，如 电量、Wifi信号等
-//        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-//                WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         // 设置布局
         setContentView(R.layout.activity_count_down);

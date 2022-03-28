@@ -3,6 +3,8 @@ package cn.xtu.lhj.timermanager;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.customview.widget.ViewDragHelper;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.Manifest;
 import android.content.BroadcastReceiver;
@@ -11,10 +13,20 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.Point;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.baidu.location.BDAbstractLocationListener;
@@ -30,6 +42,7 @@ import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
 
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,16 +53,20 @@ public class MainActivity extends BaseActivity {
     // 定位对象
     public LocationClient mLocationClient;
 
-    boolean isFirstLocated = true;                               // 是否首次定位
+    // 是否首次定位
+    boolean isFirstLocated = true;
 
     MapView mMapView;
     BaiduMap mBaiduMap;
 
     // 相关按钮
     ImageView loginImg;
-    ImageView toListPage;
+    ImageView leftListMenu;
     Button logBtn;
 
+    // 侧边栏相关
+    DrawerLayout drawerLayout; // 根布局
+    GridView gridView;
 
 
     @Override
@@ -60,6 +77,7 @@ public class MainActivity extends BaseActivity {
         SDKInitializer.initialize(getApplicationContext());
 
         fullScreenConfig();
+        getSupportActionBar().hide();
 
         setContentView(R.layout.activity_main);
 
@@ -68,13 +86,15 @@ public class MainActivity extends BaseActivity {
         OnClickHead onClick = new OnClickHead();
         loginImg.setOnClickListener(onClick);
 
-        // 事项列表按钮
-        toListPage = findViewById(R.id.go_to_list);
+        gridView = findViewById(R.id.left_grid_view);
+        drawerLayout = findViewById(R.id.drawer_layout);
+        // 事项列表按钮-079
+        leftListMenu = findViewById(R.id.go_to_list);
         OnClickList onClickList = new OnClickList();
-        toListPage.setOnClickListener(onClickList);
+        leftListMenu.setOnClickListener(onClickList);
 
         // 行程记录按钮
-        logBtn = findViewById(R.id.log);
+        logBtn = findViewById(R.id.new_trip);
         OnClickLog onClickLog = new OnClickLog();
         logBtn.setOnClickListener(onClickLog);
 
@@ -146,12 +166,8 @@ public class MainActivity extends BaseActivity {
                     Toast.makeText(MainActivity.this, "当前按钮无效", Toast.LENGTH_SHORT).show();
                 }
             } else {
-                Intent intent = new Intent(MainActivity.this, ToDoListActivity.class);
-                if (intent != null) {
-                    startActivity(intent);
-                } else {
-                    Toast.makeText(MainActivity.this, "当前按钮无效", Toast.LENGTH_SHORT).show();
-                }
+                Toast.makeText(MainActivity.this, "查看事项列表", Toast.LENGTH_SHORT).show();
+                drawerLayout.openDrawer(Gravity.LEFT);
             }
 
         }
@@ -203,6 +219,7 @@ public class MainActivity extends BaseActivity {
         }
     }
 
+    // 定位初始化
     private void initLocation() {
 
         mBaiduMap.setMyLocationEnabled(true);
@@ -263,6 +280,7 @@ public class MainActivity extends BaseActivity {
 
         mLocationClient.setLocOption(option);
     }
+
 
     private class MyLocationListener extends BDAbstractLocationListener {
 

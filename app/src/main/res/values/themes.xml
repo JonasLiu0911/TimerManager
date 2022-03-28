@@ -19,6 +19,15 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <!--欢迎页面theme-->
+    <style name="app_welcome_theme" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowBackground">@drawable/shape_gradient</item>
+        <item name="android:windowTranslucentStatus">false</item>
+        <!-- 设置状态栏颜色为透明色 -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+
+
     <style name="Theme.TimerManager.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Theme.TimerManager.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
