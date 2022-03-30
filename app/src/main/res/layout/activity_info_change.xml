@@ -1,147 +1,225 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/change_info"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <RelativeLayout
-        android:id="@+id/re_avatar"
+        android:id="@+id/re_head_in_change"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:layout_marginTop="20dp"
-        android:background="#F6FBF6">
+        android:layout_height="60dp"
+        android:layout_marginBottom="10dp"
+        android:onClick="onClick"
+        android:focusable="true"
+        android:focusableInTouchMode="false"
+        android:layout_marginTop="10dp"
+        android:background="#F6FBF6"
+        android:paddingBottom="3dp"
+        android:paddingTop="3dp">
 
-        <ImageView
-            android:id="@+id/iv_avatar"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="12dp"
-            android:src="@drawable/default_head" />
         <TextView
+            android:id="@+id/tv_head"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="20dp"
             android:text="头像"
             android:textColor="#353535"
-            android:textSize="16sp" />
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0.1dp"
-            android:layout_alignParentBottom="true"
-            android:layout_marginLeft="12dp"
-            android:layout_marginRight="12dp"
-            android:background="#dadada" />
+            android:textSize="18sp"/>
+
+        <cn.xtu.lhj.timermanager.tools.AvatarImageView
+            android:id="@+id/change_head"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="40dp"
+            android:src="@drawable/default_head" />
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="40dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:src="@drawable/to_right"
+            android:layout_centerVertical="true" />
+
     </RelativeLayout>
 
-    <LinearLayout
-        android:id="@+id/ll_bottom"
+    <RelativeLayout
+        android:id="@+id/re_nickname_in_change"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
-        android:orientation="vertical">
-        <LinearLayout
-            android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginBottom="10dp"
+        android:onClick="onClick"
+        android:focusable="true"
+        android:focusableInTouchMode="false"
+        android:layout_marginTop="5dp"
+        android:background="#F6FBF6"
+        android:paddingBottom="3dp"
+        android:paddingTop="3dp">
+
+        <TextView
+            android:id="@+id/tv_nickname"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-            <TextView
-                android:id="@+id/tv_username"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="修改昵称"/>
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="20dp"
+            android:text="昵称"
+            android:textColor="#353535"
+            android:textSize="18sp"/>
 
-            <EditText
-                android:id="@+id/et_username"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:autofillHints=""
-                android:ems="15"
-                android:inputType="textPersonName"
-                android:singleLine="true"/>
-        </LinearLayout>
-
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/change_et_nickname"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-            <TextView
-                android:id="@+id/tv_age"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="修改年龄" />
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="40dp"
+            android:textColor="#353535"
+            android:textSize="18sp" />
 
-            <EditText
-                android:id="@+id/et_age"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:autofillHints=""
-                android:ems="15"
-                android:inputType="number"
-                android:maxLength="3"
-                android:singleLine="true"/>
-        </LinearLayout>
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="40dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:src="@drawable/to_right"
+            android:layout_centerVertical="true" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/re_gender_in_change"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginBottom="10dp"
+        android:onClick="onClick"
+        android:focusable="true"
+        android:focusableInTouchMode="false"
+        android:layout_marginTop="5dp"
+        android:background="#F6FBF6"
+        android:paddingBottom="3dp"
+        android:paddingTop="3dp">
+
+        <TextView
+            android:id="@+id/tv_gender"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-            <TextView
-                android:id="@+id/tv_change_password"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="修改密码" />
-            <EditText
-                android:id="@+id/et_old_password"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:autofillHints=""
-                android:ems="15"
-                android:hint="请输入原密码"
-                android:inputType="textPassword"
-                android:selectAllOnFocus="true"
-                android:singleLine="true" />
-            <EditText
-                android:id="@+id/et_new_password"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:autofillHints=""
-                android:ems="15"
-                android:hint="请输入新密码"
-                android:inputType="textPassword"
-                android:selectAllOnFocus="true"
-                android:singleLine="true" />
-            <EditText
-                android:id="@+id/et_new_password2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:autofillHints=""
-                android:ems="15"
-                android:hint="请再次输入新密码"
-                android:inputType="textPassword"
-                android:selectAllOnFocus="true"
-                android:singleLine="true"/>
-        </LinearLayout>
-    </LinearLayout>
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="20dp"
+            android:text="性别"
+            android:textColor="#353535"
+            android:textSize="18sp"/>
 
-    <Button
-        android:id="@+id/bt_submit_change"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="48dp"
-        android:text="保存"
-        android:textSize="20sp"
-        android:layout_gravity="center">
-    </Button>
+        <TextView
+            android:id="@+id/change_et_gender"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="40dp"
+            android:textColor="#353535"
+            android:textSize="18sp" />
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="40dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:src="@drawable/to_right"
+            android:layout_centerVertical="true" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/re_age_in_change"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginBottom="10dp"
+        android:onClick="onClick"
+        android:focusable="true"
+        android:focusableInTouchMode="false"
+        android:layout_marginTop="5dp"
+        android:background="#F6FBF6"
+        android:paddingBottom="5dp"
+        android:paddingTop="3dp">
+
+        <TextView
+            android:id="@+id/tv_age"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="20dp"
+            android:text="年龄"
+            android:textColor="#353535"
+            android:textSize="18sp"/>
+
+        <TextView
+            android:id="@+id/change_et_age"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="40dp"
+            android:textColor="#353535"
+            android:textSize="18sp" />
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="40dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:src="@drawable/to_right"
+            android:layout_centerVertical="true" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/re_pwd_in_change"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginBottom="10dp"
+        android:onClick="onClick"
+        android:focusable="true"
+        android:focusableInTouchMode="false"
+        android:layout_marginTop="5dp"
+        android:background="#F6FBF6"
+        android:paddingBottom="5dp"
+        android:paddingTop="3dp">
+
+        <TextView
+            android:id="@+id/tv_pwd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="20dp"
+            android:text="密码"
+            android:textColor="#353535"
+            android:textSize="18sp"/>
+
+        <TextView
+            android:id="@+id/change_et_pwd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="40dp"
+            android:textColor="#353535"
+            android:text="******"
+            android:textSize="18sp" />
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="40dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:src="@drawable/to_right"
+            android:layout_centerVertical="true" />
+
+    </RelativeLayout>
+
 </LinearLayout>

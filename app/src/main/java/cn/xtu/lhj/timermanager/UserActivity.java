@@ -7,11 +7,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import cn.xtu.lhj.timermanager.constant.ModelConstant;
@@ -21,12 +23,17 @@ public class UserActivity extends BaseActivity {
     ActionBar actionBar;
     Button logoutBtn;
     RelativeLayout toChangeInfoPage;
+    TextView nameToFill;
+    TextView telephoneToFill;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         fullScreenConfig();
         setContentView(R.layout.activity_user);
+
+        initPage();
 
         actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -36,7 +43,7 @@ public class UserActivity extends BaseActivity {
         }
 
         // 跳转个人信息修改页
-        toChangeInfoPage = findViewById(R.id.re_change_info);
+        toChangeInfoPage = findViewById(R.id.re_my_info);
         OnClickToChange onClickToChange = new OnClickToChange();
         toChangeInfoPage.setOnClickListener(onClickToChange);
 
@@ -72,6 +79,15 @@ public class UserActivity extends BaseActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
+    public void initPage() {
+        nameToFill = findViewById(R.id.user_name_to_fill);
+        telephoneToFill = findViewById(R.id.user_telephone_to_fill);
+        SharedPreferences sharedPreferences = getSharedPreferences("login_info", MODE_PRIVATE);
+        nameToFill.setText("hahahaha");
+        telephoneToFill.setText(sharedPreferences.getString("telephone", ""));
+        Log.d("telephoneFilled", sharedPreferences.getString("telephone", ""));
+    }
+
 
     // 跳转个人信息修改监听
     private class OnClickToChange implements View.OnClickListener {
@@ -82,6 +98,7 @@ public class UserActivity extends BaseActivity {
             startActivity(intent);
         }
     }
+
     // 退出登录按钮监听
     private class OnClickLogout implements View.OnClickListener {
 

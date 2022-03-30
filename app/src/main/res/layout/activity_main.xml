@@ -25,7 +25,7 @@
             android:layout_height="64dp">
         </ImageView>
 
-        <ImageView
+        <cn.xtu.lhj.timermanager.tools.AvatarImageView
             android:id="@+id/go_to_login"
             android:src="@drawable/user"
             android:layout_alignParentTop="true"
@@ -34,7 +34,7 @@
             android:layout_marginRight="10dp"
             android:layout_width="64dp"
             android:layout_height="64dp">
-        </ImageView>
+        </cn.xtu.lhj.timermanager.tools.AvatarImageView>
 
         <Button
             android:id="@+id/new_trip"

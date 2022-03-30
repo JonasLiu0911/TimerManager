@@ -8,6 +8,8 @@ public class NetConstant {
     private static final String loginURL = "/user/login";
     private static final String registerURL = "/user/register";
 
+    private static final String getUserInfoURL = "/getUser";
+
     public static String getGetOtpCodeURL() {
         return getOtpCodeURL;
     }
@@ -18,5 +20,9 @@ public class NetConstant {
 
     public static String getRegisterURL() {
         return registerURL;
+    }
+
+    public static String getGetUserInfoURL() {
+        return getUserInfoURL;
     }
 }

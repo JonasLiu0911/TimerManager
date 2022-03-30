@@ -15,91 +15,57 @@
         android:clickable="true"
         android:layout_marginTop="10dp"
         android:background="#F6FBF6"
-        android:paddingBottom="8dp"
-        android:paddingTop="8dp">
+        android:paddingBottom="3dp"
+        android:paddingTop="3dp">
 
 
-        <ImageView
+        <cn.xtu.lhj.timermanager.tools.AvatarImageView
             android:id="@+id/iv_avatar"
             android:layout_width="64dp"
             android:layout_height="64dp"
-            android:layout_marginLeft="10dp"
+            android:layout_marginLeft="20dp"
+            android:layout_centerVertical="true"
             android:src="@drawable/default_head" />
 
         <LinearLayout
-            android:id="@+id/ll_name"
-            android:orientation="horizontal"
+            android:id="@+id/ll_name_and_tel"
+            android:orientation="vertical"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="64dp"
             android:layout_marginLeft="20dp"
-            android:layout_marginTop="10dp"
+            android:layout_centerVertical="true"
             android:layout_toRightOf="@id/iv_avatar">
 
-            <TextView
-                android:id="@+id/tv_name"
-                android:layout_width="80dp"
-                android:layout_height="wrap_content"
-                android:text="用户名："
-                android:textColor="#353535"
-                android:textSize="18sp"/>
             <TextView
                 android:id="@+id/user_name_to_fill"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
                 android:textColor="#353535"
                 android:textSize="18sp"/>
 
+            <TextView
+                android:id="@+id/user_telephone_to_fill"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:textColor="#AAAAAA"
+                android:textSize="16sp" />
+
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/tv_telephone"
-            android:layout_width="80dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_marginLeft="20dp"
-            android:layout_marginBottom="10dp"
-            android:layout_toRightOf="@id/iv_avatar"
-            android:text="账号:"
-            android:textColor="#AAAAAA"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/user_telephone_to_fill"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_marginLeft="174dp"
-            android:layout_marginBottom="10dp"
-            android:textColor="#AAAAAA"
-            android:textSize="16sp" />
-
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/re_change_info"
-        android:layout_width="match_parent"
-        android:layout_height="65dp"
-        android:background="#F6FBF6"
-        android:clickable="true"
-        android:paddingLeft="12dp"
-        android:layout_marginBottom="5dp">
         <ImageView
-            android:id="@+id/iv_change_info"
-            android:layout_width="26dp"
-            android:layout_height="26dp"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="12dp"
-            android:src="@drawable/info_change"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="20dp"
-            android:layout_toRightOf="@id/iv_change_info"
-            android:text="信息修改"
-            android:textColor="#353535"
-            android:textSize="16sp" />
+            android:layout_width="20dp"
+            android:layout_height="40dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:src="@drawable/to_right"
+            android:layout_centerVertical="true" />
+
+
     </RelativeLayout>
 
     <RelativeLayout
@@ -198,7 +164,6 @@
         android:layout_marginBottom="48dp"
         android:text="退出登录"
         android:textSize="20sp"
-        android:layout_gravity="center">
-    </Button>
+        android:layout_gravity="center" />
 
 </LinearLayout>

@@ -26,6 +26,21 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TimerManager">
         <activity
+            android:name=".PwdChangeActivity"
+            android:exported="true" />
+        <activity
+            android:name=".AgeChangeActivity"
+            android:exported="true" />
+        <activity
+            android:name=".GenderChangeActivity"
+            android:exported="true" />
+        <activity
+            android:name=".NameChangeActivity"
+            android:exported="true" />
+        <activity
+            android:name=".changeinfo.NameChangeActivity"
+            android:exported="true" />
+        <activity
             android:name=".InfoChangeActivity"
             android:exported="true" />
         <activity

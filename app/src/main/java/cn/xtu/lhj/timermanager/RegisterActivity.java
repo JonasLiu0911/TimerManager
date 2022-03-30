@@ -129,11 +129,12 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                         Log.d(TAG, "请求Url成功：" + data);
                         if (data != null) {
                             String otpCode = data.getOtpCode();
-                            //自动填充验证码
-                            setTextInThread(registerBinding.etOtpCode, otpCode);
+
+                            //自动填充验证码（不要）
+//                            setTextInThread(registerBinding.etOtpCode, otpCode);
 
                             //子线程中显示toast
-                            showToastInThread(RegisterActivity.this, "验证码：" + otpCode);
+                            showToastInThread(RegisterActivity.this, "您的验证码：" + otpCode + "，请查收");
                             Log.d(TAG, "telephone: " + telephone + " otpCode: " + otpCode);
                         }
                         Log.d(TAG, "验证码已发送， 请注意查收");
@@ -147,6 +148,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                 });
     }
 
+    // 用户请求验证码后更新UI，将验证码直接写在页面上
     private void setTextInThread(EditText editText, String otpCode) {
         runOnUiThread(new Runnable() {
             @Override
@@ -155,6 +157,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
             }
         });
     }
+
 
     private void asyncRegisterWithXHttp2(final String telephone, final String otpCode,
                                          final String username, final String gender,

@@ -9,24 +9,33 @@
         <entry key="..\:/ZZZ_Project_COPY/TimerManager/app/src/main/res/drawable/ic_menu_camera.xml" value="0.162" />
         <entry key="..\:/ZZZ_Project_COPY/TimerManager/app/src/main/res/drawable/ic_menu_gallery.xml" value="0.162" />
         <entry key="..\:/ZZZ_Project_COPY/TimerManager/app/src/main/res/drawable/shape_gradient.xml" value="0.162" />
+        <entry key="..\:/ZZZ_Project_COPY/TimerManager/app/src/main/res/drawable/shape_radis_button.xml" value="0.1745" />
         <entry key="..\:/ZZZ_Project_COPY/TimerManager/app/src/main/res/drawable/side_nav_bar.xml" value="0.162" />
         <entry key="..\:/ZZZ_Project_COPY/TimerManager/app/src/main/res/layout/action_bar.xml" value="0.23802083333333332" />
+        <entry key="..\:/ZZZ_Project_COPY/TimerManager/app/src/main/res/layout/activity_age_change.xml" value="0.20104166666666667" />
         <entry key="..\:/ZZZ_Project_COPY/TimerManager/app/src/main/res/layout/activity_count_down.xml" value="0.25364583333333335" />
+        <entry key="..\:/ZZZ_Project_COPY/TimerManager/app/src/main/res/layout/activity_gender_change.xml" value="0.215625" />
         <entry key="..\:/ZZZ_Project_COPY/TimerManager/app/src/main/res/layout/activity_info_change.xml" value="0.264" />
         <entry key="..\:/ZZZ_Project_COPY/TimerManager/app/src/main/res/layout/activity_list.xml" value="0.23802083333333332" />
         <entry key="..\:/ZZZ_Project_COPY/TimerManager/app/src/main/res/layout/activity_login.xml" value="0.25364583333333335" />
         <entry key="..\:/ZZZ_Project_COPY/TimerManager/app/src/main/res/layout/activity_main.xml" value="0.25364583333333335" />
+        <entry key="..\:/ZZZ_Project_COPY/TimerManager/app/src/main/res/layout/activity_name_change.xml" value="0.23802083333333332" />
+        <entry key="..\:/ZZZ_Project_COPY/TimerManager/app/src/main/res/layout/activity_pwd_change.xml" value="0.2640449438202247" />
         <entry key="..\:/ZZZ_Project_COPY/TimerManager/app/src/main/res/layout/activity_register.xml" value="0.23802083333333332" />
         <entry key="..\:/ZZZ_Project_COPY/TimerManager/app/src/main/res/layout/activity_to_do_list.xml" value="0.25364583333333335" />
         <entry key="..\:/ZZZ_Project_COPY/TimerManager/app/src/main/res/layout/activity_trace.xml" value="0.25364583333333335" />
-        <entry key="..\:/ZZZ_Project_COPY/TimerManager/app/src/main/res/layout/activity_user.xml" value="0.264" />
+        <entry key="..\:/ZZZ_Project_COPY/TimerManager/app/src/main/res/layout/activity_user.xml" value="0.4182776801405975" />
+        <entry key="..\:/ZZZ_Project_COPY/TimerManager/app/src/main/res/layout/add_dialog.xml" value="0.2390625" />
         <entry key="..\:/ZZZ_Project_COPY/TimerManager/app/src/main/res/layout/app_bar_list.xml" value="0.23802083333333332" />
         <entry key="..\:/ZZZ_Project_COPY/TimerManager/app/src/main/res/layout/content_list.xml" value="0.23802083333333332" />
         <entry key="..\:/ZZZ_Project_COPY/TimerManager/app/src/main/res/layout/content_list_demo.xml" value="0.23802083333333332" />
-        <entry key="..\:/ZZZ_Project_COPY/TimerManager/app/src/main/res/layout/delete_dialog.xml" value="0.264" />
+        <entry key="..\:/ZZZ_Project_COPY/TimerManager/app/src/main/res/layout/delete_dialog.xml" value="0.2" />
+        <entry key="..\:/ZZZ_Project_COPY/TimerManager/app/src/main/res/layout/dialog_details.xml" value="0.2390625" />
         <entry key="..\:/ZZZ_Project_COPY/TimerManager/app/src/main/res/layout/fragment_gallery.xml" value="0.23802083333333332" />
         <entry key="..\:/ZZZ_Project_COPY/TimerManager/app/src/main/res/layout/fragment_home.xml" value="0.23802083333333332" />
         <entry key="..\:/ZZZ_Project_COPY/TimerManager/app/src/main/res/layout/fragment_slideshow.xml" value="0.23802083333333332" />
+        <entry key="..\:/ZZZ_Project_COPY/TimerManager/app/src/main/res/layout/item_gridview.xml" value="0.42311033883579496" />
+        <entry key="..\:/ZZZ_Project_COPY/TimerManager/app/src/main/res/layout/item_popmenu.xml" value="0.2390625" />
         <entry key="..\:/ZZZ_Project_COPY/TimerManager/app/src/main/res/layout/user_title_menu.xml" value="0.2390625" />
         <entry key="..\:/ZZZ_Project_COPY/TimerManager/app/src/main/res/menu/activity_main_drawer.xml" value="0.23802083333333332" />
         <entry key="..\:/ZZZ_Project_COPY/TimerManager/app/src/main/res/menu/list.xml" value="0.1609375" />

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="0dp"
+
+    android:layout_marginEnd="0dp"
+    android:foreground="?attr/selectableItemBackground"
+
+    app:cardCornerRadius="8dp"
+    app:cardElevation="8dp"
+    app:cardPreventCornerOverlap="true"
+    app:cardUseCompatPadding="false">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="15dp">
+
+        <TextView
+            android:id="@+id/title_addDialog"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="添加日程"
+            android:textAlignment="center"
+            android:textColor="#000000"
+            android:textSize="22sp" />
+
+        <EditText
+            android:id="@+id/edt_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="事项主题"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="5dp" />
+
+        <EditText
+            android:id="@+id/edt_desc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="事项内容"
+            android:layout_marginBottom="5dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/btn_pickTime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/shape_radius_button"
+                android:text="选择日期"
+                android:textSize="16sp"
+                android:layout_marginEnd="3dp"
+                android:layout_marginBottom="5dp"/>
+
+            <Button
+                android:id="@+id/btn_pickAddress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/shape_radius_button"
+                android:text="选择地址"
+                android:textSize="16sp"
+                android:layout_marginEnd="3dp"
+                android:layout_marginBottom="5dp" />
+
+            <Button
+                android:id="@+id/bt_logout"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="48dp"
+                android:text="确定"
+                android:textSize="20sp"
+                android:layout_gravity="center"
+                android:layout_marginTop="5dp"/>
+        </LinearLayout>
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

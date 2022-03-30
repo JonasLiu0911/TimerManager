@@ -88,7 +88,7 @@ public class MainActivity extends BaseActivity {
 
         gridView = findViewById(R.id.left_grid_view);
         drawerLayout = findViewById(R.id.drawer_layout);
-        // 事项列表按钮-079
+        // 事项列表按钮
         leftListMenu = findViewById(R.id.go_to_list);
         OnClickList onClickList = new OnClickList();
         leftListMenu.setOnClickListener(onClickList);
