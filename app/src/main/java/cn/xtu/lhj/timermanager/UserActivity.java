@@ -16,9 +16,17 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.xuexiang.xhttp2.XHttp;
+import com.xuexiang.xhttp2.callback.SimpleCallBack;
+import com.xuexiang.xhttp2.exception.ApiException;
+
+import cn.xtu.lhj.timermanager.bean.UserInfo;
 import cn.xtu.lhj.timermanager.constant.ModelConstant;
+import cn.xtu.lhj.timermanager.constant.NetConstant;
 
 public class UserActivity extends BaseActivity {
+
+    private final String TAG = "UserActivity";
 
     ActionBar actionBar;
     Button logoutBtn;
@@ -83,7 +91,7 @@ public class UserActivity extends BaseActivity {
         nameToFill = findViewById(R.id.user_name_to_fill);
         telephoneToFill = findViewById(R.id.user_telephone_to_fill);
         SharedPreferences sharedPreferences = getSharedPreferences("login_info", MODE_PRIVATE);
-        nameToFill.setText("hahahaha");
+        asyncGetUserInfoWithXHttp2(sharedPreferences.getString("telephone", ""));
         telephoneToFill.setText(sharedPreferences.getString("telephone", ""));
         Log.d("telephoneFilled", sharedPreferences.getString("telephone", ""));
     }
@@ -128,6 +136,36 @@ public class UserActivity extends BaseActivity {
                 }
             });
             builder.create().show();
+
         }
+    }
+
+    // 请求用户信息
+    private void asyncGetUserInfoWithXHttp2(String telephone) {
+        XHttp.post(NetConstant.getGetUserInfoURL())
+                .params("telephone", telephone)
+                .syncRequest(false)
+                .execute(new SimpleCallBack<UserInfo>() {
+                    @Override
+                    public void onSuccess(UserInfo data) throws Throwable {
+                        Log.d(TAG, "请求URL成功：" + data);
+                        if (data != null) {
+                            String name = data.getName();
+                            nameToFill.setText(name);
+                        }
+                    }
+
+                    @Override
+                    public void onError(ApiException e) {
+                        Log.d(TAG, "请求Url异常：" + e.toString());
+                        showToastInThread(UserActivity.this, e.getMessage());
+                    }
+                });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        initPage();
     }
 }

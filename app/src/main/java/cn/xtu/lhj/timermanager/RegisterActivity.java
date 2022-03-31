@@ -191,6 +191,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                         sharedPreferences = getSharedPreferences(ModelConstant.LOGIN_INFO, MODE_PRIVATE);
                         editor = sharedPreferences.edit();
                         editor.putString("telephone", telephone);
+                        editor.putString("name", username);
                         String encryptedPassword = ValidUtils.encodeByMD5(password1);
                         editor.putString("encryptedPassword", encryptedPassword);
 

@@ -72,7 +72,7 @@ public class CountDownActivity extends BaseActivity {
     }
 
     private void initCountDown() {
-        countDownTimer = new CountDownTimer(1000 * 5, 1000) {
+        countDownTimer = new CountDownTimer(1000 * 3, 1000) {
             @SuppressLint("SetTextI18n")
             @Override
             public void onTick(long millisUntilFinished) {

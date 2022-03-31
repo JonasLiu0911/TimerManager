@@ -17,8 +17,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.slider.Slider;
+import com.xuexiang.xhttp2.XHttp;
+import com.xuexiang.xhttp2.callback.SimpleCallBack;
+import com.xuexiang.xhttp2.exception.ApiException;
+
+import java.util.Arrays;
+
+import cn.xtu.lhj.timermanager.bean.UserInfo;
+import cn.xtu.lhj.timermanager.constant.NetConstant;
 
 public class InfoChangeActivity extends BaseActivity {
+
+    private final String TAG = "InfoChangeActivity";
 
     ActionBar actionBar;
     ImageView headToFill;
@@ -64,10 +74,43 @@ public class InfoChangeActivity extends BaseActivity {
         genderToFill = findViewById(R.id.change_et_gender);
         ageToFill = findViewById(R.id.change_et_age);
 
+
         headToFill.setImageResource(R.drawable.background);
-        nickNameToFill.setText("haha");
-        genderToFill.setText("女");
-        ageToFill.setText("24");
+        SharedPreferences sharedPreferences = getSharedPreferences("login_info", MODE_PRIVATE);
+        asyncGetUserInfoWithXHttp2(sharedPreferences.getString("telephone", ""));
+    }
+
+    // 请求用户信息
+    private void asyncGetUserInfoWithXHttp2(String telephone) {
+        XHttp.post(NetConstant.getGetUserInfoURL())
+                .params("telephone", telephone)
+                .syncRequest(false)
+                .execute(new SimpleCallBack<UserInfo>() {
+                    @Override
+                    public void onSuccess(UserInfo data) throws Throwable {
+                        Log.d(TAG, "请求URL成功：" + data);
+                        if (data != null) {
+                            String name = data.getName();
+                            nickNameToFill.setText(name);
+
+                            int gender = data.getGender();
+                            if (gender == 1) {
+                                genderToFill.setText("男");
+                            } else {
+                                genderToFill.setText("女");
+                            }
+
+                            ageToFill.setText(data.getAge().toString());
+
+                        }
+                    }
+
+                    @Override
+                    public void onError(ApiException e) {
+                        Log.d(TAG, "请求Url异常：" + e.toString());
+                        showToastInThread(InfoChangeActivity.this, e.getMessage());
+                    }
+                });
     }
 
     public void onClick(View view) {
@@ -144,5 +187,11 @@ public class InfoChangeActivity extends BaseActivity {
             Intent intent = new Intent(InfoChangeActivity.this, PwdChangeActivity.class);
             startActivity(intent);
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        initPage();
     }
 }
