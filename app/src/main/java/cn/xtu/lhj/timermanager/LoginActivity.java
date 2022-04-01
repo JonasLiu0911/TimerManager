@@ -134,6 +134,11 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         }
     }
 
+    /**
+     * XHttp2请求后端接口 登录
+     * @param telephone
+     * @param password
+     */
     private void asyncLoginWithXHttp2(String telephone, String password) {
         XHttp.post(NetConstant.getLoginURL())
                 .params("telephone", telephone)

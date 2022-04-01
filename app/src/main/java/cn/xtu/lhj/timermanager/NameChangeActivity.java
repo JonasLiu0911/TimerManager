@@ -53,17 +53,7 @@ public class NameChangeActivity extends BaseActivity {
 
     }
 
-    // 菜单点击实现
-    @Override
-    public boolean onOptionsItemSelected(MenuItem menuItem) {
-        switch (menuItem.getItemId()) {
-            case android.R.id.home:
-                this.finish();
-                return true;
-        }
-        return super.onOptionsItemSelected(menuItem);
-    }
-
+    // 按钮监听
     private class OnClickSubmit implements View.OnClickListener {
 
         @Override
@@ -81,7 +71,11 @@ public class NameChangeActivity extends BaseActivity {
         }
     }
 
-    // 修改用户昵称
+    /**
+     * XHttp2请求后端接口 更新用户昵称
+     * @param telephone
+     * @param name
+     */
     private void asyncUpdateNicknameWithXHttp2(final String telephone, final String name) {
 
         if (name == null) {
@@ -115,5 +109,16 @@ public class NameChangeActivity extends BaseActivity {
                         showToastInThread(NameChangeActivity.this, e.getMessage());
                     }
                 });
+    }
+
+    // 菜单点击实现
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+            case android.R.id.home:
+                this.finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(menuItem);
     }
 }

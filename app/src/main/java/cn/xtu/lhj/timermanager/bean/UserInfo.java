@@ -2,6 +2,7 @@ package cn.xtu.lhj.timermanager.bean;
 
 public class UserInfo {
 
+    private Integer id;
     private String name;
     private Byte gender;
     private Integer age;
@@ -15,6 +16,14 @@ public class UserInfo {
         this.gender = gender;
         this.age = age;
         this.name = name;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getName() {

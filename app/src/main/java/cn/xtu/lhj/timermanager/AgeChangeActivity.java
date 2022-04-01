@@ -50,6 +50,7 @@ public class AgeChangeActivity extends BaseActivity {
         submitBtn.setOnClickListener(onClickSubmitAge);
     }
 
+    // 按钮监听
     private class OnClickSubmitAge implements View.OnClickListener {
 
         @Override
@@ -66,6 +67,11 @@ public class AgeChangeActivity extends BaseActivity {
         }
     }
 
+    /**
+     * XHttp2请求后端接口 更新用户年龄
+     * @param telephone
+     * @param age
+     */
     private void asyncUpdateAgeWithXHttp2(final String telephone, final String age) {
         XHttp.post(NetConstant.getUpdateAgeURL())
                 .params("telephone", telephone)

@@ -51,17 +51,7 @@ public class GenderChangeActivity extends BaseActivity {
         submitBtn.setOnClickListener(onClickSubmit);
     }
 
-    // 菜单点击实现
-    @Override
-    public boolean onOptionsItemSelected(MenuItem menuItem) {
-        switch (menuItem.getItemId()) {
-            case android.R.id.home:
-                this.finish();
-                return true;
-        }
-        return super.onOptionsItemSelected(menuItem);
-    }
-
+    // 按钮监听
     private class OnClickSubmit implements View.OnClickListener {
 
         @Override
@@ -79,7 +69,11 @@ public class GenderChangeActivity extends BaseActivity {
         }
     }
 
-    // 修改用户昵称
+    /**
+     * XHttp2请求后端接口 更新用户性别
+     * @param telephone
+     * @param gender
+     */
     private void asyncUpdateGenderWithXHttp2(final String telephone, final String gender) {
 
         if (gender == null) {
@@ -114,5 +108,16 @@ public class GenderChangeActivity extends BaseActivity {
                         showToastInThread(GenderChangeActivity.this, e.getMessage());
                     }
                 });
+    }
+
+    // 菜单点击实现
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+            case android.R.id.home:
+                this.finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(menuItem);
     }
 }

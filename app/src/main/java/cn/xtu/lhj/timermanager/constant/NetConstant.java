@@ -12,6 +12,7 @@ public class NetConstant {
     private static final String updateNicknameURL = "/user/updateUserName";
     private static final String updateGenderURL = "/user/updateUserGender";
     private static final String updateAgeURL = "/user/updateUserAge";
+    private static final String updatePwdURL = "/user/updateUserPwd";
 
     public static String getGetOtpCodeURL() {
         return getOtpCodeURL;
@@ -39,5 +40,9 @@ public class NetConstant {
 
     public static String getUpdateAgeURL() {
         return updateAgeURL;
+    }
+
+    public static String getUpdatePwdURL() {
+        return updatePwdURL;
     }
 }

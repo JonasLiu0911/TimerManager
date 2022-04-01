@@ -30,6 +30,9 @@ public class InfoChangeActivity extends BaseActivity {
 
     private final String TAG = "InfoChangeActivity";
 
+    //SharedPreferences对象
+    SharedPreferences sharedPreferences;
+
     ActionBar actionBar;
     ImageView headToFill;
     TextView nickNameToFill;
@@ -57,17 +60,6 @@ public class InfoChangeActivity extends BaseActivity {
         }
     }
 
-    // 菜单点击实现
-    @Override
-    public boolean onOptionsItemSelected(MenuItem menuItem) {
-        switch (menuItem.getItemId()) {
-            case android.R.id.home:
-                this.finish();
-                return true;
-        }
-        return super.onOptionsItemSelected(menuItem);
-    }
-
     public void initPage() {
         headToFill = findViewById(R.id.change_head);
         nickNameToFill = findViewById(R.id.change_et_nickname);
@@ -75,12 +67,15 @@ public class InfoChangeActivity extends BaseActivity {
         ageToFill = findViewById(R.id.change_et_age);
 
 
-        headToFill.setImageResource(R.drawable.background);
-        SharedPreferences sharedPreferences = getSharedPreferences("login_info", MODE_PRIVATE);
+//        headToFill.setImageResource(R.drawable.background);
+        sharedPreferences = getSharedPreferences("login_info", MODE_PRIVATE);
         asyncGetUserInfoWithXHttp2(sharedPreferences.getString("telephone", ""));
     }
 
-    // 请求用户信息
+    /**
+     * XHttp2请求后端接口 获取用户信息
+     * @param telephone
+     */
     private void asyncGetUserInfoWithXHttp2(String telephone) {
         XHttp.post(NetConstant.getGetUserInfoURL())
                 .params("telephone", telephone)
@@ -187,6 +182,17 @@ public class InfoChangeActivity extends BaseActivity {
             Intent intent = new Intent(InfoChangeActivity.this, PwdChangeActivity.class);
             startActivity(intent);
         }
+    }
+
+    // 菜单点击实现
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+            case android.R.id.home:
+                this.finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(menuItem);
     }
 
     @Override

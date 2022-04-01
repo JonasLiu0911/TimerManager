@@ -159,10 +159,20 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
     }
 
 
+    /**
+     * XHttp2请求后端接口 注册
+     * @param telephone
+     * @param otpCode
+     * @param username
+     * @param gender
+     * @param age
+     * @param password1
+     * @param password2
+     */
     private void asyncRegisterWithXHttp2(final String telephone, final String otpCode,
                                          final String username, final String gender,
                                          final String age, final String password1, final String password2) {
-        //判空校验
+        // 判空校验
         if (TextUtils.isEmpty(telephone) || TextUtils.isEmpty(otpCode)
                 || TextUtils.isEmpty(username) || TextUtils.isEmpty(gender)
                 || TextUtils.isEmpty(age) || TextUtils.isEmpty(password1) || TextUtils.isEmpty(password2)) {
@@ -170,13 +180,13 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
             return;
         }
 
-        //密码一致校验
+        // 密码一致校验
         if (!TextUtils.equals(password1, password2)) {
             Toast.makeText(RegisterActivity.this, "两次密码不一致，请重新输入", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        //通过校验，注册
+        // 通过校验，注册
         XHttp.post(NetConstant.getRegisterURL())
                 .params("telephone", telephone)
                 .params("otpCode", otpCode)
