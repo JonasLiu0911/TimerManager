@@ -49,6 +49,7 @@
     <string name="et_password">请输入密码</string>
     <string name="et_password2">请再次输入密码</string>
     <string name="bt_register">提交注册</string>
-    <string name="start_log">添加日程</string>
+    <string name="start_log">新建日程</string>
+    <string name="check_log">我的列表</string>
 
 </resources>

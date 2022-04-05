@@ -3,30 +3,17 @@ package cn.xtu.lhj.timermanager;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.customview.widget.ViewDragHelper;
-import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.Manifest;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.graphics.Point;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.baidu.location.BDAbstractLocationListener;
@@ -34,39 +21,39 @@ import com.baidu.location.BDLocation;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.SDKInitializer;
-import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
-import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
+import com.xuexiang.xhttp2.XHttp;
+import com.xuexiang.xhttp2.callback.SimpleCallBack;
+import com.xuexiang.xhttp2.exception.ApiException;
 
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+
+import cn.xtu.lhj.timermanager.adapter.GridAdapter;
+import cn.xtu.lhj.timermanager.bean.Schedule;
+import cn.xtu.lhj.timermanager.constant.NetConstant;
+import cn.xtu.lhj.timermanager.tools.AvatarImageView;
 
 public class MainActivity extends BaseActivity {
 
     private final String TAG = "MainActivity";
 
-    // 定位对象
-    public LocationClient mLocationClient;
-
-    // 是否首次定位
-    boolean isFirstLocated = true;
-
-    MapView mMapView;
-    BaiduMap mBaiduMap;
-
     // 相关按钮
-    ImageView loginImg;
-    ImageView leftListMenu;
-    Button logBtn;
+    AvatarImageView loginImg;                 // 头像按钮
+    AvatarImageView scheduleNotCheckImg;      // 事项选项按钮点击前
+    AvatarImageView scheduleCheckedImg;       // 事项选项按钮点击后
+    LinearLayout newTrip;                     // 新建日程
+    LinearLayout checkTrip;                   // 查看列表
+    RelativeLayout rePopScheduleList;         // 事项列表
+    ImageView packUpImg;                      // 收起
 
-    // 侧边栏相关
-    DrawerLayout drawerLayout; // 根布局
-    GridView gridView;
+    private GridView gridView;
+    private GridAdapter gridAdapter;
+    public List<Schedule> results;
 
 
     @Override
@@ -81,23 +68,7 @@ public class MainActivity extends BaseActivity {
 
         setContentView(R.layout.activity_main);
 
-        // 头像按钮
-        loginImg = findViewById(R.id.go_to_login);
-        OnClickHead onClick = new OnClickHead();
-        loginImg.setOnClickListener(onClick);
-
-        gridView = findViewById(R.id.left_grid_view);
-        drawerLayout = findViewById(R.id.drawer_layout);
-        // 事项列表按钮
-        leftListMenu = findViewById(R.id.go_to_list);
-        OnClickList onClickList = new OnClickList();
-        leftListMenu.setOnClickListener(onClickList);
-
-        // 行程记录按钮
-        logBtn = findViewById(R.id.new_trip);
-        OnClickLog onClickLog = new OnClickLog();
-        logBtn.setOnClickListener(onClickLog);
-
+        initPage();
 
         // 地图初始化
         mMapView = findViewById(R.id.bd_map_view);
@@ -125,17 +96,99 @@ public class MainActivity extends BaseActivity {
 
     }
 
+    // 页面控件及其显示 初始化
+    private void initPage() {
+        // 头像按钮
+        loginImg = findViewById(R.id.go_to_login);
+        OnClickHead onClick = new OnClickHead();
+        loginImg.setOnClickListener(onClick);
+
+        scheduleNotCheckImg = findViewById(R.id.ai_schedule_not_check);
+        OnClickNotCheck clickNotCheck = new OnClickNotCheck();
+        scheduleNotCheckImg.setOnClickListener(clickNotCheck);
+
+        scheduleCheckedImg = findViewById(R.id.ai_schedule_checked);
+        OnClickChecked clickChecked = new OnClickChecked();
+        scheduleCheckedImg.setOnClickListener(clickChecked);
+
+        // 事项列表按钮
+        checkTrip = findViewById(R.id.ll_check_trip);
+        checkTrip.getBackground().mutate().setAlpha(220);
+        OnClickList onClickList = new OnClickList();
+        checkTrip.setOnClickListener(onClickList);
+
+        // 行程记录按钮
+        newTrip = findViewById(R.id.ll_new_trip);
+        newTrip.getBackground().mutate().setAlpha(220);
+        OnClickLog onClickLog = new OnClickLog();
+        newTrip.setOnClickListener(onClickLog);
+
+        // 事项列表容器
+        rePopScheduleList = findViewById(R.id.re_pop_after_check);
+
+        packUpImg = findViewById(R.id.pack_up_list);
+        OnClickPackUp clickPackUp = new OnClickPackUp();
+        packUpImg.setOnClickListener(clickPackUp);
+
+        scheduleCheckedImg.setVisibility(View.INVISIBLE);
+        checkTrip.setVisibility(View.INVISIBLE);
+        newTrip.setVisibility(View.INVISIBLE);
+        rePopScheduleList.setVisibility(View.INVISIBLE);
+
+        initScheduleToShow();
+    }
+
+    // ========================================== 按钮相关 begin ==========================================
+    // 点击事项选项展示按钮
+    private class OnClickNotCheck implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            scheduleNotCheckImg.setVisibility(View.INVISIBLE);
+            scheduleCheckedImg.setVisibility(View.VISIBLE);
+            newTrip.setVisibility(View.VISIBLE);
+            checkTrip.setVisibility(View.VISIBLE);
+        }
+    }
+
+    // 点击收起按钮
+    private class OnClickPackUp implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            rePopScheduleList.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    // 点击事项选项隐藏按钮
+    private class OnClickChecked implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            scheduleCheckedImg.setVisibility(View.INVISIBLE);
+            scheduleNotCheckImg.setVisibility(View.VISIBLE);
+            newTrip.setVisibility(View.INVISIBLE);
+            checkTrip.setVisibility(View.INVISIBLE);
+        }
+    }
+
     // 点击头像跳转登录页---------加拦截器
     private class OnClickHead implements View.OnClickListener {
 
         @Override
         public void onClick(View v) {
-            SharedPreferences sharedPreferences = getSharedPreferences("login_info", MODE_PRIVATE);
 
             if (sharedPreferences.getString("telephone", "") == "") {
                 Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                 if (intent != null) {
                     startActivity(intent);
+
+                    scheduleCheckedImg.setVisibility(View.INVISIBLE);
+                    scheduleNotCheckImg.setVisibility(View.VISIBLE);
+                    newTrip.setVisibility(View.INVISIBLE);
+                    checkTrip.setVisibility(View.INVISIBLE);
+
+                    rePopScheduleList.setVisibility(View.INVISIBLE);
                 } else {
                     Toast.makeText(MainActivity.this, "当前按钮无效", Toast.LENGTH_SHORT).show();
                 }
@@ -143,6 +196,13 @@ public class MainActivity extends BaseActivity {
                 Intent intent = new Intent(MainActivity.this, UserActivity.class);
                 if (intent != null) {
                     startActivity(intent);
+
+                    scheduleCheckedImg.setVisibility(View.INVISIBLE);
+                    scheduleNotCheckImg.setVisibility(View.VISIBLE);
+                    newTrip.setVisibility(View.INVISIBLE);
+                    checkTrip.setVisibility(View.INVISIBLE);
+
+                    rePopScheduleList.setVisibility(View.INVISIBLE);
                 } else {
                     Toast.makeText(MainActivity.this, "当前按钮无效", Toast.LENGTH_SHORT).show();
                 }
@@ -156,7 +216,6 @@ public class MainActivity extends BaseActivity {
 
         @Override
         public void onClick(View v) {
-            SharedPreferences sharedPreferences = getSharedPreferences("login_info", MODE_PRIVATE);
 
             if (sharedPreferences.getString("telephone", "") == "") {
                 Intent intent = new Intent(MainActivity.this, LoginActivity.class);
@@ -166,19 +225,17 @@ public class MainActivity extends BaseActivity {
                     Toast.makeText(MainActivity.this, "当前按钮无效", Toast.LENGTH_SHORT).show();
                 }
             } else {
-                Toast.makeText(MainActivity.this, "查看事项列表", Toast.LENGTH_SHORT).show();
-                drawerLayout.openDrawer(Gravity.LEFT);
+                rePopScheduleList.setVisibility(View.VISIBLE);
             }
 
         }
     }
 
-    // 新建行程（判断是否登录）
+    // 新建行程按钮（判断是否登录）
     private class OnClickLog implements View.OnClickListener {
 
         @Override
         public void onClick(View v) {
-            SharedPreferences sharedPreferences = getSharedPreferences("login_info", MODE_PRIVATE);
 
             if (sharedPreferences.getString("telephone", "") == "") {
                 Toast.makeText(MainActivity.this, "请先登录", Toast.LENGTH_SHORT).show();
@@ -195,6 +252,10 @@ public class MainActivity extends BaseActivity {
             }
         }
     }
+    // ========================================== 按钮相关 end ==========================================
+
+
+    // ========================================== 定位相关 begin ==========================================
 
     // 请求权限的结果
     @Override
@@ -219,13 +280,14 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    // 定位初始化
+    // 定位初始化（需通用）
     private void initLocation() {
 
         mBaiduMap.setMyLocationEnabled(true);
 
         // 定位初始化
         mLocationClient = new LocationClient(getApplicationContext());
+
         // 注册监听函数
         mLocationClient.registerLocationListener(new MyLocationListener());
 
@@ -281,7 +343,7 @@ public class MainActivity extends BaseActivity {
         mLocationClient.setLocOption(option);
     }
 
-
+    // 位置监听，定位到当前位置（需通用）
     private class MyLocationListener extends BDAbstractLocationListener {
 
         @Override
@@ -290,36 +352,33 @@ public class MainActivity extends BaseActivity {
                 return;
             }
 
-            navigateTo(bdLocation);
+            if (isFirstLocated) {
+                LatLng ll = new LatLng(bdLocation.getLatitude(), bdLocation.getLongitude());
+                MapStatusUpdate update = MapStatusUpdateFactory.newLatLng(ll);
+                mBaiduMap.animateMapStatus(update);
 
-        }
-    }
+                update = MapStatusUpdateFactory.zoomTo(19.0f);
+                mBaiduMap.animateMapStatus(update);
 
-    private void navigateTo(BDLocation bdLocation) {
-        if (isFirstLocated) {
-            LatLng ll = new LatLng(bdLocation.getLatitude(), bdLocation.getLongitude());
-            MapStatusUpdate update = MapStatusUpdateFactory.newLatLng(ll);
-            mBaiduMap.animateMapStatus(update);
-
-            update = MapStatusUpdateFactory.zoomTo(19.0f);
-            mBaiduMap.animateMapStatus(update);
-
-            if (mBaiduMap.getLocationData() != null) {
-                if (mBaiduMap.getLocationData().latitude == bdLocation.getLatitude()
-                        && mBaiduMap.getLocationData().longitude == bdLocation.getLongitude()) {
-                    isFirstLocated = false;
+                if (mBaiduMap.getLocationData() != null) {
+                    if (mBaiduMap.getLocationData().latitude == bdLocation.getLatitude()
+                            && mBaiduMap.getLocationData().longitude == bdLocation.getLongitude()) {
+                        isFirstLocated = false;
+                    }
                 }
             }
+
+            MyLocationData.Builder locationBuilder = new MyLocationData.Builder();
+            locationBuilder.longitude(bdLocation.getLongitude());
+            locationBuilder.latitude(bdLocation.getLatitude());
+
+            MyLocationData locationData = locationBuilder.build();
+
+            mBaiduMap.setMyLocationData(locationData);
+
         }
-
-        MyLocationData.Builder locationBuilder = new MyLocationData.Builder();
-        locationBuilder.longitude(bdLocation.getLongitude());
-        locationBuilder.latitude(bdLocation.getLatitude());
-
-        MyLocationData locationData = locationBuilder.build();
-
-        mBaiduMap.setMyLocationData(locationData);
     }
+    // ========================================== 定位相关 end ==========================================
 
     @Override
     protected void onDestroy() {
@@ -339,5 +398,66 @@ public class MainActivity extends BaseActivity {
     protected void onPause() {
         super.onPause();
         mMapView.onPause();
+    }
+
+    // ========================================== 事项列表相关 end ==========================================
+
+    private void initScheduleToShow() {
+        sharedPreferences = getSharedPreferences("login_info", MODE_PRIVATE);
+        asyncGetScheduleWithXHttp2(sharedPreferences.getString("telephone", ""));
+    }
+
+    private void asyncGetScheduleWithXHttp2(String telephone) {
+        XHttp.post(NetConstant.getGetScheduleURL())
+                .params("telephone", telephone)
+                .syncRequest(false)
+                .execute(new SimpleCallBack<List<Schedule>>() {
+                    @Override
+                    public void onSuccess(List<Schedule> data) throws Throwable {
+                        Log.d(TAG, "请求URL成功：" + data);
+                        if (data != null) {
+
+                            results = new ArrayList<>(data.size());
+
+                            Log.d(TAG, "data size is " + data.size());
+                            results.addAll(data);
+
+                            for (Schedule i : results) {
+                                Log.d(TAG, "title is " + i.getScheduleTitle());
+                                Log.d(TAG, "info is " + i.getScheduleInfo());
+                                Log.d(TAG, "startTime is " + i.getScheduleStartTime());
+                                Log.d(TAG, "id is " + i.getId());
+                                Log.d(TAG, "userId is " + i.getUserId());
+                                Log.d(TAG, "latitude is " + i.getLatitude());
+                                Log.d(TAG, "longitude is " + i.getLongitude());
+                                Log.d(TAG, "createTime is " + i.getCreateTime());
+                                Log.d(TAG, "updateTime is " + i.getUpdateTime());
+                            }
+
+                            Toast.makeText(MainActivity.this, "haha", Toast.LENGTH_SHORT).show();
+
+                            Log.d(TAG, "results size is " + results.size());
+
+                            if (results == null) {
+                                Log.d(TAG, "null null null");
+                            } else {
+                                Log.d(TAG, "not null not null");
+                            }
+
+                            gridView = findViewById(R.id.grid_view_main);
+
+                            gridAdapter = new GridAdapter(MainActivity.this, results);  // 实例化适配器
+
+                            gridView.setAdapter(gridAdapter);
+                        }
+
+                    }
+
+                    @Override
+                    public void onError(ApiException e) {
+                        Log.d(TAG, "请求Url异常：" + e.toString());
+                        showToastInThread(MainActivity.this, e.getMessage());
+                    }
+                });
     }
 }

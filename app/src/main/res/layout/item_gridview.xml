@@ -12,88 +12,88 @@
         android:layout_marginEnd="0dp"
 
         android:foreground="?attr/selectableItemBackground"
-        app:cardCornerRadius="8dp"
+        app:cardCornerRadius="5dp"
 
-        app:cardElevation="8dp"
+        app:cardElevation="10dp"
         app:cardPreventCornerOverlap="true"
         app:cardUseCompatPadding="true">
 
-        <ImageView
-            android:layout_width="70dp"
-            android:layout_height="70dp" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="200dp">
 
-        <TextView
-            android:id="@+id/tv_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:layout_marginEnd="10dp"
-            android:textColor="#000000"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toEndOf="@id/progress_circular"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="标题" />
+            <TextView
+                android:id="@+id/tv_schedule_title"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
+                android:textColor="#000000"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                tools:text="标题" />
 
-        <TextView
-            android:id="@+id/tv_desc"
-            android:layout_width="85dp"
-            android:layout_height="wrap_content"
-            android:maxHeight="45dp"
-            android:maxLines="3"
-            android:textColor="#000000"
-            android:textSize="12sp"
-            app:layout_constraintStart_toEndOf="@id/progress_circular"
-            app:layout_constraintTop_toBottomOf="@+id/tv_title"
-            tools:text="描述这个计划要做什么.." />
+            <TextView
+                android:id="@+id/tv_schedule_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="45dp"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="10dp"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="10dp"
+                android:maxHeight="45dp"
+                android:maxLines="3"
+                android:textColor="#000000"
+                android:textSize="12sp"
+                tools:text="描述这个计划要做什么.." />
 
-        <TextView
-            android:id="@+id/tv_time_from"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="2dp"
-            android:layout_marginTop="4dp"
-            android:text="FROM:"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:typeface="monospace"
-            app:layout_constraintEnd_toStartOf="@id/tv_startTime"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/progress_circular" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="65dp"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="10dp"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="10dp"
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/tv_schedule_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="开始时间："
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:typeface="monospace" />
 
-        <TextView
-            android:id="@+id/tv_startTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="12sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/tv_time_from"
-            app:layout_constraintBottom_toBottomOf="@id/tv_time_from"
-            tools:text="2019年6月15日 11：:02" />
+                <TextView
+                    android:id="@+id/tv_start_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:textSize="14sp"
+                    tools:text="2019年6月15日 11 : 02" />
+            </LinearLayout>
 
-        <TextView
-            android:id="@+id/tv_ddl"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:layout_marginStart="2dp"
-            android:text="TILL:"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:typeface="monospace"
-            app:layout_constraintEnd_toStartOf="@id/tv_endTime"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_time_from" />
+<!--            <com.baidu.mapapi.map.MapView-->
+<!--                android:id="@+id/mv_schedule_location"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="100dp"-->
+<!--                android:layout_alignParentTop="true"-->
+<!--                android:layout_marginTop="90dp"-->
+<!--                android:layout_alignParentLeft="true"-->
+<!--                android:layout_marginLeft="10dp"-->
+<!--                android:layout_alignParentRight="true"-->
+<!--                android:layout_marginRight="10dp"-->
+<!--                android:clickable="true" />-->
 
-        <TextView
-            android:id="@+id/tv_endTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="12sp"
-            app:layout_constraintBottom_toBottomOf="@+id/tv_ddl"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/tv_ddl"
-            tools:text="2019年6月15日 11：:02" />
+        </RelativeLayout>
 
     </androidx.cardview.widget.CardView>
 

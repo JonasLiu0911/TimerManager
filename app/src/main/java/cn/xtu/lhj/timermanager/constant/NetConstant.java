@@ -14,6 +14,8 @@ public class NetConstant {
     private static final String updateAgeURL = "/user/updateUserAge";
     private static final String updatePwdURL = "/user/updateUserPwd";
 
+    private static final String getScheduleURL = "/schedule/getSchedule";
+
     public static String getGetOtpCodeURL() {
         return getOtpCodeURL;
     }
@@ -44,5 +46,9 @@ public class NetConstant {
 
     public static String getUpdatePwdURL() {
         return updatePwdURL;
+    }
+
+    public static String getGetScheduleURL() {
+        return getScheduleURL;
     }
 }
