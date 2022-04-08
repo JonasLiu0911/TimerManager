@@ -19,41 +19,50 @@
             android:layout_height="80dp">
 
             <LinearLayout
-                android:layout_width="200dp"
-                android:layout_height="80dp"
+                android:layout_width="180dp"
+                android:layout_height="60dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
                 android:orientation="horizontal">
 
                 <RelativeLayout
-                    android:layout_width="80dp"
-                    android:layout_height="80dp">
+                    android:layout_width="60dp"
+                    android:layout_height="60dp">
 
-                    <cn.xtu.lhj.timermanager.tools.AvatarImageView
+                    <ImageView
                         android:id="@+id/ai_schedule_not_check"
-                        android:src="@drawable/schedule_not_check"
-                        android:layout_alignParentLeft="true"
-                        android:layout_marginLeft="10dp"
-                        android:layout_centerVertical="true"
                         android:layout_width="60dp"
-                        android:layout_height="60dp" />
+                        android:layout_height="60dp"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/schedule_not_check" />
 
-                    <cn.xtu.lhj.timermanager.tools.AvatarImageView
+                    <ImageView
                         android:id="@+id/ai_schedule_checked"
-                        android:src="@drawable/schedule_checked"
-                        android:layout_alignParentLeft="true"
-                        android:layout_marginLeft="10dp"
-                        android:layout_centerVertical="true"
                         android:layout_width="60dp"
-                        android:layout_height="60dp" />
+                        android:layout_height="60dp"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/schedule_checked" />
                 </RelativeLayout>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                <ImageView
+                    android:id="@+id/iv_new_trip"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:layout_gravity="center"
-                    android:text="菜单选项"
-                    android:textStyle="bold"
-                    android:textColor="#2DC94E"
-                    android:textSize="20sp"/>
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="5dp"
+                    android:src="@drawable/add" />
+
+                <ImageView
+                    android:id="@+id/iv_check_trip"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="10dp"
+                    android:src="@drawable/list" />
 
             </LinearLayout>
 
@@ -69,58 +78,6 @@
 
         </RelativeLayout>
 
-        <LinearLayout
-            android:id="@+id/ll_new_trip"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="40dp"
-            android:layout_alignParentTop="true"
-            android:layout_marginTop="80dp"
-            android:layout_width="130dp"
-            android:layout_height="40dp"
-            android:background="@drawable/button_background"
-            android:orientation="horizontal">
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="10dp"
-                android:src="@drawable/add" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="@string/start_log"
-                android:textColor="#2DC94E"
-                android:textSize="20sp"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/ll_check_trip"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="40dp"
-            android:layout_alignParentTop="true"
-            android:layout_marginTop="130dp"
-            android:layout_width="130dp"
-            android:layout_height="40dp"
-            android:background="@drawable/button_background"
-            android:orientation="horizontal">
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="10dp"
-                android:src="@drawable/list" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="@string/check_log"
-                android:textColor="#2DC94E"
-                android:textSize="20sp"/>
-        </LinearLayout>
-
     </RelativeLayout>
 
     <!--  事项列表  -->
@@ -130,22 +87,7 @@
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
         android:layout_marginTop="80dp"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="10dp"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="10dp"
         android:background="@drawable/view_background">
-
-        <GridView
-            android:id="@+id/grid_view_main"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="40dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginBottom="20dp"
-            android:numColumns="1"
-            android:verticalSpacing="10dp" />
 
         <ImageView
             android:id="@+id/pack_up_list"
@@ -156,6 +98,16 @@
             android:src="@drawable/pack_up"
             android:textSize="20sp" />
 
+        <GridView
+            android:id="@+id/grid_view_main"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="20dp"
+            android:numColumns="1"
+            android:verticalSpacing="10dp" />
     </RelativeLayout>
 
 

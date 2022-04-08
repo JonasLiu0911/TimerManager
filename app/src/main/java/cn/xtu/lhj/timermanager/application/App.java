@@ -21,6 +21,6 @@ public class App extends Application {
 /**
  * Android Studio Terminal连接MuMu模拟器
  *
- * cd D:\android-sdk_r24.4.1-windows\android-sdk-windows\platform-tools
- * adb connect 127.0.0.1:7555
+ cd D:\android-sdk_r24.4.1-windows\android-sdk-windows\platform-tools
+ adb connect 127.0.0.1:7555
  */

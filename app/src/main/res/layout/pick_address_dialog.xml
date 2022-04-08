@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:foreground="?attr/selectableItemBackground"
+
+    app:cardCornerRadius="30dp"
+    app:cardElevation="8dp"
+    app:cardPreventCornerOverlap="true"
+    app:cardUseCompatPadding="false">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@drawable/dialog_bg"
+        android:padding="15dp">
+
+        <TextView
+            android:id="@+id/title_addDialog"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="请选择地点"
+            android:textAlignment="center"
+            android:textColor="#000000"
+            android:layout_marginBottom="0dp"
+            android:textSize="20sp" />
+
+        <View
+            android:layout_width="320dp"
+            android:layout_height="1px"
+            android:background="#BABABA"
+            android:layout_gravity="center"
+            android:layout_marginBottom="5dp"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="400dp">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="400dp"
+                android:layout_alignParentTop="true"
+                app:cardCornerRadius="20dp">
+
+                <com.baidu.mapapi.map.MapView
+                    android:id="@+id/map_view_in_dialog"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clickable="true" />
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/search_layout"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_alignParentTop="true"
+                android:background="@drawable/edittext_background"
+                app:cardBackgroundColor="#fff"
+                app:cardCornerRadius="0dp">
+                <!--搜索编辑框-->
+                <EditText
+                    android:id="@+id/et_input_poi"
+                    android:layout_width="320dp"
+                    android:layout_height="30dp"
+                    android:layout_marginVertical="5dp"
+                    android:layout_marginLeft="20dp"
+                    android:background="@null"
+                    android:hint="搜索地点"
+                    android:inputType="text"
+                    android:singleLine="true"
+                    android:textColor="@android:color/black"
+                    android:textColorHint="#95A1AA" />
+
+                <!--搜索按钮-->
+                <ImageView
+                    android:id="@+id/iv_to_search"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="right|center_vertical"
+                    android:layout_marginRight="20dp"
+                    android:src="@drawable/search" />
+            </androidx.cardview.widget.CardView>
+
+        </RelativeLayout>
+
+
+        <LinearLayout
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp"
+            android:layout_gravity="center">
+
+            <Button
+                android:id="@+id/btn_cancel_address"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="40dp"
+                android:text="取消"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_gravity="center"
+                android:textSize="14sp"/>
+
+            <Button
+                android:id="@+id/btn_submit_address"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="40dp"
+                android:text="确定"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_gravity="center"
+                android:textSize="14sp"/>
+
+        </LinearLayout>
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

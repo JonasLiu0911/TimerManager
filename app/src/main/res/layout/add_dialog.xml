@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
+    android:layout_width="350dp"
     android:layout_height="wrap_content"
-    android:layout_marginStart="0dp"
-
-    android:layout_marginEnd="0dp"
+    android:layout_gravity="center"
     android:foreground="?attr/selectableItemBackground"
 
-    app:cardCornerRadius="8dp"
+    app:cardCornerRadius="30dp"
     app:cardElevation="8dp"
     app:cardPreventCornerOverlap="true"
     app:cardUseCompatPadding="false">
@@ -17,6 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
+        android:background="@drawable/dialog_bg"
         android:padding="15dp">
 
         <TextView
@@ -26,22 +25,36 @@
             android:text="添加日程"
             android:textAlignment="center"
             android:textColor="#000000"
+            android:layout_marginBottom="5dp"
             android:textSize="24sp" />
 
         <EditText
             android:id="@+id/edt_title"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="30dp"
             android:hint="事项主题"
             android:textSize="20sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="5dp" />
+            android:inputType="text"
+            android:background="@drawable/edittext_background"
+            android:layout_marginBottom="2dp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="#8E8E8E"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="5dp"/>
 
         <EditText
             android:id="@+id/edt_desc"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="72dp"
             android:hint="事项内容"
+            android:minLines="4"
+            android:gravity="top"
+            android:background="@drawable/edittext_background"
+            android:textSize="18sp"
+            android:inputType="text"
             android:layout_marginBottom="5dp" />
 
         <LinearLayout
@@ -49,37 +62,72 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <Button
-                android:id="@+id/btn_pickTime"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@drawable/shape_radius_button"
-                android:text="选择日期"
-                android:textSize="16sp"
-                android:layout_marginEnd="3dp"
-                android:layout_marginBottom="5dp"/>
+                android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/btn_pickAddress"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@drawable/shape_radius_button"
-                android:text="选择地点"
-                android:textSize="16sp"
-                android:layout_marginEnd="3dp"
-                android:layout_marginBottom="5dp" />
+                <Button
+                    android:id="@+id/btn_pick_time"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/view_background"
+                    android:text="选择时间"
+                    android:textColor="#fff"
+                    android:textSize="16sp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginBottom="10dp"/>
 
-            <Button
-                android:id="@+id/btn_submit"
+                <Button
+                    android:id="@+id/btn_pick_address"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/view_background"
+                    android:text="选择地点"
+                    android:textColor="#fff"
+                    android:textSize="16sp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="10dp" />
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="48dp"
-                android:text="确定"
-                android:textSize="20sp"
-                android:layout_gravity="center"
-                android:layout_marginTop="5dp"/>
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp"
+                android:layout_gravity="center">
+
+                <Button
+                    android:id="@+id/btn_cancel"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="40dp"
+                    android:text="取消"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_gravity="center"
+                    android:textSize="14sp"/>
+
+                <Button
+                    android:id="@+id/btn_submit"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="40dp"
+                    android:text="确定"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_gravity="center"
+                    android:textSize="14sp"/>
+
+            </LinearLayout>
+
+
         </LinearLayout>
     </LinearLayout>
 

@@ -2,6 +2,7 @@ package cn.xtu.lhj.timermanager.adapter;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -10,14 +11,30 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 
+import com.baidu.location.BDAbstractLocationListener;
+import com.baidu.location.BDLocation;
+import com.baidu.location.LocationClient;
+import com.baidu.location.LocationClientOption;
+import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.map.MapStatusUpdate;
+import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
+import com.baidu.mapapi.map.MyLocationData;
+import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.search.core.SearchResult;
+import com.baidu.mapapi.search.geocode.GeoCodeResult;
+import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener;
+import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import cn.xtu.lhj.timermanager.MainActivity;
 import cn.xtu.lhj.timermanager.R;
 import cn.xtu.lhj.timermanager.bean.Schedule;
+import cn.xtu.lhj.timermanager.utils.BDMapUtils;
 
 public class GridAdapter extends BaseAdapter {
 
@@ -65,7 +82,7 @@ public class GridAdapter extends BaseAdapter {
             viewHolder.tvScheduleTitle = view.findViewById(R.id.tv_schedule_title);
             viewHolder.tvScheduleInfo = view.findViewById(R.id.tv_schedule_info);
             viewHolder.tvScheduleStartTime = view.findViewById(R.id.tv_start_time);
-//            viewHolder.mvScheduleLocation = view.findViewById(R.id.mv_schedule_location);
+            viewHolder.tvScheduleLocation = view.findViewById(R.id.tv_location);
 
             view.setTag(viewHolder);
         } else {
@@ -74,14 +91,33 @@ public class GridAdapter extends BaseAdapter {
         }
 
         String scheduleTitle = schedule.getScheduleTitle();
-        viewHolder.tvScheduleTitle.setText(cut(scheduleTitle, 5));
+        viewHolder.tvScheduleTitle.setText(cut(scheduleTitle, 8));
 
         String scheduleInfo = schedule.getScheduleInfo();
-        viewHolder.tvScheduleInfo.setText(cut(scheduleInfo, 24));
+        viewHolder.tvScheduleInfo.setText(cut(scheduleInfo, 16));
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         Date scheduleStartTime = schedule.getScheduleStartTime();
         viewHolder.tvScheduleStartTime.setText(dateFormat.format(scheduleStartTime));
+
+        Double scheduleLongitude = (Double) schedule.getLongitude().doubleValue();
+        Double scheduleLatitude = (Double) schedule.getLatitude().doubleValue();
+
+        BDMapUtils.reverseGeoParse(scheduleLongitude, scheduleLatitude, new OnGetGeoCoderResultListener() {
+            @Override
+            public void onGetGeoCodeResult(GeoCodeResult geoCodeResult) {
+            }
+
+            @Override
+            public void onGetReverseGeoCodeResult(ReverseGeoCodeResult reverseGeoCodeResult) {
+                if (reverseGeoCodeResult == null || reverseGeoCodeResult.error != SearchResult.ERRORNO.NO_ERROR) {
+                    viewHolder.tvScheduleLocation.setText("未找到搜索结果");
+                } else {
+                    viewHolder.tvScheduleLocation.setText(cut(reverseGeoCodeResult.getSematicDescription(), 18));
+                }
+            }
+        });
+        Log.d("Longitude Latitude", scheduleLongitude + " " + scheduleLatitude);
 
         return view;
     }
@@ -91,7 +127,7 @@ public class GridAdapter extends BaseAdapter {
         TextView tvScheduleTitle;
         TextView tvScheduleInfo;
         TextView tvScheduleStartTime;
-        MapView mvScheduleLocation;
+        TextView tvScheduleLocation;
     }
 
     // 长度裁剪
@@ -101,7 +137,7 @@ public class GridAdapter extends BaseAdapter {
         if (contentLength < length) {
             return content;
         } else {
-            String result = content.substring(0, length - 1) + "...";
+            String result = content.substring(0, length - 1) + "......";
             return result;
         }
     }
