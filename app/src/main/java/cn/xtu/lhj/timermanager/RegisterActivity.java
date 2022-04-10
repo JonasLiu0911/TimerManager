@@ -169,9 +169,14 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
      * @param password1
      * @param password2
      */
-    private void asyncRegisterWithXHttp2(final String telephone, final String otpCode,
-                                         final String username, final String gender,
-                                         final String age, final String password1, final String password2) {
+    private void asyncRegisterWithXHttp2(
+            final String telephone,
+            final String otpCode,
+            final String username,
+            final String gender,
+            final String age,
+            final String password1,
+            final String password2) {
         // 判空校验
         if (TextUtils.isEmpty(telephone) || TextUtils.isEmpty(otpCode)
                 || TextUtils.isEmpty(username) || TextUtils.isEmpty(gender)

@@ -7,31 +7,25 @@ public class Schedule {
     private Integer id;
     private BigDecimal longitude;
     private BigDecimal latitude;
-    private Integer userId;
+    private String telephone;
     private String scheduleTitle;
     private String scheduleInfo;
-    private Date scheduleStartTime;
-    private Date createTime;
-    private Date updateTime;
+    private Long scheduleStartTime;
 
     public Schedule(Integer id,
                     BigDecimal longitude,
                     BigDecimal latitude,
-                    Integer userId,
+                    String telephone,
                     String scheduleTitle,
                     String scheduleInfo,
-                    Date scheduleStartTime,
-                    Date createTime,
-                    Date updateTime) {
+                    Long scheduleStartTime) {
         this.id = id;
         this.longitude = longitude;
         this.latitude = latitude;
-        this.userId = userId;
+        this.telephone = telephone;
         this.scheduleTitle = scheduleTitle;
         this.scheduleInfo = scheduleInfo;
         this.scheduleStartTime = scheduleStartTime;
-        this.createTime = createTime;
-        this.updateTime = updateTime;
     }
 
     public Schedule() {
@@ -62,12 +56,12 @@ public class Schedule {
         this.latitude = latitude;
     }
 
-    public Integer getUserId() {
-        return userId;
+    public String getTelephone() {
+        return telephone;
     }
 
-    public void setUserId(Integer userId) {
-        this.userId = userId;
+    public void setTelephone(String telephone) {
+        this.telephone = telephone;
     }
 
     public String getScheduleTitle() {
@@ -86,27 +80,11 @@ public class Schedule {
         this.scheduleInfo = scheduleInfo;
     }
 
-    public Date getScheduleStartTime() {
+    public Long getScheduleStartTime() {
         return scheduleStartTime;
     }
 
-    public void setScheduleStartTime(Date scheduleStartTime) {
+    public void setScheduleStartTime(Long scheduleStartTime) {
         this.scheduleStartTime = scheduleStartTime;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
     }
 }

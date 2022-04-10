@@ -40,16 +40,39 @@
             android:layout_height="400dp">
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/cv_search"
+                android:layout_width="match_parent"
+                android:layout_height="358dp"
+                app:cardBackgroundColor="#fff"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="42dp">
+                <ListView
+                    android:id="@+id/dialog_search_poi_listview"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/map_card"
                 android:layout_width="match_parent"
                 android:layout_height="400dp"
                 android:layout_alignParentTop="true"
-                app:cardCornerRadius="20dp">
+                android:layout_marginTop="44dp"
+                app:cardCornerRadius="30dp">
 
                 <com.baidu.mapapi.map.MapView
                     android:id="@+id/map_view_in_dialog"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:clickable="true" />
+
+                <ImageView
+                    android:id="@+id/move_pick_point"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/marker" />
 
             </androidx.cardview.widget.CardView>
 
@@ -64,12 +87,12 @@
                 <!--搜索编辑框-->
                 <EditText
                     android:id="@+id/et_input_poi"
-                    android:layout_width="320dp"
+                    android:layout_width="310dp"
                     android:layout_height="30dp"
                     android:layout_marginVertical="5dp"
-                    android:layout_marginLeft="20dp"
+                    android:layout_marginLeft="15dp"
                     android:background="@null"
-                    android:hint="搜索地点"
+                    android:hint="请输入地址"
                     android:inputType="text"
                     android:singleLine="true"
                     android:textColor="@android:color/black"
@@ -78,11 +101,53 @@
                 <!--搜索按钮-->
                 <ImageView
                     android:id="@+id/iv_to_search"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:layout_gravity="right|center_vertical"
-                    android:layout_marginRight="20dp"
+                    android:layout_marginRight="15dp"
                     android:src="@drawable/search" />
+            </androidx.cardview.widget.CardView>
+
+            <View
+                android:layout_width="320dp"
+                android:layout_height="1px"
+                android:background="#CCCCCC"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="41dp"
+                android:layout_centerHorizontal="true"/>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cv_move"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="42dp"
+                app:cardBackgroundColor="#fff"
+                app:cardCornerRadius="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/move_poi_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="20dp"
+                        android:text="地址名"
+                        android:textColor="#2E2E2E"
+                        android:textSize="20dp" />
+
+                    <TextView
+                        android:id="@+id/move_poi_address"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="20dp"
+                        android:textColor="#717171"
+                        android:text="地址详情"
+                        android:textSize="18dp" />
+                </LinearLayout>
+
             </androidx.cardview.widget.CardView>
 
         </RelativeLayout>

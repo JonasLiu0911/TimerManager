@@ -11,6 +11,9 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
+
+import androidx.cardview.widget.CardView;
 
 import com.baidu.mapapi.map.MapView;
 
@@ -24,6 +27,12 @@ public class PickAddressDialog extends AlertDialog {
     public EditText edtInputAddress;
     public ImageView ivToSearch;
     public MapView mvInDialog;
+    public CardView cvSearch;
+    public CardView cvMove;
+    public CardView cvMap;
+    public TextView moveName;
+    public TextView moveAddress;
+    public ImageView movePickPoint;
 
     public Button submitAddress;
     public Button cancelAddress;
@@ -63,8 +72,17 @@ public class PickAddressDialog extends AlertDialog {
         edtInputAddress = findViewById(R.id.et_input_poi);
         ivToSearch = findViewById(R.id.iv_to_search);
         mvInDialog = findViewById(R.id.map_view_in_dialog);
+        cvSearch = findViewById(R.id.cv_search);
+        cvMove = findViewById(R.id.cv_move);
+        cvMap = findViewById(R.id.map_card);
+        moveName = findViewById(R.id.move_poi_name);
+        moveAddress = findViewById(R.id.move_poi_address);
+
+        movePickPoint = findViewById(R.id.move_pick_point);
         submitAddress = findViewById(R.id.btn_submit_address);
         cancelAddress = findViewById(R.id.btn_cancel_address);
+
+        cvSearch.setVisibility(View.INVISIBLE);
     }
 
     private void initEvent() {

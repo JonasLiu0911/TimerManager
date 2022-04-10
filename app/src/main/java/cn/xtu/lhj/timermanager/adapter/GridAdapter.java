@@ -35,6 +35,7 @@ import cn.xtu.lhj.timermanager.MainActivity;
 import cn.xtu.lhj.timermanager.R;
 import cn.xtu.lhj.timermanager.bean.Schedule;
 import cn.xtu.lhj.timermanager.utils.BDMapUtils;
+import cn.xtu.lhj.timermanager.utils.DateUtils;
 
 public class GridAdapter extends BaseAdapter {
 
@@ -96,9 +97,10 @@ public class GridAdapter extends BaseAdapter {
         String scheduleInfo = schedule.getScheduleInfo();
         viewHolder.tvScheduleInfo.setText(cut(scheduleInfo, 16));
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        Date scheduleStartTime = schedule.getScheduleStartTime();
-        viewHolder.tvScheduleStartTime.setText(dateFormat.format(scheduleStartTime));
+        long scheduleTimeString = schedule.getScheduleStartTime();
+        String scheduleStartTime = DateUtils.getTime2String(scheduleTimeString, "yyyy-MM-dd HH:mm");
+        Log.d("check", schedule.getScheduleStartTime().toString());
+        viewHolder.tvScheduleStartTime.setText(scheduleStartTime);
 
         Double scheduleLongitude = (Double) schedule.getLongitude().doubleValue();
         Double scheduleLatitude = (Double) schedule.getLatitude().doubleValue();

@@ -26,6 +26,7 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -35,11 +36,25 @@ import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.map.BitmapDescriptor;
+import com.baidu.mapapi.map.BitmapDescriptorFactory;
+import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
+import com.baidu.mapapi.map.MarkerOptions;
+import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
+import com.baidu.mapapi.map.OverlayOptions;
+import com.baidu.mapapi.map.Projection;
 import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.model.inner.Point;
+import com.baidu.mapapi.search.core.PoiInfo;
+import com.baidu.mapapi.search.geocode.GeoCodeResult;
+import com.baidu.mapapi.search.geocode.GeoCoder;
+import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener;
+import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption;
+import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
 import com.google.gson.Gson;
 import com.xuexiang.xhttp2.XHttp;
 import com.xuexiang.xhttp2.callback.SimpleCallBack;
@@ -48,6 +63,8 @@ import com.xuexiang.xhttp2.reflect.TypeToken;
 
 
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -61,6 +78,8 @@ import cn.xtu.lhj.timermanager.bean.Schedule;
 import cn.xtu.lhj.timermanager.constant.NetConstant;
 import cn.xtu.lhj.timermanager.thread.UIRefresh;
 import cn.xtu.lhj.timermanager.tools.AvatarImageView;
+import cn.xtu.lhj.timermanager.utils.BDMapUtils;
+import cn.xtu.lhj.timermanager.utils.DateUtils;
 
 public class MainActivity extends BaseActivity {
 
@@ -96,8 +115,25 @@ public class MainActivity extends BaseActivity {
     private PickAddressDialog pickAddressDialog;
     private MapView mapViewInPick;
     private BaiduMap baiduMapInPick;
+    private TextView fitAddressName;
+    private TextView fitAddressDesc;
+    private MyLocationConfiguration.LocationMode mCurrentModeInPick;
     private boolean isFirstLocatedInPick = true;
     private LocationClient locationClientInPick;
+    private Double pointLongitude;
+    private Double pointLatitude;
+    private Gson gsonSaveLocation;
+    private String jsonLocationToSave;
+    private String jsonLocationToGet;
+    private LatLng latLngGet;
+
+    private Gson gsonSaveSchedule;
+    private String jsonSaveSchedule;
+
+
+    private LatLng latLngInPick;
+    private String cityInPick;
+    private GeoCoder geoCoderInPick;
 
 
     @Override
@@ -369,32 +405,90 @@ public class MainActivity extends BaseActivity {
 
     // 地点选择框中的定位初始化 ccc
     private void initLocationInPick() {
+        mapViewInPick = pickAddressDialog.mvInDialog;
+        baiduMapInPick = mapViewInPick.getMap();
 
+        fitAddressName = pickAddressDialog.moveName;
+        fitAddressDesc = pickAddressDialog.moveAddress;
+
+        gsonSaveLocation = new Gson();
+        sharedPreferences = getSharedPreferences("login_info", MODE_PRIVATE);
+
+        // 定义地图状态
+        MapStatus mapStatusInPick = new MapStatus.Builder().zoom(18).build();
+        MapStatusUpdate mapStatusUpdateInPick = MapStatusUpdateFactory.newMapStatus(mapStatusInPick);
+
+        // 改变地图状态
+        baiduMapInPick.setMapStatus(mapStatusUpdateInPick);
+
+        // 地图状态改变相关监听
+        baiduMapInPick.setOnMapStatusChangeListener(new BaiduMap.OnMapStatusChangeListener() {
+            @Override
+            public void onMapStatusChangeStart(MapStatus mapStatus) {
+
+            }
+
+            @Override
+            public void onMapStatusChangeStart(MapStatus mapStatus, int i) {
+
+            }
+
+            @Override
+            public void onMapStatusChange(MapStatus mapStatus) {
+
+            }
+
+            @Override
+            public void onMapStatusChangeFinish(MapStatus mapStatus) {
+                LatLng centerPoint = mapStatus.target;
+                pointLongitude = (Double) centerPoint.longitude;
+                pointLatitude = (Double) centerPoint.latitude;
+                Log.d(TAG, centerPoint.latitude + "/" + centerPoint.longitude);
+                // 把选择好的位置信息存入sharedPreferences中
+                LatLng locationToStock = new LatLng(pointLatitude, pointLongitude);
+                editor = sharedPreferences.edit();
+                jsonLocationToSave = gsonSaveLocation.toJson(locationToStock);
+                editor.putString("location_save", jsonLocationToSave);
+
+                BDMapUtils.reverseGeoParse(pointLongitude, pointLatitude, new OnGetGeoCoderResultListener() {
+                    @Override
+                    public void onGetGeoCodeResult(GeoCodeResult geoCodeResult) {
+
+                    }
+
+                    @Override
+                    public void onGetReverseGeoCodeResult(ReverseGeoCodeResult reverseGeoCodeResult) {
+                        fitAddressName.setText(reverseGeoCodeResult.getAddress());
+                        fitAddressDesc.setText(reverseGeoCodeResult.getSematicDescription());
+                    }
+                });
+            }
+        });
+
+        // 开启定位图层
         baiduMapInPick.setMyLocationEnabled(true);
+        // 定位图层显示方式
+        mCurrentModeInPick = MyLocationConfiguration.LocationMode.NORMAL;
+        // 设置定位图层配置信息
+        baiduMapInPick.setMyLocationConfiguration(new MyLocationConfiguration(mCurrentModeInPick, true, null));
 
-        // 定位初始化
+        // 初始化定位
         locationClientInPick = new LocationClient(getApplicationContext());
-
-        // 注册监听函数
+        // 注册定位监听
         locationClientInPick.registerLocationListener(new MyLocationListenerInPick());
 
-        LocationClientOption option = new LocationClientOption();
+        LocationClientOption optionInPick = new LocationClientOption();
+        optionInPick.setCoorType("BD09LL");
+        optionInPick.setIsNeedAddress(true);
+        optionInPick.setIsNeedLocationDescribe(true);
+        optionInPick.setIsNeedLocationPoiList(true);
 
-        option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
-        option.setCoorType("BD09LL");
-        option.setScanSpan(2000);
-        option.setOpenGps(true);
-        option.setLocationNotify(true);
-        option.setIgnoreKillProcess(false);
-        option.SetIgnoreCacheException(false);
-        option.setWifiCacheTimeOut(5 * 60 * 1000);
-        option.setEnableSimulateGps(false);
-        option.setIsNeedAddress(true);
-        option.setNeedDeviceDirect(true);
-        option.setIsNeedLocationDescribe(true);
-        option.setIsNeedLocationPoiList(true);
+        optionInPick.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
+        optionInPick.setOpenGps(true);
+        optionInPick.setScanSpan(1000);
 
-        locationClientInPick.setLocOption(option);
+        locationClientInPick.setLocOption(optionInPick);
+        locationClientInPick.start();
     }
 
     // 位置监听，定位到当前位置 ccc
@@ -439,33 +533,29 @@ public class MainActivity extends BaseActivity {
 
         @Override
         public void onReceiveLocation(BDLocation bdLocation) {
-            if (bdLocation == null) {
+            if (bdLocation == null || baiduMapInPick == null) {
                 return;
             }
 
+            // 定位数据
+            MyLocationData data = new MyLocationData.Builder()
+                    .accuracy(bdLocation.getRadius())
+                    .direction(bdLocation.getDirection())
+                    .latitude(bdLocation.getLatitude())
+                    .longitude(bdLocation.getLongitude())
+                    .build();
+
+            // 设置定位数据
+            baiduMapInPick.setMyLocationData(data);
+
+            // 是否第一次定位
             if (isFirstLocatedInPick) {
+                isFirstLocatedInPick = false;
                 LatLng ll = new LatLng(bdLocation.getLatitude(), bdLocation.getLongitude());
-                MapStatusUpdate update = MapStatusUpdateFactory.newLatLng(ll);
-                baiduMapInPick.animateMapStatus(update);
-
-                update = MapStatusUpdateFactory.zoomTo(19.0f);
-                baiduMapInPick.animateMapStatus(update);
-
-                if (baiduMapInPick.getLocationData() != null) {
-                    if (baiduMapInPick.getLocationData().latitude == bdLocation.getLatitude()
-                            && baiduMapInPick.getLocationData().longitude == bdLocation.getLongitude()) {
-                        isFirstLocatedInPick = false;
-                    }
-                }
+                MapStatusUpdate msu = MapStatusUpdateFactory.newLatLngZoom(ll, 18);
+                baiduMapInPick.animateMapStatus(msu);
             }
 
-            MyLocationData.Builder locationBuilder = new MyLocationData.Builder();
-            locationBuilder.longitude(bdLocation.getLongitude());
-            locationBuilder.latitude(bdLocation.getLatitude());
-
-            MyLocationData locationData = locationBuilder.build();
-
-            baiduMapInPick.setMyLocationData(locationData);
         }
     }
     // ========================================== 定位相关 end ==========================================
@@ -476,9 +566,14 @@ public class MainActivity extends BaseActivity {
         mMapView.onDestroy();
         mBaiduMap.setMyLocationEnabled(false);    // 关闭定位图层
         mLocationClient.stop();                   // 停止定位服务
+
         mapViewInPick.onDestroy();
         baiduMapInPick.setMyLocationEnabled(false);
         locationClientInPick.stop();
+        if (geoCoderInPick != null) {
+            geoCoderInPick.destroy();
+        }
+        mapViewInPick = null;
     }
 
     @Override
@@ -491,7 +586,6 @@ public class MainActivity extends BaseActivity {
     protected void onPause() {
         super.onPause();
         mMapView.onPause();
-        mapViewInPick.onPause();
     }
 
     // ========================================== 事项列表相关 end ==========================================
@@ -518,11 +612,9 @@ public class MainActivity extends BaseActivity {
                 Log.d(TAG, "info is " + i.getScheduleInfo());
                 Log.d(TAG, "startTime is " + i.getScheduleStartTime());
                 Log.d(TAG, "id is " + i.getId());
-                Log.d(TAG, "userId is " + i.getUserId());
+                Log.d(TAG, "telephone is " + sharedPreferences.getString("telephone", ""));
                 Log.d(TAG, "latitude is " + i.getLatitude());
                 Log.d(TAG, "longitude is " + i.getLongitude());
-                Log.d(TAG, "createTime is " + i.getCreateTime());
-                Log.d(TAG, "updateTime is " + i.getUpdateTime());
             }
         }
 
@@ -568,6 +660,25 @@ public class MainActivity extends BaseActivity {
                 });
     }
 
+    private void asyncAddScheduleWithXHttp2(
+            final String jsonStr) {
+        XHttp.post(NetConstant.getAddScheduleURL())
+                .params("jsonStr", jsonStr)
+                .syncRequest(false)
+                .execute(new SimpleCallBack<Object>() {
+                    @Override
+                    public void onSuccess(Object response) throws Throwable {
+                        Toast.makeText(MainActivity.this, "添加成功", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onError(ApiException e) {
+                        Log.d(TAG, "请求Url异常：" + e.toString());
+                        showToastInThread(MainActivity.this, e.getMessage());
+                    }
+                });
+    }
+
 
 
     // 添加日程按钮（判断是否登录）
@@ -587,7 +698,6 @@ public class MainActivity extends BaseActivity {
                     Toast.makeText(MainActivity.this, "当前按钮无效", Toast.LENGTH_SHORT).show();
                 }
             } else {
-                Toast.makeText(MainActivity.this, "行程记录", Toast.LENGTH_SHORT).show();
 
                 addDialog = new AddDialog(MainActivity.this, R.style.dialog);
                 addDialog.setOnClickListener(new AddDialog.OnClickListener() {
@@ -627,7 +737,11 @@ public class MainActivity extends BaseActivity {
                         pickAddressDialog.setOnClickListener(new PickAddressDialog.OnClickListener() {
                             @Override
                             public void onToSearchClick() {
-                                Toast.makeText(MainActivity.this, "搜索", Toast.LENGTH_SHORT).show();
+                                InputMethodManager imm1 = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                                imm1.hideSoftInputFromWindow(pickAddressDialog.ivToSearch.getWindowToken(), 0);
+                                pickAddressDialog.cvMove.setVisibility(View.INVISIBLE);
+                                pickAddressDialog.cvSearch.setVisibility(View.VISIBLE);
+                                pickAddressDialog.cvMap.setVisibility(View.INVISIBLE);
                             }
 
                             @Override
@@ -637,12 +751,11 @@ public class MainActivity extends BaseActivity {
 
                             @Override
                             public void onSubmitAddressClick() {
-                                Toast.makeText(MainActivity.this, "提交", Toast.LENGTH_SHORT).show();
+                                editor.commit();
                             }
                         }).show();
+                        pickAddressDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);  // 点击EditText 弹出软键盘
 
-                        mapViewInPick = pickAddressDialog.findViewById(R.id.map_view_in_dialog);
-                        baiduMapInPick = mapViewInPick.getMap();
                         initLocationInPick();
                         locationClientInPick.start();
 
@@ -656,21 +769,68 @@ public class MainActivity extends BaseActivity {
                     @Override
                     public void onSubmitClick() {
 
-                        String inputTitle = addDialog.edtTitle.getText().toString();  // 事项标题（要提交）
-                        String inputDesc = addDialog.edtDesc.getText().toString();    // 事项详情（要提交）
+                        // 取出电话号码
+                        String telephone = sharedPreferences.getString("telephone", "");
 
-                        date = new Date();                                             // 事项时间（要提交）
-                        date.setYear(sharedPreferences.getInt("year", 2000));
-                        date.setMonth(sharedPreferences.getInt("month", 8));
-                        date.setDate(sharedPreferences.getInt("day", 28));
-                        date.setHours(sharedPreferences.getInt("hour", 12));
-                        date.setMinutes(sharedPreferences.getInt("minute", 28));
+                        // 事项标题（要提交）
+                        String inputTitle = addDialog.edtTitle.getText().toString();
+                        Log.d(TAG, "标题：" + inputTitle);
+                        // 事项详情（要提交）
+                        String inputDesc = addDialog.edtDesc.getText().toString();
+                        Log.d(TAG, "详情：" + inputDesc);
 
-                        Toast.makeText(MainActivity.this,inputTitle + inputDesc,Toast.LENGTH_SHORT).show();
-                        Toast.makeText(MainActivity.this, date+"", Toast.LENGTH_SHORT).show();
+                        int year = sharedPreferences.getInt("year", 2000);
+                        int month = sharedPreferences.getInt("month", 8);
+                        int day = sharedPreferences.getInt("day", 28);
+                        int hour = sharedPreferences.getInt("hour", 12);
+                        int minute = sharedPreferences.getInt("minute", 28);
+                        int second = 0;
 
-                        Toast.makeText(MainActivity.this,"添加成功",Toast.LENGTH_SHORT).show();
+                        // 事项时间（要提交）
+                        date = new Date();
+                        date.setYear(year);
+                        date.setMonth(month);
+                        date.setDate(day);
+                        date.setHours(hour);
+                        date.setMinutes(minute);
+                        date.setSeconds(second);
+                        Log.d(TAG, date + "------");
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        Long timeString = DateUtils.getString2Time(dateFormat.format(date), "yyyy-MM-dd HH:mm:ss");
+
+                        Log.d(TAG, "时间戳：" + timeString);
+                        Log.d(TAG, "转换后时间：" + DateUtils.getTime2String(timeString, "yyyy-MM-dd HH:mm"));
+
+                        // 从sharedPreferences中取出用户选择的位置
+                        jsonLocationToGet = sharedPreferences.getString("location_save", "");
+                        Type type = new TypeToken<LatLng>() {}.getType();
+                        latLngGet = gson.fromJson(jsonLocationToGet, type);
+                        // 事项经度（要提交）
+                        BigDecimal longitudeToServer = BigDecimal.valueOf(latLngGet.longitude);
+                        // 事项纬度（要提交）
+                        BigDecimal latitudeToServer = BigDecimal.valueOf(latLngGet.latitude);
+
+                        Log.d(TAG, "经度：" + longitudeToServer);
+                        Log.d(TAG, "纬度：" + latitudeToServer);
+
+//                        Toast.makeText(MainActivity.this,inputTitle + inputDesc,Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(MainActivity.this, date+"", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(MainActivity.this, longitudeToServer + "/" + latitudeToServer, Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(MainActivity.this,"添加成功",Toast.LENGTH_SHORT).show();
                         // 网络请求，将新建日程传到后端
+                        Schedule scheduleToServer = new Schedule();
+                        scheduleToServer.setTelephone(telephone);
+                        scheduleToServer.setLongitude(longitudeToServer);
+                        scheduleToServer.setLatitude(latitudeToServer);
+                        scheduleToServer.setScheduleTitle(inputTitle);
+                        scheduleToServer.setScheduleInfo(inputDesc);
+                        scheduleToServer.setScheduleStartTime(timeString);
+                        Log.d(TAG, "-------：" + scheduleToServer.getScheduleStartTime());
+
+                        gsonSaveSchedule = new Gson();
+                        jsonSaveSchedule = gsonSaveSchedule.toJson(scheduleToServer);
+
+                        asyncAddScheduleWithXHttp2(jsonSaveSchedule);
                     }
 
                     @Override
@@ -697,7 +857,7 @@ public class MainActivity extends BaseActivity {
                 calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
                 // 把日期值存入sharedPreferences中
-                editor.putInt("year", year);
+                editor.putInt("year", year - 1900);
                 editor.putInt("month", month);
                 editor.putInt("day", dayOfMonth);
                 editor.commit();
