@@ -8,7 +8,10 @@ import android.view.View;
 
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.baidu.location.BDAbstractLocationListener;
@@ -41,10 +44,15 @@ public class GridAdapter extends BaseAdapter {
 
     private Context context;
     private List<Schedule> scheduleList;
+    private View.OnClickListener onClickListener;
+    private Schedule schedule2Item;
 
-    public GridAdapter(Context context, List<Schedule> scheduleList) {
+    private boolean isShowDelete;
+
+    public GridAdapter(Context context, List<Schedule> scheduleList, View.OnClickListener onClickListener) {
         this.context = context;
         this.scheduleList = scheduleList;
+        this.onClickListener = onClickListener;
     }
 
     // 返回子项个数
@@ -58,7 +66,7 @@ public class GridAdapter extends BaseAdapter {
 
     // 返回子项对应的对象
     @Override
-    public Object getItem(int position) {
+    public Schedule getItem(int position) {
         return scheduleList.get(position);
     }
 
@@ -66,6 +74,15 @@ public class GridAdapter extends BaseAdapter {
     @Override
     public long getItemId(int position) {
         return position;
+    }
+
+    public void setIsShowDelete(boolean isShowDelete) {
+        this.isShowDelete = isShowDelete;
+        notifyDataSetChanged();
+    }
+
+    public boolean getIsShowDelete() {
+        return isShowDelete;
     }
 
     // 返回子项视图
@@ -84,6 +101,8 @@ public class GridAdapter extends BaseAdapter {
             viewHolder.tvScheduleInfo = view.findViewById(R.id.tv_schedule_info);
             viewHolder.tvScheduleStartTime = view.findViewById(R.id.tv_start_time);
             viewHolder.tvScheduleLocation = view.findViewById(R.id.tv_location);
+
+            viewHolder.ivDeleteSchedule = view.findViewById(R.id.iv_delete_item);     // 删除按钮（图片）
 
             view.setTag(viewHolder);
         } else {
@@ -121,6 +140,10 @@ public class GridAdapter extends BaseAdapter {
         });
         Log.d("Longitude Latitude", scheduleLongitude + " " + scheduleLatitude);
 
+        viewHolder.ivDeleteSchedule.setVisibility(isShowDelete ? View.VISIBLE : View.GONE);
+        viewHolder.ivDeleteSchedule.setTag(position);
+        viewHolder.ivDeleteSchedule.setOnClickListener(this.onClickListener);
+
         return view;
     }
 
@@ -130,6 +153,7 @@ public class GridAdapter extends BaseAdapter {
         TextView tvScheduleInfo;
         TextView tvScheduleStartTime;
         TextView tvScheduleLocation;
+        ImageView ivDeleteSchedule;
     }
 
     // 长度裁剪

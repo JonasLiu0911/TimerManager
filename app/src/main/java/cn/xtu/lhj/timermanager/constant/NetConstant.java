@@ -16,6 +16,7 @@ public class NetConstant {
 
     private static final String getScheduleURL = "/schedule/getSchedule";
     private static final String addScheduleURL = "/schedule/addSchedule";
+    private static final String deleteScheduleURL = "/schedule/deleteSchedule";
 
     public static String getGetOtpCodeURL() {
         return getOtpCodeURL;
@@ -55,5 +56,9 @@ public class NetConstant {
 
     public static String getAddScheduleURL() {
         return addScheduleURL;
+    }
+
+    public static String getDeleteScheduleURL() {
+        return deleteScheduleURL;
     }
 }

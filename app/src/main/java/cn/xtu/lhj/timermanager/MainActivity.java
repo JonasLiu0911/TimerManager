@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -96,8 +97,8 @@ public class MainActivity extends BaseActivity {
 
     private GridView gridView;
     private GridAdapter gridAdapter;
-    private List<Schedule> results;
     private List<Schedule> scheduleList;
+    private boolean isShowDelete = false;
 
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
@@ -593,7 +594,6 @@ public class MainActivity extends BaseActivity {
     private void initScheduleToShow() {
 
         gson = new Gson();
-        results = new ArrayList<>();
         sharedPreferences = getSharedPreferences("login_info", MODE_PRIVATE);
         asyncGetScheduleWithXHttp2(sharedPreferences.getString("telephone", ""));
 
@@ -620,6 +620,21 @@ public class MainActivity extends BaseActivity {
 
     }
 
+    // 刷新方法内操作（还有没有更好的！！！）
+    private void fresh() {
+        try {
+            Thread.sleep(500);
+            initScheduleToShow();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * 网络请求，通过手机号获取日程信息
+     * @param telephone
+     */
     public void asyncGetScheduleWithXHttp2(String telephone) {
         XHttp.post(NetConstant.getGetScheduleURL())
                 .params("telephone", telephone)
@@ -643,11 +658,33 @@ public class MainActivity extends BaseActivity {
                                 Log.d(TAG, "save fail......");
                             }
 
-                            results.addAll(data);
-
                             gridView = findViewById(R.id.grid_view_main);
-                            gridAdapter = new GridAdapter(MainActivity.this, results);  // 实例化适配器
+                            gridAdapter = new GridAdapter(MainActivity.this, data, onClickListener);  // 实例化适配器
                             gridView.setAdapter(gridAdapter);
+
+                            gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                @Override
+                                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                    Schedule ll = gridAdapter.getItem(position);
+                                    Toast.makeText(MainActivity.this, ll.getScheduleTitle(), Toast.LENGTH_SHORT).show();
+
+                                }
+                            });
+
+                            gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                                @Override
+                                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+                                    if (gridAdapter.getIsShowDelete()) {
+                                        isShowDelete = false;
+                                    } else {
+                                        isShowDelete = true;
+                                    }
+                                    gridAdapter.setIsShowDelete(isShowDelete);
+
+                                    return true;
+                                }
+                            });
                         }
 
                     }
@@ -660,8 +697,39 @@ public class MainActivity extends BaseActivity {
                 });
     }
 
-    private void asyncAddScheduleWithXHttp2(
-            final String jsonStr) {
+
+    // 子项中删除按钮 添加监听事件
+    private View.OnClickListener onClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            ImageView deleteItem = (ImageView) v;
+            int pos = (Integer) deleteItem.getTag();
+            Schedule scheduleToDelete = gridAdapter.getItem(pos);
+            Log.d(TAG, "id: " + scheduleToDelete.getId());
+            Log.d(TAG, "title: " + scheduleToDelete.getScheduleTitle());
+            Log.d(TAG, "删除键位置: " + pos);
+            asyncDeleteScheduleWithXHttp2(scheduleToDelete.getId());
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            fresh();
+                        }
+                    });
+                }
+            }).start();
+        }
+    };
+
+
+    /**
+     * 添加日程
+     * @param jsonStr
+     */
+    private void asyncAddScheduleWithXHttp2(final String jsonStr) {
         XHttp.post(NetConstant.getAddScheduleURL())
                 .params("jsonStr", jsonStr)
                 .syncRequest(false)
@@ -679,6 +747,28 @@ public class MainActivity extends BaseActivity {
                 });
     }
 
+
+    /**
+     * 网络请求，通过日程id删除日程
+     * @param id
+     */
+    private void asyncDeleteScheduleWithXHttp2(final Integer id) {
+        XHttp.post(NetConstant.getDeleteScheduleURL())
+                .params("scheduleId", id)
+                .syncRequest(false)
+                .execute(new SimpleCallBack<Object>() {
+                    @Override
+                    public void onSuccess(Object response) throws Throwable {
+                        Toast.makeText(MainActivity.this, "删除成功", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onError(ApiException e) {
+                        Log.d(TAG, "请求Url异常：" + e.toString());
+                        showToastInThread(MainActivity.this, e.getMessage());
+                    }
+                });
+    }
 
 
     // 添加日程按钮（判断是否登录）
@@ -831,6 +921,18 @@ public class MainActivity extends BaseActivity {
                         jsonSaveSchedule = gsonSaveSchedule.toJson(scheduleToServer);
 
                         asyncAddScheduleWithXHttp2(jsonSaveSchedule);
+
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        fresh();
+                                    }
+                                });
+                            }
+                        }).start();
                     }
 
                     @Override
