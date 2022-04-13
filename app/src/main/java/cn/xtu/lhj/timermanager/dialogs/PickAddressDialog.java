@@ -1,4 +1,4 @@
-package cn.xtu.lhj.timermanager;
+package cn.xtu.lhj.timermanager.dialogs;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -16,6 +16,8 @@ import android.widget.TextView;
 import androidx.cardview.widget.CardView;
 
 import com.baidu.mapapi.map.MapView;
+
+import cn.xtu.lhj.timermanager.R;
 
 public class PickAddressDialog extends AlertDialog {
 
@@ -38,7 +40,7 @@ public class PickAddressDialog extends AlertDialog {
     public Button cancelAddress;
 
 
-    protected PickAddressDialog(Context context, int themeResId) {
+    public PickAddressDialog(Context context, int themeResId) {
         super(context, themeResId);
     }
 

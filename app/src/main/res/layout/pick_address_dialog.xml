@@ -58,7 +58,7 @@
                 android:layout_height="400dp"
                 android:layout_alignParentTop="true"
                 android:layout_marginTop="44dp"
-                app:cardCornerRadius="30dp">
+                app:cardCornerRadius="20dp">
 
                 <com.baidu.mapapi.map.MapView
                     android:id="@+id/map_view_in_dialog"

@@ -22,7 +22,7 @@
         <RelativeLayout
             android:id="@+id/rl_item_sc"
             android:layout_width="match_parent"
-            android:layout_height="150dp"
+            android:layout_height="160dp"
             android:background="#fff">
 
             <TextView
@@ -64,24 +64,24 @@
                 android:layout_alignParentTop="true"
                 android:layout_alignParentRight="true"
                 android:layout_marginLeft="10dp"
-                android:layout_marginTop="75dp"
+                android:layout_marginTop="80dp"
                 android:layout_marginRight="10dp"
-                android:textSize="20sp"
                 android:textColor="#000000"
+                android:textSize="20sp"
                 tools:text="2022-02-22 22 : 22" />
 
             <TextView
                 android:id="@+id/tv_location"
                 android:layout_width="wrap_content"
-                android:layout_height="30dp"
+                android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentRight="true"
                 android:layout_marginLeft="10dp"
-                android:layout_marginTop="110dp"
+                android:layout_marginTop="115dp"
                 android:layout_marginRight="10dp"
                 android:textColor="#474646"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 tools:text="根据经纬度获取位置详情" />
 
             <ImageView

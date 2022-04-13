@@ -7,23 +7,19 @@ import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -39,6 +35,7 @@ import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
+import com.baidu.mapapi.map.LogoPosition;
 import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
@@ -47,14 +44,10 @@ import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.map.OverlayOptions;
-import com.baidu.mapapi.map.Projection;
 import com.baidu.mapapi.model.LatLng;
-import com.baidu.mapapi.model.inner.Point;
-import com.baidu.mapapi.search.core.PoiInfo;
 import com.baidu.mapapi.search.geocode.GeoCodeResult;
 import com.baidu.mapapi.search.geocode.GeoCoder;
 import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener;
-import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
 import com.google.gson.Gson;
 import com.xuexiang.xhttp2.XHttp;
@@ -65,19 +58,18 @@ import com.xuexiang.xhttp2.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.Timer;
 
 import cn.xtu.lhj.timermanager.adapter.GridAdapter;
 import cn.xtu.lhj.timermanager.bean.Schedule;
 import cn.xtu.lhj.timermanager.constant.NetConstant;
-import cn.xtu.lhj.timermanager.thread.UIRefresh;
+import cn.xtu.lhj.timermanager.dialogs.AddDialog;
+import cn.xtu.lhj.timermanager.dialogs.DetailDialog;
+import cn.xtu.lhj.timermanager.dialogs.PickAddressDialog;
 import cn.xtu.lhj.timermanager.tools.AvatarImageView;
 import cn.xtu.lhj.timermanager.utils.BDMapUtils;
 import cn.xtu.lhj.timermanager.utils.DateUtils;
@@ -131,6 +123,16 @@ public class MainActivity extends BaseActivity {
     private Gson gsonSaveSchedule;
     private String jsonSaveSchedule;
 
+    private Integer detailScheduleId;
+    private Gson gsonUpdateSchedule;
+    private String jsonUpdateSchedule;
+
+    // 日程详情查看相关
+    private DetailDialog detailDialog;
+
+    private MapView mapViewInDetail;
+    private BaiduMap baiduMapInDetail;
+
 
     private LatLng latLngInPick;
     private String cityInPick;
@@ -154,6 +156,8 @@ public class MainActivity extends BaseActivity {
         // 地图初始化
         mMapView = findViewById(R.id.bd_map_view);
         mBaiduMap = mMapView.getMap();
+
+        mMapView.showZoomControls(false);
 
         // 权限请求
         List<String> permissionList = new ArrayList<>();
@@ -334,7 +338,8 @@ public class MainActivity extends BaseActivity {
                     initLocation();
                     mLocationClient.start();
                 } else {
-                    Toast.makeText(this, "发生未知错误", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "发生未知错误");
+//                    Toast.makeText(this, "发生未知错误", Toast.LENGTH_SHORT).show();
                     finish();
                 }
                 break;
@@ -354,51 +359,18 @@ public class MainActivity extends BaseActivity {
 
         LocationClientOption option = new LocationClientOption();
 
-        // 可选，设置定位模式，默认高精度（Hight_Accuracy）
-        // 低功耗（Battery_Saving）；仅使用设备（Device_Sensors）
         option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
-
-        // 可选，设置返回经纬度坐标类型，默认GCJ02
-        // GCJ02：国测局坐标；BD09ll：百度经纬度坐标；BD09：百度墨卡托坐标
-        // 海外地区定位，无需设置坐标类型，统一返回WGS84类型
         option.setCoorType("BD09LL");
-
-        // 可选，设置发起定位请求的间隔，int类型，单位ms
-        // 若设置为0，则代表单次定位，即仅定位一次，默认为0
-        // 若设置非0，需设置1000ms以上才有效
         option.setScanSpan(2000);
-
-        // 可选，设置是否使用gps，默认false
-        // 使用高精度和仅用设备两种定位模式的，参数必须设置为true
         option.setOpenGps(true);
-
-        // 可选，设置是否当GPS有效时按照1S/1次频率输出GPS结果，默认false
         option.setLocationNotify(true);
-
-        // 可选，定位SDK内部是一个service，并放到了独立进程
-        // 设置是否在stop的时候杀死这个进程，默认（建议）不杀死，即setIgnoreKillProcess(true)
         option.setIgnoreKillProcess(false);
-
-        // 可选，设置是否收集Crash信息，默认收集，即参数为false
         option.SetIgnoreCacheException(false);
-
-        // 可选，V7.2版本新增能力
-        // 如果设置了该接口，首次启动定位时，会先判断当前WiFi是否超出有效期，若超出有效期，会先重新扫描WiFi，然后定位
         option.setWifiCacheTimeOut(5 * 60 * 1000);
-
-        // 可选，设置是否需要过滤GPS仿真结果，默认需要，即参数为false
         option.setEnableSimulateGps(false);
-
-        // 设置是否需要地址信息
         option.setIsNeedAddress(true);
-
-        // 设置返回结果包含手机方向
         option.setNeedDeviceDirect(true);
-
-        // 设置是否需要位置语义化结果
         option.setIsNeedLocationDescribe(true);
-
-        // 设置是否需要POI结果
         option.setIsNeedLocationPoiList(true);
 
         mLocationClient.setLocOption(option);
@@ -492,6 +464,35 @@ public class MainActivity extends BaseActivity {
         locationClientInPick.start();
     }
 
+    // 详情框中定位初始化 ccc
+    private void initLocationInDetail(double longitude, double latitude) {
+        mapViewInDetail = detailDialog.detailAddressBaiduMap;
+        baiduMapInDetail = mapViewInDetail.getMap();
+
+        mapViewInDetail.showScaleControl(false);
+        mapViewInDetail.showZoomControls(false);
+        // 设置详情栏中的地图不可操作
+        baiduMapInDetail.getUiSettings().setAllGesturesEnabled(false);
+
+        baiduMapInDetail.setMapType(BaiduMap.MAP_TYPE_NORMAL);
+
+        mapViewInDetail.setLogoPosition(LogoPosition.logoPostionleftBottom);
+
+        LatLng point = new LatLng(latitude, longitude);
+        Log.d(TAG, point.latitude + "/" + point.longitude);
+
+        MapStatus.Builder builder = new MapStatus.Builder();
+        builder.target(point).zoom(19.5f);
+        baiduMapInDetail.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
+
+        detailDialog.detailPoint.setVisibility(View.VISIBLE);
+
+        // 标记点加不上啊！！！呜呜呜
+//        BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.marker_small);
+//        OverlayOptions markerOptions = new MarkerOptions().position(point).icon(bitmapDescriptor);
+//        baiduMapInDetail.addOverlay(markerOptions);
+    }
+
     // 位置监听，定位到当前位置 ccc
     private class MyLocationListener extends BDAbstractLocationListener {
 
@@ -518,11 +519,10 @@ public class MainActivity extends BaseActivity {
                 }
             }
 
-            MyLocationData.Builder locationBuilder = new MyLocationData.Builder();
-            locationBuilder.longitude(bdLocation.getLongitude());
-            locationBuilder.latitude(bdLocation.getLatitude());
-
-            MyLocationData locationData = locationBuilder.build();
+            MyLocationData locationData = new MyLocationData.Builder()
+                    .latitude(bdLocation.getLatitude())
+                    .longitude(bdLocation.getLongitude())
+                    .build();
 
             mBaiduMap.setMyLocationData(locationData);
 
@@ -540,8 +540,6 @@ public class MainActivity extends BaseActivity {
 
             // 定位数据
             MyLocationData data = new MyLocationData.Builder()
-                    .accuracy(bdLocation.getRadius())
-                    .direction(bdLocation.getDirection())
                     .latitude(bdLocation.getLatitude())
                     .longitude(bdLocation.getLongitude())
                     .build();
@@ -623,7 +621,7 @@ public class MainActivity extends BaseActivity {
     // 刷新方法内操作（还有没有更好的！！！）
     private void fresh() {
         try {
-            Thread.sleep(500);
+            Thread.sleep(1000);
             initScheduleToShow();
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -658,6 +656,8 @@ public class MainActivity extends BaseActivity {
                                 Log.d(TAG, "save fail......");
                             }
 
+                            setDateAndTimePickDialog();
+
                             gridView = findViewById(R.id.grid_view_main);
                             gridAdapter = new GridAdapter(MainActivity.this, data, onClickListener);  // 实例化适配器
                             gridView.setAdapter(gridAdapter);
@@ -665,9 +665,150 @@ public class MainActivity extends BaseActivity {
                             gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                                 @Override
                                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                                    Schedule ll = gridAdapter.getItem(position);
-                                    Toast.makeText(MainActivity.this, ll.getScheduleTitle(), Toast.LENGTH_SHORT).show();
 
+                                    Schedule scheduleDetail = gridAdapter.getItem(position);
+                                    detailScheduleId = scheduleDetail.getId();
+
+//                                    Toast.makeText(MainActivity.this, detailScheduleId+"", Toast.LENGTH_SHORT).show();
+//                                    Toast.makeText(MainActivity.this, scheduleDetail.getScheduleTitle(), Toast.LENGTH_SHORT).show();
+
+                                    // 在这里写，弹出日程详情的dialog
+                                    detailDialog = new DetailDialog(MainActivity.this, R.style.dialog);
+
+                                    detailDialog.setOnClickListener(new DetailDialog.OnClickListener() {
+                                        @Override
+                                        public void updateTimeClick() {
+                                            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                                            imm.hideSoftInputFromWindow(detailDialog.detailTimeStr.getWindowToken(), 0);
+                                            // 弹出日期时间选择器（Dialog）
+                                            DatePickerDialog datePickerDialog = new DatePickerDialog(MainActivity.this,
+                                                    AlertDialog.THEME_HOLO_DARK,
+                                                    datePicker, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+                                            datePickerDialog.setTitle("修改日期");
+                                            datePickerDialog.show();
+                                        }
+
+                                        @Override
+                                        public void updateAddressClick() {
+//                                            Toast.makeText(MainActivity.this, "更新地址", Toast.LENGTH_SHORT).show();
+                                            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                                            imm.hideSoftInputFromWindow(detailDialog.detailTimeStr.getWindowToken(), 0);
+
+                                            // 弹出地图＋POI搜索栏（对话框Dialog），用户选择地点
+                                            pickAddressDialog = new PickAddressDialog(MainActivity.this, R.style.dialog_address);
+
+                                            // 地点选择框的点击事件（还未完成）
+                                            pickAddressDialog.setOnClickListener(new PickAddressDialog.OnClickListener() {
+                                                @Override
+                                                public void onToSearchClick() {
+                                                    InputMethodManager imm1 = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                                                    imm1.hideSoftInputFromWindow(pickAddressDialog.ivToSearch.getWindowToken(), 0);
+                                                    pickAddressDialog.cvMove.setVisibility(View.INVISIBLE);
+                                                    pickAddressDialog.cvSearch.setVisibility(View.VISIBLE);
+                                                    pickAddressDialog.cvMap.setVisibility(View.INVISIBLE);
+                                                }
+
+                                                @Override
+                                                public void onCancelAddressClick() {
+//                                                    Toast.makeText(MainActivity.this, "必须选择地点，请重新进入", Toast.LENGTH_SHORT).show();
+                                                }
+
+                                                @Override
+                                                public void onSubmitAddressClick() {
+                                                    editor.commit();
+                                                }
+                                            }).show();
+                                            pickAddressDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);  // 点击EditText 弹出软键盘
+
+                                            initLocationInPick();
+                                            locationClientInPick.start();
+
+                                            isFirstLocatedInPick = true;
+                                        }
+
+                                        @Override
+                                        public void beginUpdateClick() {
+//                                            Toast.makeText(MainActivity.this, "开始更新", Toast.LENGTH_SHORT).show();
+                                            detailDialog.initEvent();
+                                            detailDialog.setCanceledOnTouchOutside(false);
+                                        }
+
+                                        @Override
+                                        public void cancelUpdateClick() {
+//                                            Toast.makeText(MainActivity.this, "取消修改", Toast.LENGTH_SHORT).show();
+                                            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                                            imm.hideSoftInputFromWindow(detailDialog.detailTimeStr.getWindowToken(), 0);
+                                        }
+
+                                        @Override
+                                        public void submitUpdateClick() {
+                                            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                                            imm.hideSoftInputFromWindow(detailDialog.detailTimeStr.getWindowToken(), 0);
+
+                                            // 取出电话号码
+                                            String telephone = sharedPreferences.getString("telephone", "");
+
+                                            // 事项标题（要提交）
+                                            String inputTitle = detailDialog.detailTitle.getText().toString();
+                                            // 事项详情（要提交）
+                                            String inputDesc = detailDialog.detailDesc.getText().toString();
+
+                                            int year = sharedPreferences.getInt("year", 2000);
+                                            int month = sharedPreferences.getInt("month", 8);
+                                            int day = sharedPreferences.getInt("day", 28);
+                                            int hour = sharedPreferences.getInt("hour", 12);
+                                            int minute = sharedPreferences.getInt("minute", 28);
+                                            int second = 0;
+                                            // 事项时间（要提交）
+                                            date = new Date();
+                                            date.setYear(year);
+                                            date.setMonth(month);
+                                            date.setDate(day);
+                                            date.setHours(hour);
+                                            date.setMinutes(minute);
+                                            date.setSeconds(second);
+                                            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                            Long timeString = DateUtils.getString2Time(dateFormat.format(date), "yyyy-MM-dd HH:mm:ss");
+
+                                            // 从sharedPreferences中取出用户选择的位置
+                                            jsonLocationToGet = sharedPreferences.getString("location_save", "");
+                                            Type type = new TypeToken<LatLng>() {}.getType();
+                                            latLngGet = gson.fromJson(jsonLocationToGet, type);
+                                            // 事项经度（要提交）
+                                            BigDecimal longitudeToServer = BigDecimal.valueOf(latLngGet.longitude);
+                                            // 事项纬度（要提交）
+                                            BigDecimal latitudeToServer = BigDecimal.valueOf(latLngGet.latitude);
+
+                                            // 网络请求，将新建日程传到后端
+                                            Schedule scheduleToUpdate = new Schedule();
+                                            scheduleToUpdate.setId(detailScheduleId);
+                                            scheduleToUpdate.setTelephone(telephone);
+                                            scheduleToUpdate.setLongitude(longitudeToServer);
+                                            scheduleToUpdate.setLatitude(latitudeToServer);
+                                            scheduleToUpdate.setScheduleTitle(inputTitle);
+                                            scheduleToUpdate.setScheduleInfo(inputDesc);
+                                            scheduleToUpdate.setScheduleStartTime(timeString);
+                                            Log.d(TAG, "-------：" + scheduleToUpdate.getId());
+                                            Log.d(TAG, "-------：" + scheduleToUpdate.getTelephone());
+                                            Log.d(TAG, "-------：" + scheduleToUpdate.getLongitude());
+                                            Log.d(TAG, "-------：" + scheduleToUpdate.getLatitude());
+                                            Log.d(TAG, "-------：" + scheduleToUpdate.getScheduleTitle());
+                                            Log.d(TAG, "-------：" + scheduleToUpdate.getScheduleInfo());
+                                            Log.d(TAG, "-------：" + scheduleToUpdate.getScheduleStartTime());
+
+                                            gsonSaveSchedule = new Gson();
+                                            jsonSaveSchedule = gsonSaveSchedule.toJson(scheduleToUpdate);
+                                            // 继续写，异步更新
+                                            asyncUpdateScheduleWithXHttp2(jsonSaveSchedule);
+
+                                        }
+                                    }).show();
+                                    detailDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+                                    detailDialog.detailTitle.setText(scheduleDetail.getScheduleTitle());
+                                    detailDialog.detailDesc.setText(scheduleDetail.getScheduleInfo());
+                                    detailDialog.detailTimeStr.setText(DateUtils.getTime2String(scheduleDetail.getScheduleStartTime(), "yyyy-MM-dd HH:mm"));
+                                    Log.d(TAG, scheduleDetail.getLongitude().doubleValue() + " " + scheduleDetail.getLatitude().doubleValue());
+                                    initLocationInDetail(scheduleDetail.getLongitude().doubleValue(), scheduleDetail.getLatitude().doubleValue());
                                 }
                             });
 
@@ -710,23 +851,12 @@ public class MainActivity extends BaseActivity {
             Log.d(TAG, "删除键位置: " + pos);
             asyncDeleteScheduleWithXHttp2(scheduleToDelete.getId());
 
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            fresh();
-                        }
-                    });
-                }
-            }).start();
         }
     };
 
 
     /**
-     * 添加日程
+     * 网络请求，添加日程
      * @param jsonStr
      */
     private void asyncAddScheduleWithXHttp2(final String jsonStr) {
@@ -737,6 +867,48 @@ public class MainActivity extends BaseActivity {
                     @Override
                     public void onSuccess(Object response) throws Throwable {
                         Toast.makeText(MainActivity.this, "添加成功", Toast.LENGTH_SHORT).show();
+
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        fresh();
+                                    }
+                                });
+                            }
+                        }).start();
+                    }
+
+                    @Override
+                    public void onError(ApiException e) {
+                        Log.d(TAG, "请求Url异常：" + e.toString());
+                        showToastInThread(MainActivity.this, e.getMessage());
+                    }
+                });
+    }
+
+    private void asyncUpdateScheduleWithXHttp2(final String jsonStr) {
+        XHttp.post(NetConstant.getUpdateScheduleURL())
+                .params("jsonStr", jsonStr)
+                .syncRequest(false)
+                .execute(new SimpleCallBack<Object>() {
+                    @Override
+                    public void onSuccess(Object response) throws Throwable {
+                        Toast.makeText(MainActivity.this, "修改成功", Toast.LENGTH_SHORT).show();
+
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        fresh();
+                                    }
+                                });
+                            }
+                        }).start();
                     }
 
                     @Override
@@ -760,6 +932,18 @@ public class MainActivity extends BaseActivity {
                     @Override
                     public void onSuccess(Object response) throws Throwable {
                         Toast.makeText(MainActivity.this, "删除成功", Toast.LENGTH_SHORT).show();
+
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        fresh();
+                                    }
+                                });
+                            }
+                        }).start();
                     }
 
                     @Override
@@ -807,6 +991,12 @@ public class MainActivity extends BaseActivity {
                                 AlertDialog.THEME_HOLO_DARK,
                                 datePicker, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
                         datePickerDialog.setTitle("请选择日期");
+                        datePickerDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "取消", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Toast.makeText(MainActivity.this, "必须选择时间，请重新进入", Toast.LENGTH_SHORT).show();
+                            }
+                        });
                         datePickerDialog.show();
                     }
 
@@ -823,7 +1013,7 @@ public class MainActivity extends BaseActivity {
                         // 弹出地图＋POI搜索栏（对话框Dialog），用户选择地点
                         pickAddressDialog = new PickAddressDialog(MainActivity.this, R.style.dialog_address);
 
-                        // 地点选择框的点击事件
+                        // 地点选择框的点击事件（还未完成）
                         pickAddressDialog.setOnClickListener(new PickAddressDialog.OnClickListener() {
                             @Override
                             public void onToSearchClick() {
@@ -836,7 +1026,7 @@ public class MainActivity extends BaseActivity {
 
                             @Override
                             public void onCancelAddressClick() {
-                                Toast.makeText(MainActivity.this, "取消", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(MainActivity.this, "必须选择地点，请重新进入", Toast.LENGTH_SHORT).show();
                             }
 
                             @Override
@@ -903,10 +1093,6 @@ public class MainActivity extends BaseActivity {
                         Log.d(TAG, "经度：" + longitudeToServer);
                         Log.d(TAG, "纬度：" + latitudeToServer);
 
-//                        Toast.makeText(MainActivity.this,inputTitle + inputDesc,Toast.LENGTH_SHORT).show();
-//                        Toast.makeText(MainActivity.this, date+"", Toast.LENGTH_SHORT).show();
-//                        Toast.makeText(MainActivity.this, longitudeToServer + "/" + latitudeToServer, Toast.LENGTH_SHORT).show();
-//                        Toast.makeText(MainActivity.this,"添加成功",Toast.LENGTH_SHORT).show();
                         // 网络请求，将新建日程传到后端
                         Schedule scheduleToServer = new Schedule();
                         scheduleToServer.setTelephone(telephone);
@@ -922,22 +1108,11 @@ public class MainActivity extends BaseActivity {
 
                         asyncAddScheduleWithXHttp2(jsonSaveSchedule);
 
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        fresh();
-                                    }
-                                });
-                            }
-                        }).start();
                     }
 
                     @Override
                     public void onCancelClick() {
-                        Toast.makeText(MainActivity.this,"取消添加",Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(MainActivity.this,"取消添加",Toast.LENGTH_SHORT).show();
                     }
                 }).show();
                 addDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);  // 点击EditText 弹出软键盘
@@ -979,6 +1154,12 @@ public class MainActivity extends BaseActivity {
                             }
                         }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true);
                 timePickerDialog.setTitle("请选择具体时间");
+                timePickerDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(MainActivity.this, "必须选择具体时间，请重新进入", Toast.LENGTH_SHORT).show();
+                    }
+                });
                 timePickerDialog.show();
 
             }

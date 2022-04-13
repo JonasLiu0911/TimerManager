@@ -111,7 +111,7 @@ public class GridAdapter extends BaseAdapter {
         }
 
         String scheduleTitle = schedule.getScheduleTitle();
-        viewHolder.tvScheduleTitle.setText(cut(scheduleTitle, 8));
+        viewHolder.tvScheduleTitle.setText(cut(scheduleTitle, 9));
 
         String scheduleInfo = schedule.getScheduleInfo();
         viewHolder.tvScheduleInfo.setText(cut(scheduleInfo, 16));
@@ -134,7 +134,7 @@ public class GridAdapter extends BaseAdapter {
                 if (reverseGeoCodeResult == null || reverseGeoCodeResult.error != SearchResult.ERRORNO.NO_ERROR) {
                     viewHolder.tvScheduleLocation.setText("未找到搜索结果");
                 } else {
-                    viewHolder.tvScheduleLocation.setText(cut(reverseGeoCodeResult.getSematicDescription(), 18));
+                    viewHolder.tvScheduleLocation.setText(reverseGeoCodeResult.getSematicDescription());
                 }
             }
         });

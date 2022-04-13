@@ -1,22 +1,19 @@
-package cn.xtu.lhj.timermanager;
+package cn.xtu.lhj.timermanager.dialogs;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+
+import cn.xtu.lhj.timermanager.R;
 
 public class AddDialog extends AlertDialog {
 

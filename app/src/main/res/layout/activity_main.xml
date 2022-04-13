@@ -92,7 +92,7 @@
         <ImageView
             android:id="@+id/pack_up_list"
             android:layout_width="match_parent"
-            android:layout_height="30dp"
+            android:layout_height="40dp"
             android:layout_alignParentTop="true"
             android:gravity="center"
             android:src="@drawable/pack_up"
@@ -103,7 +103,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginLeft="10dp"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="50dp"
             android:layout_marginRight="10dp"
             android:layout_marginBottom="20dp"
             android:numColumns="1"
