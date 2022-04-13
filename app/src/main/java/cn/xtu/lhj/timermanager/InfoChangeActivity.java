@@ -82,7 +82,7 @@ public class InfoChangeActivity extends BaseActivity {
                 .syncRequest(false)
                 .execute(new SimpleCallBack<UserInfo>() {
                     @Override
-                    public void onSuccess(UserInfo data) throws Throwable {
+                    public void onSuccess(UserInfo data) {
                         Log.d(TAG, "请求URL成功：" + data);
                         if (data != null) {
                             String name = data.getName();

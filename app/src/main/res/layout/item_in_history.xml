@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:descendantFocusability="blocksDescendants">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="0dp"
+        android:layout_marginEnd="0dp"
+
+        android:foreground="?attr/selectableItemBackground"
+        app:cardCornerRadius="5dp"
+
+        app:cardElevation="10dp"
+        app:cardPreventCornerOverlap="true"
+        app:cardUseCompatPadding="true">
+
+        <RelativeLayout
+            android:id="@+id/rl_item_sc"
+            android:layout_width="match_parent"
+            android:layout_height="160dp"
+            android:background="#fff">
+
+            <TextView
+                android:id="@+id/tv_schedule_title"
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="50dp"
+                android:textColor="#000"
+                android:textSize="25sp"
+                android:textStyle="bold"
+                tools:text="标题" />
+
+            <TextView
+                android:id="@+id/tv_schedule_info"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="50dp"
+                android:layout_marginRight="10dp"
+                android:maxHeight="45dp"
+                android:maxLines="3"
+                android:textColor="#000"
+                android:textSize="16sp"
+                tools:text="描述这个计划要做什么..." />
+
+            <TextView
+                android:id="@+id/tv_start_time"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="80dp"
+                android:layout_marginRight="10dp"
+                android:textColor="#000"
+                android:textSize="20sp"
+                tools:text="2022-02-22 22 : 22" />
+
+            <TextView
+                android:id="@+id/tv_location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="115dp"
+                android:layout_marginRight="10dp"
+                android:textColor="#000"
+                android:textSize="16sp"
+                tools:text="根据经纬度获取位置详情" />
+
+            <ImageView
+                android:id="@+id/iv_delete_item"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="10dp"
+                android:clickable="false"
+                android:focusable="false"
+                android:src="@drawable/delete_history" />
+        </RelativeLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

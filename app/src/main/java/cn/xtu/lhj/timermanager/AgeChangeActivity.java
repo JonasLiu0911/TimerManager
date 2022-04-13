@@ -35,7 +35,6 @@ public class AgeChangeActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_age_change);
         ageChangeBinding = DataBindingUtil.setContentView(this, R.layout.activity_age_change);
 
         actionBar = getSupportActionBar();
@@ -79,7 +78,7 @@ public class AgeChangeActivity extends BaseActivity {
                 .syncRequest(false)
                 .execute(new SimpleCallBack<Object>() {
                     @Override
-                    public void onSuccess(Object response) throws Throwable {
+                    public void onSuccess(Object response) {
                         editor = sharedPreferences.edit();
                         editor.putString("age", age);
 

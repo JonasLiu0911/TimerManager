@@ -47,7 +47,6 @@ public class PwdChangeActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         pwdChangeBinding = DataBindingUtil.setContentView(this, R.layout.activity_pwd_change);
-//        setContentView(R.layout.activity_pwd_change);
 
         actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -80,14 +79,11 @@ public class PwdChangeActivity extends BaseActivity {
 
     private void setOnFocusChangeErrMsg() {
         pwdChangeBinding.etNewPwd.setOnFocusChangeListener(
-                new View.OnFocusChangeListener() {
-                    @Override
-                    public void onFocusChange(View v, boolean hasFocus) {
-                        String inputStr = pwdChangeBinding.etNewPwd.getText().toString();
-                        if (!hasFocus) {
-                            if (!ValidUtils.isPasswordValid(inputStr)) {
-                                pwdChangeBinding.etNewPwd.setError("密码必须不少于6位");
-                            }
+                (v, hasFocus) -> {
+                    String inputStr = pwdChangeBinding.etNewPwd.getText().toString();
+                    if (!hasFocus) {
+                        if (!ValidUtils.isPasswordValid(inputStr)) {
+                            pwdChangeBinding.etNewPwd.setError("密码必须不少于6位");
                         }
                     }
                 }
@@ -117,8 +113,6 @@ public class PwdChangeActivity extends BaseActivity {
             }
             sharedPreferences = getSharedPreferences("login_info", MODE_PRIVATE);
             String encryptedPassword = sharedPreferences.getString("encryptedPassword", "");
-
-//            Toast.makeText(PwdChangeActivity.this, encryptedInputStr + "  " + encryptedPassword, Toast.LENGTH_SHORT).show();
 
             if (encryptedInputStr.equals(encryptedPassword)) {
                 submitBtn1.setVisibility(View.INVISIBLE);

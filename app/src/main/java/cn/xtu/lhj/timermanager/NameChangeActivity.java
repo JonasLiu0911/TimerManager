@@ -37,7 +37,6 @@ public class NameChangeActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-//        setContentView(R.layout.activity_name_change);
         nameChangeBinding = DataBindingUtil.setContentView(this, R.layout.activity_name_change);
 
         actionBar = getSupportActionBar();
@@ -66,7 +65,6 @@ public class NameChangeActivity extends BaseActivity {
                 Toast.makeText(NameChangeActivity.this, "昵称不能为空", Toast.LENGTH_SHORT).show();
             } else {
                     asyncUpdateNicknameWithXHttp2(telephone, name);
-//                Toast.makeText(NameChangeActivity.this, "昵称：" + name + " 手机号：" + telephone, Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -90,7 +88,7 @@ public class NameChangeActivity extends BaseActivity {
                 .execute(new SimpleCallBack<Object>() {
 
                     @Override
-                    public void onSuccess(Object response) throws Throwable {
+                    public void onSuccess(Object response) {
 
                         editor = sharedPreferences.edit();
                         editor.putString("name", name);

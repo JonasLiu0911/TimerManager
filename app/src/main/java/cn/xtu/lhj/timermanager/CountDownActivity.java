@@ -60,7 +60,7 @@ public class CountDownActivity extends BaseActivity {
                 .syncRequest(false)
                 .execute(new SimpleCallBack<Object>() {
                     @Override
-                    public void onSuccess(Object data) throws Throwable {
+                    public void onSuccess(Object data) {
                         Log.d(TAG, "请求Url成功，自动登录成功");
                     }
 

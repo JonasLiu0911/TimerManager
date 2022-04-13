@@ -60,25 +60,22 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     //校验账号、密码的合法性
     private void setOnFocusChangeErrMsg(EditText editText, String inputType, String errMsg) {
         editText.setOnFocusChangeListener(
-                new View.OnFocusChangeListener() {
-                    @Override
-                    public void onFocusChange(View view, boolean hasFocus) {
-                        String inputStr = editText.getText().toString();
-                        if (!hasFocus) {
-                            switch (inputType) {
-                                case "phone":
-                                    if (!ValidUtils.isPhoneValid(inputStr)) {
-                                        editText.setError(errMsg);
-                                    }
-                                    break;
-                                case "password":
-                                    if (!ValidUtils.isPasswordValid(inputStr)) {
-                                        editText.setError(errMsg);
-                                    }
-                                    break;
-                                default:
-                                    break;
-                            }
+                (view, hasFocus) -> {
+                    String inputStr = editText.getText().toString();
+                    if (!hasFocus) {
+                        switch (inputType) {
+                            case "phone":
+                                if (!ValidUtils.isPhoneValid(inputStr)) {
+                                    editText.setError(errMsg);
+                                }
+                                break;
+                            case "password":
+                                if (!ValidUtils.isPasswordValid(inputStr)) {
+                                    editText.setError(errMsg);
+                                }
+                                break;
+                            default:
+                                break;
                         }
                     }
                 }

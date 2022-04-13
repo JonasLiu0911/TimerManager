@@ -37,7 +37,6 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
         getSupportActionBar().hide();
 
         registerBinding = DataBindingUtil.setContentView(this, R.layout.activity_register);
-//        setContentView(R.layout.activity_register);
 
         Intent intent = getIntent();
         account = intent.getStringExtra("account");
@@ -58,33 +57,30 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
 
     private void setOnFocusChangeErrMsg(EditText editText, String inputType, String errMsg) {
         editText.setOnFocusChangeListener(
-                new View.OnFocusChangeListener() {
-                    @Override
-                    public void onFocusChange(View v, boolean hasFocus) {
-                        String inputStr = editText.getText().toString();
-                        if (!hasFocus) {
-                            switch (inputType) {
-                                case "phone":
-                                    if (!ValidUtils.isPhoneValid(inputStr)) {
-                                        editText.setError(errMsg);
-                                    }
-                                    break;
+                (v, hasFocus) -> {
+                    String inputStr = editText.getText().toString();
+                    if (!hasFocus) {
+                        switch (inputType) {
+                            case "phone":
+                                if (!ValidUtils.isPhoneValid(inputStr)) {
+                                    editText.setError(errMsg);
+                                }
+                                break;
 
-                                case "password":
-                                    if (!ValidUtils.isPasswordValid(inputStr)) {
-                                        editText.setError(errMsg);
-                                    }
-                                    break;
+                            case "password":
+                                if (!ValidUtils.isPasswordValid(inputStr)) {
+                                    editText.setError(errMsg);
+                                }
+                                break;
 
-                                case "gender":
-                                    if (!ValidUtils.isGenderValid(inputStr)) {
-                                        editText.setError(errMsg);
-                                    }
-                                    break;
+                            case "gender":
+                                if (!ValidUtils.isGenderValid(inputStr)) {
+                                    editText.setError(errMsg);
+                                }
+                                break;
 
-                                default:
-                                    break;
-                            }
+                            default:
+                                break;
                         }
                     }
                 }
@@ -93,6 +89,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
     }
 
     public void onClick(View view) {
+
         String telephone = registerBinding.etTelephone.getText().toString();
         String otpCode = registerBinding.etOtpCode.getText().toString();
         String username = registerBinding.etUsername.getText().toString();
@@ -125,7 +122,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                 .syncRequest(false)
                 .execute(new SimpleCallBack<OtpCode>() {
                     @Override
-                    public void onSuccess(OtpCode data) throws Throwable {
+                    public void onSuccess(OtpCode data) {
                         Log.d(TAG, "请求Url成功：" + data);
                         if (data != null) {
                             String otpCode = data.getOtpCode();

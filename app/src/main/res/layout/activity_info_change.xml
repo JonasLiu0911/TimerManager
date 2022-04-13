@@ -5,7 +5,8 @@
     android:id="@+id/change_info"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#EDEDED">
 
     <RelativeLayout
         android:id="@+id/re_head_in_change"
@@ -16,7 +17,7 @@
         android:focusable="true"
         android:focusableInTouchMode="false"
         android:layout_marginTop="10dp"
-        android:background="#FCFFFC"
+        android:background="@drawable/bars_background"
         android:paddingBottom="3dp"
         android:paddingTop="3dp">
 
@@ -30,7 +31,7 @@
             android:textColor="#353535"
             android:textSize="18sp"/>
 
-        <cn.xtu.lhj.timermanager.tools.AvatarImageView
+        <cn.xtu.lhj.timermanager.utils.AvatarImageView
             android:id="@+id/change_head"
             android:layout_width="50dp"
             android:layout_height="50dp"
@@ -58,7 +59,7 @@
         android:focusable="true"
         android:focusableInTouchMode="false"
         android:layout_marginTop="5dp"
-        android:background="#FCFFFC"
+        android:background="@drawable/bars_background"
         android:paddingBottom="3dp"
         android:paddingTop="3dp">
 
@@ -101,7 +102,7 @@
         android:focusable="true"
         android:focusableInTouchMode="false"
         android:layout_marginTop="5dp"
-        android:background="#FCFFFC"
+        android:background="@drawable/bars_background"
         android:paddingBottom="3dp"
         android:paddingTop="3dp">
 
@@ -144,7 +145,7 @@
         android:focusable="true"
         android:focusableInTouchMode="false"
         android:layout_marginTop="5dp"
-        android:background="#FCFFFC"
+        android:background="@drawable/bars_background"
         android:paddingBottom="5dp"
         android:paddingTop="3dp">
 
@@ -187,7 +188,7 @@
         android:focusable="true"
         android:focusableInTouchMode="false"
         android:layout_marginTop="5dp"
-        android:background="#FCFFFC"
+        android:background="@drawable/bars_background"
         android:paddingBottom="5dp"
         android:paddingTop="3dp">
 

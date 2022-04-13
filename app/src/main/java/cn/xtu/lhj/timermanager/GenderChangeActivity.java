@@ -36,7 +36,6 @@ public class GenderChangeActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_gender_change);
         genderChangeBinding = DataBindingUtil.setContentView(this, R.layout.activity_gender_change);
 
         actionBar = getSupportActionBar();
@@ -88,7 +87,7 @@ public class GenderChangeActivity extends BaseActivity {
                 .execute(new SimpleCallBack<Object>() {
 
                     @Override
-                    public void onSuccess(Object response) throws Throwable {
+                    public void onSuccess(Object response) {
 
                         editor = sharedPreferences.edit();
                         editor.putString("gender", gender);
@@ -103,7 +102,6 @@ public class GenderChangeActivity extends BaseActivity {
 
                     @Override
                     public void onError(ApiException e) {
-                        Toast.makeText(GenderChangeActivity.this, "ttttttt", Toast.LENGTH_SHORT).show();
                         Log.d(TAG, "请求Url异常：" + e.toString());
                         showToastInThread(GenderChangeActivity.this, e.getMessage());
                     }

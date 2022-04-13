@@ -31,6 +31,7 @@ public class UserActivity extends BaseActivity {
     ActionBar actionBar;
     Button logoutBtn;
     RelativeLayout toChangeInfoPage;
+    RelativeLayout toHistoryPage;
     TextView nameToFill;
     TextView telephoneToFill;
 
@@ -55,6 +56,11 @@ public class UserActivity extends BaseActivity {
         OnClickToChange onClickToChange = new OnClickToChange();
         toChangeInfoPage.setOnClickListener(onClickToChange);
 
+        toHistoryPage = findViewById(R.id.re_history_trip);
+        OnClickToHistory onClickToHistory = new OnClickToHistory();
+        toHistoryPage.setOnClickListener(onClickToHistory);
+
+
         // 退出登录按钮
         logoutBtn = findViewById(R.id.bt_logout);
         OnClickLogout onClickLogout = new OnClickLogout();
@@ -69,23 +75,10 @@ public class UserActivity extends BaseActivity {
             case android.R.id.home:
                 this.finish();
                 return true;
-            case R.id.exit:
-                Intent intent = new Intent(UserActivity.this, MainActivity.class);
-                startActivity(intent);
-                break;
-            case R.id.update:
-                Toast.makeText(UserActivity.this, "用户信息更新", Toast.LENGTH_SHORT).show();
-                break;
         }
         return super.onOptionsItemSelected(menuItem);
     }
 
-    // 实例化菜单并显示
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.user_title_menu, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
 
     public void initPage() {
         nameToFill = findViewById(R.id.user_name_to_fill);
@@ -107,6 +100,15 @@ public class UserActivity extends BaseActivity {
         }
     }
 
+    private class OnClickToHistory implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(UserActivity.this, HistoryActivity.class);
+            startActivity(intent);
+        }
+    }
+
     // 退出登录按钮监听
     private class OnClickLogout implements View.OnClickListener {
 
@@ -118,23 +120,15 @@ public class UserActivity extends BaseActivity {
             builder.setMessage("是否确定退出");
             builder.setIcon(R.drawable.warning);
 
-            builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    SharedPreferences sharedPreferences = getSharedPreferences(ModelConstant.LOGIN_INFO, MODE_PRIVATE);
-                    sharedPreferences.edit().clear().apply();
-                    // 跳转到登录页
-                    Intent intent = new Intent(UserActivity.this, LoginActivity.class);
-                    startActivity(intent);
-                    finish();
-                }
+            builder.setPositiveButton("确认", (dialog, which) -> {
+                SharedPreferences sharedPreferences = getSharedPreferences(ModelConstant.LOGIN_INFO, MODE_PRIVATE);
+                sharedPreferences.edit().clear().apply();
+                // 跳转到登录页
+                Intent intent = new Intent(UserActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
             });
-            builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            });
+            builder.setNegativeButton("取消", (dialog, which) -> dialog.dismiss());
             builder.create().show();
 
         }
@@ -147,7 +141,7 @@ public class UserActivity extends BaseActivity {
                 .syncRequest(false)
                 .execute(new SimpleCallBack<UserInfo>() {
                     @Override
-                    public void onSuccess(UserInfo data) throws Throwable {
+                    public void onSuccess(UserInfo data) {
                         Log.d(TAG, "请求URL成功：" + data);
                         if (data != null) {
                             String name = data.getName();

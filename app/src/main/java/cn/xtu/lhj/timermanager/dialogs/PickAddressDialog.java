@@ -47,7 +47,7 @@ public class PickAddressDialog extends AlertDialog {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.pick_address_dialog);
+        setContentView(R.layout.dialog_pick_address);
 
         setCanceledOnTouchOutside(false);
 

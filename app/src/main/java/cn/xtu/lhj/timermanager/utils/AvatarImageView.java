@@ -1,4 +1,4 @@
-package cn.xtu.lhj.timermanager.tools;
+package cn.xtu.lhj.timermanager.utils;
 
 
 import android.content.Context;

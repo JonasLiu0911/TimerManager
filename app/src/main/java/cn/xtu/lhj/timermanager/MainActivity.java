@@ -33,17 +33,13 @@ import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
-import com.baidu.mapapi.map.BitmapDescriptor;
-import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.LogoPosition;
 import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
-import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
-import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.search.geocode.GeoCodeResult;
 import com.baidu.mapapi.search.geocode.GeoCoder;
@@ -70,7 +66,7 @@ import cn.xtu.lhj.timermanager.constant.NetConstant;
 import cn.xtu.lhj.timermanager.dialogs.AddDialog;
 import cn.xtu.lhj.timermanager.dialogs.DetailDialog;
 import cn.xtu.lhj.timermanager.dialogs.PickAddressDialog;
-import cn.xtu.lhj.timermanager.tools.AvatarImageView;
+import cn.xtu.lhj.timermanager.utils.AvatarImageView;
 import cn.xtu.lhj.timermanager.utils.BDMapUtils;
 import cn.xtu.lhj.timermanager.utils.DateUtils;
 
@@ -339,7 +335,6 @@ public class MainActivity extends BaseActivity {
                     mLocationClient.start();
                 } else {
                     Log.d(TAG, "发生未知错误");
-//                    Toast.makeText(this, "发生未知错误", Toast.LENGTH_SHORT).show();
                     finish();
                 }
                 break;
@@ -669,9 +664,6 @@ public class MainActivity extends BaseActivity {
                                     Schedule scheduleDetail = gridAdapter.getItem(position);
                                     detailScheduleId = scheduleDetail.getId();
 
-//                                    Toast.makeText(MainActivity.this, detailScheduleId+"", Toast.LENGTH_SHORT).show();
-//                                    Toast.makeText(MainActivity.this, scheduleDetail.getScheduleTitle(), Toast.LENGTH_SHORT).show();
-
                                     // 在这里写，弹出日程详情的dialog
                                     detailDialog = new DetailDialog(MainActivity.this, R.style.dialog);
 
@@ -826,6 +818,8 @@ public class MainActivity extends BaseActivity {
                                     return true;
                                 }
                             });
+                        } else {
+                            Toast.makeText(MainActivity.this, "暂无日程", Toast.LENGTH_SHORT).show();
                         }
 
                     }

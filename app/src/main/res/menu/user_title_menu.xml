@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/exit"
-        android:title="exit">
+        android:id="@+id/up"
+        android:title="按时间升序">
     </item>
 
     <item
-        android:id="@+id/update"
-        android:title="修改">
+        android:id="@+id/down"
+        android:title="按时间降序">
     </item>
 
 </menu>

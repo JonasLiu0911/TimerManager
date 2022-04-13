@@ -41,7 +41,7 @@ public class DetailDialog extends AlertDialog {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.detail_dialog);
+        setContentView(R.layout.dialog_detail);
 
         setCanceledOnTouchOutside(true);
 
