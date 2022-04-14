@@ -45,6 +45,10 @@ import com.baidu.mapapi.search.geocode.GeoCodeResult;
 import com.baidu.mapapi.search.geocode.GeoCoder;
 import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
+import com.google.android.material.imageview.ShapeableImageView;
 import com.google.gson.Gson;
 import com.xuexiang.xhttp2.XHttp;
 import com.xuexiang.xhttp2.callback.SimpleCallBack;
@@ -69,13 +73,14 @@ import cn.xtu.lhj.timermanager.dialogs.PickAddressDialog;
 import cn.xtu.lhj.timermanager.utils.AvatarImageView;
 import cn.xtu.lhj.timermanager.utils.BDMapUtils;
 import cn.xtu.lhj.timermanager.utils.DateUtils;
+import cn.xtu.lhj.timermanager.utils.SPUtils;
 
 public class MainActivity extends BaseActivity {
 
     private final String TAG = "MainActivity";
 
     // 相关按钮
-    AvatarImageView loginImg;               // 头像按钮
+    ShapeableImageView loginImg;            // 头像按钮
     ImageView scheduleNotCheckImg;          // 事项选项按钮点击前
     ImageView scheduleCheckedImg;           // 事项选项按钮点击后
     ImageView newTrip;                      // 新建日程
@@ -134,6 +139,10 @@ public class MainActivity extends BaseActivity {
     private String cityInPick;
     private GeoCoder geoCoderInPick;
 
+    private RequestOptions requestOptions = RequestOptions.circleCropTransform()
+            .diskCacheStrategy(DiskCacheStrategy.NONE)//不做磁盘缓存
+            .skipMemoryCache(true);//不做内存缓存
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,6 +157,8 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
 
         initPage();
+
+        initHead();
 
         // 地图初始化
         mMapView = findViewById(R.id.bd_map_view);
@@ -218,6 +229,13 @@ public class MainActivity extends BaseActivity {
         editor = sharedPreferences.edit();
 
         initScheduleToShow();
+    }
+
+    private void initHead() {
+        String imageUrl = SPUtils.getString("imageUrl",null,MainActivity.this);
+        if(imageUrl != null) {
+            Glide.with(MainActivity.this).load(imageUrl).apply(requestOptions).into(loginImg);
+        }
     }
 
     // ========================================== 按钮相关 begin ==========================================
@@ -574,6 +592,7 @@ public class MainActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
         mMapView.onResume();
+        initHead();
     }
 
     @Override

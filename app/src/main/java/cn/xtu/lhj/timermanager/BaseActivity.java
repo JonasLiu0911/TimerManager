@@ -44,12 +44,9 @@ public class BaseActivity extends AppCompatActivity {
 
     // 实现在子线程中显示Toast
     protected void showToastInThread(Context context, String msg) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                toast = Toast.makeText(context, msg, Toast.LENGTH_LONG);
-                toast.show();
-            }
+        runOnUiThread(() -> {
+            toast = Toast.makeText(context, msg, Toast.LENGTH_LONG);
+            toast.show();
         });
     }
 

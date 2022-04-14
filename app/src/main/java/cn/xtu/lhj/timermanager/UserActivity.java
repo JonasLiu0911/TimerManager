@@ -12,10 +12,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
+import com.google.android.material.imageview.ShapeableImageView;
 import com.xuexiang.xhttp2.XHttp;
 import com.xuexiang.xhttp2.callback.SimpleCallBack;
 import com.xuexiang.xhttp2.exception.ApiException;
@@ -23,6 +28,7 @@ import com.xuexiang.xhttp2.exception.ApiException;
 import cn.xtu.lhj.timermanager.bean.UserInfo;
 import cn.xtu.lhj.timermanager.constant.ModelConstant;
 import cn.xtu.lhj.timermanager.constant.NetConstant;
+import cn.xtu.lhj.timermanager.utils.SPUtils;
 
 public class UserActivity extends BaseActivity {
 
@@ -34,6 +40,11 @@ public class UserActivity extends BaseActivity {
     RelativeLayout toHistoryPage;
     TextView nameToFill;
     TextView telephoneToFill;
+    ShapeableImageView headToFill;
+
+    private RequestOptions requestOptions = RequestOptions.circleCropTransform()
+            .diskCacheStrategy(DiskCacheStrategy.NONE)//不做磁盘缓存
+            .skipMemoryCache(true);//不做内存缓存
 
 
     @Override
@@ -83,10 +94,18 @@ public class UserActivity extends BaseActivity {
     public void initPage() {
         nameToFill = findViewById(R.id.user_name_to_fill);
         telephoneToFill = findViewById(R.id.user_telephone_to_fill);
+        headToFill = findViewById(R.id.iv_avatar);
         SharedPreferences sharedPreferences = getSharedPreferences("login_info", MODE_PRIVATE);
         asyncGetUserInfoWithXHttp2(sharedPreferences.getString("telephone", ""));
         telephoneToFill.setText(sharedPreferences.getString("telephone", ""));
         Log.d("telephoneFilled", sharedPreferences.getString("telephone", ""));
+    }
+
+    public void initHead() {
+        String imageUrl = SPUtils.getString("imageUrl",null,UserActivity.this);
+        if(imageUrl != null){
+            Glide.with(UserActivity.this).load(imageUrl).apply(requestOptions).into(headToFill);
+        }
     }
 
 
@@ -160,6 +179,6 @@ public class UserActivity extends BaseActivity {
     @Override
     public void onResume() {
         super.onResume();
-        initPage();
+        initHead();
     }
 }

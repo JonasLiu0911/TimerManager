@@ -66,14 +66,14 @@
 
             </LinearLayout>
 
-            <cn.xtu.lhj.timermanager.utils.AvatarImageView
+            <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/go_to_login"
-                android:src="@drawable/default_user"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
                 android:layout_alignParentRight="true"
-                android:layout_marginRight="20dp"
                 android:layout_centerVertical="true"
-                android:layout_width="60dp"
-                android:layout_height="60dp" />
+                android:layout_marginRight="20dp"
+                android:src="@drawable/default_user" />
 
 
         </RelativeLayout>

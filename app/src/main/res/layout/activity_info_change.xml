@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_marginBottom="10dp"
-        android:onClick="onClick"
+        android:onClick="toChangeHead"
         android:focusable="true"
         android:focusableInTouchMode="false"
         android:layout_marginTop="10dp"
@@ -31,14 +31,15 @@
             android:textColor="#353535"
             android:textSize="18sp"/>
 
-        <cn.xtu.lhj.timermanager.utils.AvatarImageView
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/change_head"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="40dp"
-            android:src="@drawable/default_head" />
+            android:src="@drawable/app_logo"
+            app:shapeAppearanceOverlay="@style/circleImageStyle" />
 
         <ImageView
             android:layout_width="20dp"
@@ -55,7 +56,7 @@
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_marginBottom="10dp"
-        android:onClick="onClick"
+        android:onClick="toChangeName"
         android:focusable="true"
         android:focusableInTouchMode="false"
         android:layout_marginTop="5dp"
@@ -98,7 +99,7 @@
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_marginBottom="10dp"
-        android:onClick="onClick"
+        android:onClick="toChangeGender"
         android:focusable="true"
         android:focusableInTouchMode="false"
         android:layout_marginTop="5dp"
@@ -141,7 +142,7 @@
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_marginBottom="10dp"
-        android:onClick="onClick"
+        android:onClick="toChangeAge"
         android:focusable="true"
         android:focusableInTouchMode="false"
         android:layout_marginTop="5dp"
@@ -184,7 +185,7 @@
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_marginBottom="10dp"
-        android:onClick="onClick"
+        android:onClick="toChangePwd"
         android:focusable="true"
         android:focusableInTouchMode="false"
         android:layout_marginTop="5dp"

@@ -20,13 +20,13 @@
         android:paddingTop="3dp">
 
 
-        <cn.xtu.lhj.timermanager.utils.AvatarImageView
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/iv_avatar"
             android:layout_width="64dp"
             android:layout_height="64dp"
-            android:layout_marginLeft="20dp"
             android:layout_centerVertical="true"
-            android:src="@drawable/default_head" />
+            android:layout_marginLeft="20dp"
+            android:src="@drawable/app_logo" />
 
         <LinearLayout
             android:id="@+id/ll_name_and_tel"
