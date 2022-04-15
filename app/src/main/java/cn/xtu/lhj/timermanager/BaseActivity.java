@@ -20,17 +20,6 @@ public class BaseActivity extends AppCompatActivity {
 
     protected Toast toast;
 
-    public BaiduMap mBaiduMap;
-    // 定位对象
-    public LocationClient mLocationClient;
-
-    public MapView mMapView;
-
-    public SharedPreferences sharedPreferences;
-
-    // 是否首次定位
-    public boolean isFirstLocated = true;
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
         super.onCreate(savedInstanceState, persistentState);

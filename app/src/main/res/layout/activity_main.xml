@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/relative_layout_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -19,7 +21,7 @@
             android:layout_height="80dp">
 
             <LinearLayout
-                android:layout_width="180dp"
+                android:layout_width="220dp"
                 android:layout_height="60dp"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"
@@ -64,6 +66,14 @@
                     android:layout_marginRight="10dp"
                     android:src="@drawable/list" />
 
+                <ImageView
+                    android:id="@+id/iv_to_backstage"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:layout_marginRight="10dp"
+                    android:src="@drawable/to_back_stage" />
+
             </LinearLayout>
 
             <com.google.android.material.imageview.ShapeableImageView
@@ -73,7 +83,8 @@
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:layout_marginRight="20dp"
-                android:src="@drawable/default_user" />
+                android:background="@drawable/default_user"
+                app:shapeAppearanceOverlay="@style/circleImageStyle"/>
 
 
         </RelativeLayout>
@@ -86,7 +97,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="150dp"
         android:background="@drawable/view_background">
 
         <ImageView
@@ -94,8 +105,8 @@
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:layout_alignParentTop="true"
-            android:gravity="center"
             android:background="@drawable/pack_up_background"
+            android:gravity="center"
             android:src="@drawable/pack_up"
             android:textSize="20sp" />
 

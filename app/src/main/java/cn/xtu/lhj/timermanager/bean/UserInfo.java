@@ -7,15 +7,17 @@ public class UserInfo {
     private Byte gender;
     private Integer age;
     private String telephone;
+    private String headUrl;
 
     public UserInfo() {
     }
 
-    public UserInfo(String telephone, Byte gender, Integer age, String name) {
+    public UserInfo(String telephone, Byte gender, Integer age, String name, String headUrl) {
         this.telephone = telephone;
         this.gender = gender;
         this.age = age;
         this.name = name;
+        this.headUrl = headUrl;
     }
 
     public Integer getId() {
@@ -56,5 +58,13 @@ public class UserInfo {
 
     public void setTelephone(String telephone) {
         this.telephone = telephone;
+    }
+
+    public String getHeadUrl() {
+        return headUrl;
+    }
+
+    public void setHeadUrl(String headUrl) {
+        this.headUrl = headUrl;
     }
 }

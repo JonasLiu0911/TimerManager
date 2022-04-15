@@ -26,7 +26,8 @@
             android:layout_height="64dp"
             android:layout_centerVertical="true"
             android:layout_marginLeft="20dp"
-            android:src="@drawable/app_logo" />
+            android:background="@drawable/default_user"
+            app:shapeAppearanceOverlay="@style/circleImageStyle" />
 
         <LinearLayout
             android:id="@+id/ll_name_and_tel"

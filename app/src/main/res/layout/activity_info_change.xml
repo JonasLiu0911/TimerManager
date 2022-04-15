@@ -38,7 +38,7 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="40dp"
-            android:src="@drawable/app_logo"
+            android:background="@drawable/default_user"
             app:shapeAppearanceOverlay="@style/circleImageStyle" />
 
         <ImageView

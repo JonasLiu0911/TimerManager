@@ -16,8 +16,10 @@ import com.xuexiang.xhttp2.callback.SimpleCallBack;
 import com.xuexiang.xhttp2.exception.ApiException;
 
 
+import cn.xtu.lhj.timermanager.bean.UserInfo;
 import cn.xtu.lhj.timermanager.constant.NetConstant;
 import cn.xtu.lhj.timermanager.databinding.ActivityLoginBinding;
+import cn.xtu.lhj.timermanager.utils.SPUtils;
 import cn.xtu.lhj.timermanager.utils.ValidUtils;
 
 public class LoginActivity extends BaseActivity implements View.OnClickListener {
@@ -153,6 +155,37 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                         editor.putString("telephone", telephone);
                         editor.putString("encryptedPassword", encryptedPassword);
 
+                        asyncGetUserInfoWithXHttp2(telephone);
+
+                    }
+
+                    @Override
+                    public void onError(ApiException e) {
+                        Log.d(TAG, "请求Url失败：" + e.getMessage());
+                        showToastInThread(LoginActivity.this, e.getMessage());
+                    }
+                });
+    }
+
+    private void asyncGetUserInfoWithXHttp2(String telephone) {
+        XHttp.post(NetConstant.getGetUserInfoURL())
+                .params("telephone", telephone)
+                .syncRequest(false)
+                .execute(new SimpleCallBack<UserInfo>() {
+                    @Override
+                    public void onSuccess(UserInfo data) {
+                        Log.d(TAG, "请求URL成功：" + data);
+                        Log.d(TAG, "name: " + data.getName());
+                        Log.d(TAG, "age: " + data.getAge());
+                        Log.d(TAG, "gender: " + data.getGender());
+                        Log.d(TAG, "head: " + data.getHeadUrl());
+
+
+                        editor.putString("name", data.getName());
+                        editor.putString("age", data.getAge().toString());
+                        editor.putString("gender", data.getGender() == 1 ? "男" : "女");
+                        editor.putString("imageUrl", data.getHeadUrl());
+
                         if (editor.commit()) {
                             Intent login_to_main = new Intent(LoginActivity.this, MainActivity.class);
                             startActivity(login_to_main);
@@ -160,11 +193,14 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                         } else {
                             showToastInThread(LoginActivity.this, "验证失败，请重新登录");
                         }
+
+//                        SPUtils.putString("imageUrl", data.getHeadUrl(), LoginActivity.this);
+                        Log.d(TAG, "head: " + sharedPreferences.getString("imageUrl", "0"));
                     }
 
                     @Override
                     public void onError(ApiException e) {
-                        Log.d(TAG, "请求Url失败：" + e.getMessage());
+                        Log.d(TAG, "请求Url异常：" + e.toString());
                         showToastInThread(LoginActivity.this, e.getMessage());
                     }
                 });

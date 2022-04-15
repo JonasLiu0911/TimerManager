@@ -9,6 +9,7 @@ public class NetConstant {
     private static final String registerURL = "/user/register";
 
     private static final String getUserInfoURL = "/user/getUserInfo";
+    private static final String updateHeadURL = "/user/updateUserAvatar";
     private static final String updateNicknameURL = "/user/updateUserName";
     private static final String updateGenderURL = "/user/updateUserGender";
     private static final String updateAgeURL = "/user/updateUserAge";
@@ -71,5 +72,9 @@ public class NetConstant {
 
     public static String getGetHistoryURL() {
         return getHistoryURL;
+    }
+
+    public static String getUpdateHeadURL() {
+        return updateHeadURL;
     }
 }

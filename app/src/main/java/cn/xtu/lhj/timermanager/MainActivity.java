@@ -7,6 +7,7 @@ import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.Notification;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -33,6 +34,7 @@ import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.map.DotOptions;
 import com.baidu.mapapi.map.LogoPosition;
 import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdate;
@@ -40,6 +42,7 @@ import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
+import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.search.geocode.GeoCodeResult;
 import com.baidu.mapapi.search.geocode.GeoCoder;
@@ -70,14 +73,24 @@ import cn.xtu.lhj.timermanager.constant.NetConstant;
 import cn.xtu.lhj.timermanager.dialogs.AddDialog;
 import cn.xtu.lhj.timermanager.dialogs.DetailDialog;
 import cn.xtu.lhj.timermanager.dialogs.PickAddressDialog;
-import cn.xtu.lhj.timermanager.utils.AvatarImageView;
 import cn.xtu.lhj.timermanager.utils.BDMapUtils;
 import cn.xtu.lhj.timermanager.utils.DateUtils;
+import cn.xtu.lhj.timermanager.utils.NotificationUtils;
 import cn.xtu.lhj.timermanager.utils.SPUtils;
 
 public class MainActivity extends BaseActivity {
 
     private final String TAG = "MainActivity";
+
+    private BaiduMap mBaiduMap;
+    private LocationClient mLocationClient;
+    private MapView mMapView;
+    private MyLocationListener myLocationListener = new MyLocationListener();
+    private NotificationUtils mNotificationUtils;
+    private Notification notification;
+    // 是否首次定位
+    public boolean isFirstLocated = true;
+    private boolean isEnableLocInForeground = false;
 
     // 相关按钮
     ShapeableImageView loginImg;            // 头像按钮
@@ -87,6 +100,7 @@ public class MainActivity extends BaseActivity {
     ImageView checkTrip;                    // 查看列表
     RelativeLayout rePopScheduleList;       // 事项列表
     ImageView packUpImg;                    // 收起
+    ImageView toBackStage;
 
     private GridView gridView;
     private GridAdapter gridAdapter;
@@ -163,6 +177,7 @@ public class MainActivity extends BaseActivity {
         // 地图初始化
         mMapView = findViewById(R.id.bd_map_view);
         mBaiduMap = mMapView.getMap();
+//        mBaiduMap.setMyLocationEnabled(true);
 
         mMapView.showZoomControls(false);
 
@@ -213,6 +228,11 @@ public class MainActivity extends BaseActivity {
         OnClickLog onClickLog = new OnClickLog();
         newTrip.setOnClickListener(onClickLog);
 
+        // 跳转后台
+        toBackStage = findViewById(R.id.iv_to_backstage);
+//        OnClickToBack onClickToBack = new OnClickToBack();
+//        toBackStage.setOnClickListener(onClickToBack);
+
         // 事项列表容器
         rePopScheduleList = findViewById(R.id.re_pop_after_check);
 
@@ -223,10 +243,13 @@ public class MainActivity extends BaseActivity {
         scheduleCheckedImg.setVisibility(View.INVISIBLE);
         checkTrip.setVisibility(View.INVISIBLE);
         newTrip.setVisibility(View.INVISIBLE);
+        toBackStage.setVisibility(View.INVISIBLE);
         rePopScheduleList.setVisibility(View.INVISIBLE);
 
         sharedPreferences = getSharedPreferences("login_info", MODE_PRIVATE);
         editor = sharedPreferences.edit();
+
+        initHead();
 
         initScheduleToShow();
     }
@@ -235,10 +258,32 @@ public class MainActivity extends BaseActivity {
         String imageUrl = SPUtils.getString("imageUrl",null,MainActivity.this);
         if(imageUrl != null) {
             Glide.with(MainActivity.this).load(imageUrl).apply(requestOptions).into(loginImg);
+        } else {
+            loginImg.setImageResource(R.drawable.default_head);
         }
     }
 
     // ========================================== 按钮相关 begin ==========================================
+    // 跳转后台
+    private class OnClickToBack implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            if (mLocationClient != null) {
+                if (isEnableLocInForeground) {
+                    //关闭后台定位（true：通知栏消失；false：通知栏可手动划除）
+                    mLocationClient.disableLocInForeground(true);
+                    isEnableLocInForeground = false;
+                    mLocationClient.stop();
+                } else {
+                    mLocationClient.enableLocInForeground(1, notification);
+                    isEnableLocInForeground = true;
+                    mLocationClient.start();
+                }
+            }
+        }
+    }
+
     // 点击事项选项展示按钮
     private class OnClickNotCheck implements View.OnClickListener {
 
@@ -248,6 +293,7 @@ public class MainActivity extends BaseActivity {
             scheduleCheckedImg.setVisibility(View.VISIBLE);
             newTrip.setVisibility(View.VISIBLE);
             checkTrip.setVisibility(View.VISIBLE);
+            toBackStage.setVisibility(View.VISIBLE);
         }
     }
 
@@ -269,6 +315,7 @@ public class MainActivity extends BaseActivity {
             scheduleNotCheckImg.setVisibility(View.VISIBLE);
             newTrip.setVisibility(View.INVISIBLE);
             checkTrip.setVisibility(View.INVISIBLE);
+            toBackStage.setVisibility(View.INVISIBLE);
             rePopScheduleList.setVisibility(View.INVISIBLE);
         }
     }
@@ -288,6 +335,7 @@ public class MainActivity extends BaseActivity {
                     scheduleNotCheckImg.setVisibility(View.VISIBLE);
                     newTrip.setVisibility(View.INVISIBLE);
                     checkTrip.setVisibility(View.INVISIBLE);
+                    toBackStage.setVisibility(View.INVISIBLE);
 
                     rePopScheduleList.setVisibility(View.INVISIBLE);
                 } else {
@@ -302,6 +350,7 @@ public class MainActivity extends BaseActivity {
                     scheduleNotCheckImg.setVisibility(View.VISIBLE);
                     newTrip.setVisibility(View.INVISIBLE);
                     checkTrip.setVisibility(View.INVISIBLE);
+                    toBackStage.setVisibility(View.INVISIBLE);
 
                     rePopScheduleList.setVisibility(View.INVISIBLE);
                 } else {
@@ -511,8 +560,7 @@ public class MainActivity extends BaseActivity {
 
         @Override
         public void onReceiveLocation(BDLocation bdLocation) {
-
-            if (bdLocation == null) {
+            if (bdLocation == null || mMapView == null) {
                 return;
             }
 
@@ -538,6 +586,8 @@ public class MainActivity extends BaseActivity {
                     .build();
 
             mBaiduMap.setMyLocationData(locationData);
+            android.graphics.Point location = new android.graphics.Point(150, 300);
+            mBaiduMap.setCompassPosition(location);
 
         }
     }

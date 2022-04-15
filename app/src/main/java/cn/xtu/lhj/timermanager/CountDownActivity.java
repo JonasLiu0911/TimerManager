@@ -10,19 +10,25 @@ import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.WindowManager;
 
+import com.bumptech.glide.Glide;
 import com.google.android.filament.View;
 import com.xuexiang.xhttp2.XHttp;
 import com.xuexiang.xhttp2.callback.SimpleCallBack;
 import com.xuexiang.xhttp2.exception.ApiException;
 
+import cn.xtu.lhj.timermanager.bean.UserInfo;
 import cn.xtu.lhj.timermanager.constant.ModelConstant;
 import cn.xtu.lhj.timermanager.constant.NetConstant;
+import cn.xtu.lhj.timermanager.utils.SPUtils;
 
 public class CountDownActivity extends BaseActivity {
 
     private CountDownTimer countDownTimer;
 
     final static String TAG = "CountDownActivity";
+
+    public SharedPreferences sharedPreferences;
+    public SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,21 +44,25 @@ public class CountDownActivity extends BaseActivity {
         // 设置布局
         setContentView(R.layout.activity_count_down);
 
+        sharedPreferences = getSharedPreferences("login_info", MODE_PRIVATE);
+
         autoLogin();
+
+        asyncGetUserInfoWithXHttp2(sharedPreferences.getString("telephone", ""));
 
         initCountDown();
     }
 
-    private void autoLogin() {
-        SharedPreferences sharedPreferences = getSharedPreferences(ModelConstant.LOGIN_INFO, MODE_PRIVATE);
-        String telephoneInSp = sharedPreferences.getString("telephone", "");
-        String passwordInSp = sharedPreferences.getString("encryptedPassword", "");
+    // 异步 自动登录
+    public void autoLogin() {
 
-        // 异步登录
-        asyncValidateWithXHttp2(telephoneInSp, passwordInSp);
+        String telToAutoLogin = sharedPreferences.getString("telephone", "");
+        String pwdInToAutoLogin = sharedPreferences.getString("encryptedPassword", "");
+
+        asyncValidateWithXHttp2(telToAutoLogin, pwdInToAutoLogin);
     }
 
-    private void asyncValidateWithXHttp2(String telephone, String password) {
+    public void asyncValidateWithXHttp2(String telephone, String password) {
         XHttp.post(NetConstant.getLoginURL())
                 .params("telephone", telephone)
                 .params("password", password)
@@ -71,6 +81,38 @@ public class CountDownActivity extends BaseActivity {
                 });
     }
 
+    private void asyncGetUserInfoWithXHttp2(String telephone) {
+        XHttp.post(NetConstant.getGetUserInfoURL())
+                .params("telephone", telephone)
+                .syncRequest(false)
+                .execute(new SimpleCallBack<UserInfo>() {
+                    @Override
+                    public void onSuccess(UserInfo data) {
+                        Log.d(TAG, "CountDown 请求URL成功：" + data);
+                        Log.d(TAG, "name: " + data.getName());
+                        Log.d(TAG, "age: " + data.getAge());
+                        Log.d(TAG, "gender: " + data.getGender());
+                        Log.d(TAG, "head: " + data.getHeadUrl());
+
+                        editor = sharedPreferences.edit();
+
+                        editor.putString("nameBegin", data.getName());
+                        editor.putString("age", data.getAge().toString());
+                        editor.putString("gender", data.getGender() == 1 ? "男" : "女");
+                        editor.putString("imageUrl", data.getHeadUrl());
+                        editor.commit();
+
+                        Log.d(TAG, "head: " + sharedPreferences.getString("imageUrl", "0"));
+                    }
+
+                    @Override
+                    public void onError(ApiException e) {
+                        Log.d(TAG, "请求Url异常：" + e.toString());
+                        showToastInThread(CountDownActivity.this, e.getMessage());
+                    }
+                });
+    }
+
     private void initCountDown() {
         countDownTimer = new CountDownTimer(1000 * 3, 1000) {
             @SuppressLint("SetTextI18n")
@@ -84,6 +126,8 @@ public class CountDownActivity extends BaseActivity {
             }
         }.start();
     }
+
+
 
     private void jumpTo() {
 

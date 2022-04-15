@@ -110,42 +110,40 @@ public class InfoChangeActivity extends BaseActivity {
 
 
         sharedPreferences = getSharedPreferences("login_info", MODE_PRIVATE);
-        asyncGetUserInfoWithXHttp2(sharedPreferences.getString("telephone", ""));
+
+        nickNameToFill.setText(sharedPreferences.getString("name", ""));
+        genderToFill.setText(sharedPreferences.getString("gender", ""));
+        ageToFill.setText(sharedPreferences.getString("age", ""));
+
 
         checkVersion();
+
+        initHead();
     }
 
-    /**
-     * XHttp2请求后端接口 获取用户信息
-     * @param telephone
-     */
-    private void asyncGetUserInfoWithXHttp2(String telephone) {
-        XHttp.post(NetConstant.getGetUserInfoURL())
+    public void initHead() {
+        String imageUrl = SPUtils.getString("imageUrl",null,InfoChangeActivity.this);
+        if(imageUrl != null){
+            Glide.with(InfoChangeActivity.this).load(imageUrl).apply(requestOptions).into(headToFill);
+        } else {
+            headToFill.setImageResource(R.drawable.default_head);
+        }
+    }
+
+    private void asyncUpdateHeadWithXHttp2(String telephone, String headUrl) {
+
+        if (headUrl == null) {
+            return;
+        }
+
+        XHttp.post(NetConstant.getUpdateHeadURL())
                 .params("telephone", telephone)
+                .params("headUrl", headUrl)
                 .syncRequest(false)
-                .execute(new SimpleCallBack<UserInfo>() {
+                .execute(new SimpleCallBack<Object>() {
                     @Override
-                    public void onSuccess(UserInfo data) {
-                        Log.d(TAG, "请求URL成功：" + data);
-                        if (data != null) {
-                            String name = data.getName();
-                            nickNameToFill.setText(name);
-
-                            int gender = data.getGender();
-                            if (gender == 1) {
-                                genderToFill.setText("男");
-                            } else {
-                                genderToFill.setText("女");
-                            }
-
-                            ageToFill.setText(data.getAge().toString());
-
-                            String imageUrl = SPUtils.getString("imageUrl",null,InfoChangeActivity.this);
-                            if(imageUrl != null){
-                                Glide.with(InfoChangeActivity.this).load(imageUrl).apply(requestOptions).into(headToFill);
-                            }
-
-                        }
+                    public void onSuccess(Object response) throws Throwable {
+                        Toast.makeText(InfoChangeActivity.this, "修改成功", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
@@ -234,8 +232,10 @@ public class InfoChangeActivity extends BaseActivity {
     private void displayImage(String imagePath) {
         if (!TextUtils.isEmpty(imagePath)) {
 
-            //放入缓存
-            SPUtils.putString("imageUrl",imagePath,this);
+            String telephone = sharedPreferences.getString("telephone", "");
+            SPUtils.putString("imageUrl", imagePath, this);
+
+            asyncUpdateHeadWithXHttp2(telephone, imagePath);
 
             //显示图片
             Glide.with(this).load(imagePath).apply(requestOptions).into(headToFill);

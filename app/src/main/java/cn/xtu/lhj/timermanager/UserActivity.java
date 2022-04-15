@@ -95,16 +95,21 @@ public class UserActivity extends BaseActivity {
         nameToFill = findViewById(R.id.user_name_to_fill);
         telephoneToFill = findViewById(R.id.user_telephone_to_fill);
         headToFill = findViewById(R.id.iv_avatar);
+
         SharedPreferences sharedPreferences = getSharedPreferences("login_info", MODE_PRIVATE);
-        asyncGetUserInfoWithXHttp2(sharedPreferences.getString("telephone", ""));
+
+        nameToFill.setText(sharedPreferences.getString("name", ""));
         telephoneToFill.setText(sharedPreferences.getString("telephone", ""));
-        Log.d("telephoneFilled", sharedPreferences.getString("telephone", ""));
+
+        initHead();
     }
 
     public void initHead() {
         String imageUrl = SPUtils.getString("imageUrl",null,UserActivity.this);
         if(imageUrl != null){
             Glide.with(UserActivity.this).load(imageUrl).apply(requestOptions).into(headToFill);
+        } else {
+            headToFill.setImageResource(R.drawable.default_head);
         }
     }
 
@@ -151,29 +156,6 @@ public class UserActivity extends BaseActivity {
             builder.create().show();
 
         }
-    }
-
-    // 请求用户信息
-    private void asyncGetUserInfoWithXHttp2(String telephone) {
-        XHttp.post(NetConstant.getGetUserInfoURL())
-                .params("telephone", telephone)
-                .syncRequest(false)
-                .execute(new SimpleCallBack<UserInfo>() {
-                    @Override
-                    public void onSuccess(UserInfo data) {
-                        Log.d(TAG, "请求URL成功：" + data);
-                        if (data != null) {
-                            String name = data.getName();
-                            nameToFill.setText(name);
-                        }
-                    }
-
-                    @Override
-                    public void onError(ApiException e) {
-                        Log.d(TAG, "请求Url异常：" + e.toString());
-                        showToastInThread(UserActivity.this, e.getMessage());
-                    }
-                });
     }
 
     @Override
