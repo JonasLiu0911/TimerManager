@@ -8,12 +8,14 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -48,6 +50,7 @@ import com.baidu.mapapi.search.geocode.GeoCodeResult;
 import com.baidu.mapapi.search.geocode.GeoCoder;
 import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
+import com.baidu.mapapi.utils.DistanceUtil;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
@@ -75,6 +78,7 @@ import cn.xtu.lhj.timermanager.dialogs.DetailDialog;
 import cn.xtu.lhj.timermanager.dialogs.PickAddressDialog;
 import cn.xtu.lhj.timermanager.utils.BDMapUtils;
 import cn.xtu.lhj.timermanager.utils.DateUtils;
+import cn.xtu.lhj.timermanager.utils.DistanceUtils;
 import cn.xtu.lhj.timermanager.utils.NotificationUtils;
 import cn.xtu.lhj.timermanager.utils.SPUtils;
 
@@ -100,7 +104,7 @@ public class MainActivity extends BaseActivity {
     ImageView checkTrip;                    // 查看列表
     RelativeLayout rePopScheduleList;       // 事项列表
     ImageView packUpImg;                    // 收起
-    ImageView toBackStage;
+//    ImageView toBackStage;
 
     private GridView gridView;
     private GridAdapter gridAdapter;
@@ -112,6 +116,13 @@ public class MainActivity extends BaseActivity {
     private Gson gson;
     private String jsonToSave;
     private String jsonToGet;
+
+    private Gson gsonFirst;
+    private String jsonFirstSave;
+    private String jsonFirstGet;
+    private boolean flag = true;
+    private boolean isGetFirst = true;
+    private Schedule scheduleFirst;
 
     // 日期、时间选择相关
     private AddDialog addDialog;
@@ -148,6 +159,8 @@ public class MainActivity extends BaseActivity {
     private MapView mapViewInDetail;
     private BaiduMap baiduMapInDetail;
 
+    LatLng targetPoint;
+
 
     private LatLng latLngInPick;
     private String cityInPick;
@@ -181,6 +194,8 @@ public class MainActivity extends BaseActivity {
 
         mMapView.showZoomControls(false);
 
+        scheduleFirst = new Schedule();
+
         // 权限请求
         List<String> permissionList = new ArrayList<>();
         if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -199,6 +214,29 @@ public class MainActivity extends BaseActivity {
         } else {
             initLocation();
             mLocationClient.start();
+
+            // 设置后台定位
+            // android8.0及以上使用NotificationUtils
+            if (Build.VERSION.SDK_INT >= 26) {
+                mNotificationUtils = new NotificationUtils(this);
+                Notification.Builder builder2 = mNotificationUtils.getAndroidChannelNotification
+                        ("适配android 8限制后台定位功能", "正在后台定位");
+                notification = builder2.build();
+            } else {
+                //获取一个Notification构造器
+                Notification.Builder builder = new Notification.Builder(MainActivity.this);
+                Intent nfIntent = new Intent(MainActivity.this, MainActivity.class);
+
+                builder.setContentIntent(PendingIntent.
+                        getActivity(MainActivity.this, 0, nfIntent, 0)) // 设置PendingIntent
+                        .setContentTitle("适配android限制后台定位功能")         // 设置下拉列表里的标题
+                        .setSmallIcon(R.drawable.logo)                      // 设置状态栏内的小图标
+                        .setContentText("正在后台定位")                       // 设置上下文内容
+                        .setWhen(System.currentTimeMillis());               // 设置该通知发生的时间
+
+                notification = builder.build(); // 获取构建好的Notification
+            }
+            notification.defaults = Notification.DEFAULT_SOUND;             //设置为默认的声音
         }
 
     }
@@ -229,7 +267,7 @@ public class MainActivity extends BaseActivity {
         newTrip.setOnClickListener(onClickLog);
 
         // 跳转后台
-        toBackStage = findViewById(R.id.iv_to_backstage);
+//        toBackStage = findViewById(R.id.iv_to_backstage);
 //        OnClickToBack onClickToBack = new OnClickToBack();
 //        toBackStage.setOnClickListener(onClickToBack);
 
@@ -243,7 +281,7 @@ public class MainActivity extends BaseActivity {
         scheduleCheckedImg.setVisibility(View.INVISIBLE);
         checkTrip.setVisibility(View.INVISIBLE);
         newTrip.setVisibility(View.INVISIBLE);
-        toBackStage.setVisibility(View.INVISIBLE);
+//        toBackStage.setVisibility(View.INVISIBLE);
         rePopScheduleList.setVisibility(View.INVISIBLE);
 
         sharedPreferences = getSharedPreferences("login_info", MODE_PRIVATE);
@@ -254,6 +292,7 @@ public class MainActivity extends BaseActivity {
         initScheduleToShow();
     }
 
+    // 加载用户头像
     private void initHead() {
         String imageUrl = SPUtils.getString("imageUrl",null,MainActivity.this);
         if(imageUrl != null) {
@@ -262,6 +301,7 @@ public class MainActivity extends BaseActivity {
             loginImg.setImageResource(R.drawable.default_head);
         }
     }
+
 
     // ========================================== 按钮相关 begin ==========================================
     // 跳转后台
@@ -293,7 +333,7 @@ public class MainActivity extends BaseActivity {
             scheduleCheckedImg.setVisibility(View.VISIBLE);
             newTrip.setVisibility(View.VISIBLE);
             checkTrip.setVisibility(View.VISIBLE);
-            toBackStage.setVisibility(View.VISIBLE);
+//            toBackStage.setVisibility(View.VISIBLE);
         }
     }
 
@@ -315,7 +355,7 @@ public class MainActivity extends BaseActivity {
             scheduleNotCheckImg.setVisibility(View.VISIBLE);
             newTrip.setVisibility(View.INVISIBLE);
             checkTrip.setVisibility(View.INVISIBLE);
-            toBackStage.setVisibility(View.INVISIBLE);
+//            toBackStage.setVisibility(View.INVISIBLE);
             rePopScheduleList.setVisibility(View.INVISIBLE);
         }
     }
@@ -335,7 +375,7 @@ public class MainActivity extends BaseActivity {
                     scheduleNotCheckImg.setVisibility(View.VISIBLE);
                     newTrip.setVisibility(View.INVISIBLE);
                     checkTrip.setVisibility(View.INVISIBLE);
-                    toBackStage.setVisibility(View.INVISIBLE);
+//                    toBackStage.setVisibility(View.INVISIBLE);
 
                     rePopScheduleList.setVisibility(View.INVISIBLE);
                 } else {
@@ -350,7 +390,7 @@ public class MainActivity extends BaseActivity {
                     scheduleNotCheckImg.setVisibility(View.VISIBLE);
                     newTrip.setVisibility(View.INVISIBLE);
                     checkTrip.setVisibility(View.INVISIBLE);
-                    toBackStage.setVisibility(View.INVISIBLE);
+//                    toBackStage.setVisibility(View.INVISIBLE);
 
                     rePopScheduleList.setVisibility(View.INVISIBLE);
                 } else {
@@ -383,6 +423,7 @@ public class MainActivity extends BaseActivity {
     // ========================================== 按钮相关 end ==========================================
 
 
+
     // ========================================== 定位相关 begin ==========================================
 
     // 请求权限的结果
@@ -400,6 +441,29 @@ public class MainActivity extends BaseActivity {
                     }
                     initLocation();
                     mLocationClient.start();
+
+                    // 设置后台定位
+                    // android8.0及以上使用NotificationUtils
+                    if (Build.VERSION.SDK_INT >= 26) {
+                        mNotificationUtils = new NotificationUtils(this);
+                        Notification.Builder builder2 = mNotificationUtils.getAndroidChannelNotification
+                                ("适配android 8限制后台定位功能", "正在后台定位");
+                        notification = builder2.build();
+                    } else {
+                        //获取一个Notification构造器
+                        Notification.Builder builder = new Notification.Builder(MainActivity.this);
+                        Intent nfIntent = new Intent(MainActivity.this, MainActivity.class);
+
+                        builder.setContentIntent(PendingIntent.
+                                getActivity(MainActivity.this, 0, nfIntent, 0)) // 设置PendingIntent
+                                .setContentTitle("适配android限制后台定位功能")         // 设置下拉列表里的标题
+                                .setSmallIcon(R.drawable.logo)                      // 设置状态栏内的小图标
+                                .setContentText("正在后台定位")                       // 设置上下文内容
+                                .setWhen(System.currentTimeMillis());               // 设置该通知发生的时间
+
+                        notification = builder.build(); // 获取构建好的Notification
+                    }
+                    notification.defaults = Notification.DEFAULT_SOUND;             //设置为默认的声音
                 } else {
                     Log.d(TAG, "发生未知错误");
                     finish();
@@ -408,7 +472,7 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    // 定位初始化 ccc
+    // 首页的定位初始化 ccc
     private void initLocation() {
 
         mBaiduMap.setMyLocationEnabled(true);
@@ -423,7 +487,7 @@ public class MainActivity extends BaseActivity {
 
         option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
         option.setCoorType("BD09LL");
-        option.setScanSpan(2000);
+        option.setScanSpan(5000);
         option.setOpenGps(true);
         option.setLocationNotify(true);
         option.setIgnoreKillProcess(false);
@@ -476,14 +540,17 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onMapStatusChangeFinish(MapStatus mapStatus) {
                 LatLng centerPoint = mapStatus.target;
-                pointLongitude = (Double) centerPoint.longitude;
-                pointLatitude = (Double) centerPoint.latitude;
+                pointLongitude = centerPoint.longitude;
+                pointLatitude = centerPoint.latitude;
                 Log.d(TAG, centerPoint.latitude + "/" + centerPoint.longitude);
                 // 把选择好的位置信息存入sharedPreferences中
                 LatLng locationToStock = new LatLng(pointLatitude, pointLongitude);
                 editor = sharedPreferences.edit();
                 jsonLocationToSave = gsonSaveLocation.toJson(locationToStock);
                 editor.putString("location_save", jsonLocationToSave);
+                Log.d("update--", centerPoint.latitude + "/" + centerPoint.longitude);
+                Log.d("update--", pointLatitude.toString());
+                Log.d("update--", Double.valueOf(pointLatitude.toString()) + "--");
 
                 BDMapUtils.reverseGeoParse(pointLongitude, pointLatitude, new OnGetGeoCoderResultListener() {
                     @Override
@@ -497,6 +564,8 @@ public class MainActivity extends BaseActivity {
                         fitAddressDesc.setText(reverseGeoCodeResult.getSematicDescription());
                     }
                 });
+
+
             }
         });
 
@@ -555,7 +624,7 @@ public class MainActivity extends BaseActivity {
 //        baiduMapInDetail.addOverlay(markerOptions);
     }
 
-    // 位置监听，定位到当前位置 ccc
+    // 首页的位置监听，定位到当前位置 ccc
     private class MyLocationListener extends BDAbstractLocationListener {
 
         @Override
@@ -589,6 +658,7 @@ public class MainActivity extends BaseActivity {
             android.graphics.Point location = new android.graphics.Point(150, 300);
             mBaiduMap.setCompassPosition(location);
 
+            getFirstSchedule(bdLocation.getLongitude(), bdLocation.getLatitude());
         }
     }
 
@@ -682,14 +752,102 @@ public class MainActivity extends BaseActivity {
 
     }
 
+    private void getScheduleFirstItem() {
+        gsonFirst = new Gson();
+        sharedPreferences = getSharedPreferences("login_info", MODE_PRIVATE);
+        asyncGetScheduleWithXHttp22(sharedPreferences.getString("telephone", ""));
+
+        jsonFirstGet = sharedPreferences.getString("schedule_first", "");
+        Log.d("testtttt", jsonFirstGet);
+        Type type = new TypeToken<Schedule>() {}.getType();
+        scheduleFirst = gsonFirst.fromJson(jsonFirstGet, type);
+        Log.d("testtttt", scheduleFirst.getLongitude() + "//");
+    }
+
+    private void getFirstSchedule(double longitudeCurrent, double latitudeCurrent) {
+        if (isGetFirst) {
+            getScheduleFirstItem();
+            isGetFirst = false;
+        }
+        if (scheduleFirst == null) {
+            Log.d(TAG, "schedule list first is empty");
+        } else {
+            Log.d("testttt--", scheduleFirst.getScheduleStartTime() + "");
+            Date dateJudge = new Date(System.currentTimeMillis());
+            SimpleDateFormat dateFormatJudge = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Long timeString = DateUtils.getString2Time(dateFormatJudge.format(dateJudge), "yyyy-MM-dd HH:mm:ss");
+
+            Log.d(TAG, timeString+"-----------");
+            Log.d(TAG, scheduleFirst.getScheduleStartTime() + "[[[");
+
+            Log.d(TAG, "-----" + scheduleFirst.getLongitude() + "--" + scheduleFirst.getLatitude());
+
+            LatLng currentPoint = new LatLng(latitudeCurrent, longitudeCurrent);
+            targetPoint = new LatLng(scheduleFirst.getLatitude().doubleValue(), scheduleFirst.getLongitude().doubleValue());
+            Log.d("testttt--", DistanceUtil.getDistance(currentPoint, targetPoint) + "distance-------");
+            Log.d("testttt-----", DistanceUtils.calculateDistance(targetPoint.latitude, targetPoint.longitude,
+                    currentPoint.latitude, currentPoint.longitude) + "--111");
+            Log.d("testttt-----", DistanceUtils.distHaversineRAD(targetPoint.latitude, targetPoint.longitude,
+                    currentPoint.latitude, currentPoint.longitude) + "--222");
+            Log.d("testttt-----", DistanceUtils.distanceSimplify(targetPoint.latitude, targetPoint.longitude,
+                    currentPoint.latitude, currentPoint.longitude) + "--333");
+
+            // 计算两点间距离
+            double dis = DistanceUtils.calculateDistance(targetPoint.latitude, targetPoint.longitude, currentPoint.latitude, currentPoint.longitude);
+
+            // 判断时间是否到达列表最早日程开始时间点 前十分钟
+            if ((scheduleFirst.getScheduleStartTime() - timeString <= 1000 * 60 * 10) && dis >= 200 && flag) {
+                Toast.makeText(MainActivity.this, "到点了！！！", Toast.LENGTH_LONG).show();
+                flag = false;
+            } else if ((scheduleFirst.getScheduleStartTime() - timeString <= 1000 * 60 * 10) && dis < 200 && flag) {
+                Toast.makeText(MainActivity.this, "到位啦", Toast.LENGTH_SHORT).show();
+                flag = false;
+            }
+        }
+
+    }
+
     // 刷新方法内操作（还有没有更好的！！！）
     private void fresh() {
         try {
             Thread.sleep(1000);
             initScheduleToShow();
+            getScheduleFirstItem();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    public void asyncGetScheduleWithXHttp22(String telephone) {
+        XHttp.post(NetConstant.getGetScheduleURL())
+                .params("telephone", telephone)
+                .syncRequest(false)
+                .execute(new SimpleCallBack<List<Schedule>>() {
+                    @Override
+                    public void onSuccess(List<Schedule> data) throws Throwable {
+                        if (data != null) {
+                            gsonFirst = new Gson();
+                            editor = sharedPreferences.edit();
+                            jsonFirstSave = gsonFirst.toJson(data.get(0));
+                            Log.d("testtt", jsonFirstSave);
+                            editor.putString("schedule_first", jsonFirstSave);
+
+                            if (editor.commit()) {
+                                Log.d(TAG, "save first success!!!");
+                            } else {
+                                Log.d(TAG, "save first fail......");
+                            }
+                        } else {
+                            Toast.makeText(MainActivity.this, "暂无日程", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onError(ApiException e) {
+                        Log.d(TAG, "请求Url异常：" + e.toString());
+                        showToastInThread(MainActivity.this, e.getMessage());
+                    }
+                });
     }
 
 
@@ -776,6 +934,7 @@ public class MainActivity extends BaseActivity {
 
                                                 @Override
                                                 public void onSubmitAddressClick() {
+                                                    Log.d(TAG, sharedPreferences.getString("location_save", "") + "kkkkk");
                                                     editor.commit();
                                                 }
                                             }).show();
@@ -806,6 +965,7 @@ public class MainActivity extends BaseActivity {
                                             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                                             imm.hideSoftInputFromWindow(detailDialog.detailTimeStr.getWindowToken(), 0);
 
+                                            editor = sharedPreferences.edit();
                                             // 取出电话号码
                                             String telephone = sharedPreferences.getString("telephone", "");
 
@@ -833,12 +993,19 @@ public class MainActivity extends BaseActivity {
 
                                             // 从sharedPreferences中取出用户选择的位置
                                             jsonLocationToGet = sharedPreferences.getString("location_save", "");
+                                            Log.d("test", "location" + jsonLocationToGet);
                                             Type type = new TypeToken<LatLng>() {}.getType();
                                             latLngGet = gson.fromJson(jsonLocationToGet, type);
+
+                                            Log.d("update--", latLngGet.longitude + "");
+                                            Log.d("update--", latLngGet.latitude + "");
                                             // 事项经度（要提交）
                                             BigDecimal longitudeToServer = BigDecimal.valueOf(latLngGet.longitude);
                                             // 事项纬度（要提交）
                                             BigDecimal latitudeToServer = BigDecimal.valueOf(latLngGet.latitude);
+
+                                            Log.d("update--", longitudeToServer + "");
+                                            Log.d("update--", latitudeToServer + "");
 
                                             // 网络请求，将新建日程传到后端
                                             Schedule scheduleToUpdate = new Schedule();
@@ -1094,6 +1261,7 @@ public class MainActivity extends BaseActivity {
 
                             @Override
                             public void onSubmitAddressClick() {
+                                Log.d(TAG, sharedPreferences.getString("location_save", "") + "kkkkk");
                                 editor.commit();
                             }
                         }).show();

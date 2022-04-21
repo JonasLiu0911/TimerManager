@@ -161,6 +161,6 @@ public class UserActivity extends BaseActivity {
     @Override
     public void onResume() {
         super.onResume();
-        initHead();
+        initPage();
     }
 }

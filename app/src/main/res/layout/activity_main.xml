@@ -66,13 +66,13 @@
                     android:layout_marginRight="10dp"
                     android:src="@drawable/list" />
 
-                <ImageView
-                    android:id="@+id/iv_to_backstage"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_gravity="center"
-                    android:layout_marginRight="10dp"
-                    android:src="@drawable/to_back_stage" />
+<!--                <ImageView-->
+<!--                    android:id="@+id/iv_to_backstage"-->
+<!--                    android:layout_width="40dp"-->
+<!--                    android:layout_height="40dp"-->
+<!--                    android:layout_gravity="center"-->
+<!--                    android:layout_marginRight="10dp"-->
+<!--                    android:src="@drawable/to_back_stage" />-->
 
             </LinearLayout>
 
@@ -84,7 +84,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginRight="20dp"
                 android:background="@drawable/default_user"
-                app:shapeAppearanceOverlay="@style/circleImageStyle"/>
+                app:shapeAppearanceOverlay="@style/circleImageStyle" />
 
 
         </RelativeLayout>
