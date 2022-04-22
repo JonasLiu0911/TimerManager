@@ -15,10 +15,9 @@ public class DistanceUtils {
 
     // 效果不行
     public static double distHaversineRAD(double lat1, double lng1, double lat2, double lng2) {
-        double hsinX = Math.sin((lng1 - lng2) * 0.5);
-        double hsinY = Math.sin((lat1 - lat2) * 0.5);
-        double h = hsinY * hsinY +
-                (Math.cos(lat1) * Math.cos(lat2) * hsinX * hsinX);
+        double hSinX = Math.sin((lng1 - lng2) * 0.5);
+        double hSinY = Math.sin((lat1 - lat2) * 0.5);
+        double h = hSinY * hSinY + (Math.cos(lat1) * Math.cos(lat2) * hSinX * hSinX);
         return 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h)) * 6367000;
     }
 

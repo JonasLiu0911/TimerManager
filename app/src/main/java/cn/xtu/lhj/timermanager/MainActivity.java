@@ -1,13 +1,18 @@
 package cn.xtu.lhj.timermanager;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Context;
@@ -15,6 +20,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -69,6 +75,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 import cn.xtu.lhj.timermanager.adapter.GridAdapter;
 import cn.xtu.lhj.timermanager.bean.Schedule;
@@ -76,6 +83,7 @@ import cn.xtu.lhj.timermanager.constant.NetConstant;
 import cn.xtu.lhj.timermanager.dialogs.AddDialog;
 import cn.xtu.lhj.timermanager.dialogs.DetailDialog;
 import cn.xtu.lhj.timermanager.dialogs.PickAddressDialog;
+import cn.xtu.lhj.timermanager.receiver.AlarmReceiver;
 import cn.xtu.lhj.timermanager.utils.BDMapUtils;
 import cn.xtu.lhj.timermanager.utils.DateUtils;
 import cn.xtu.lhj.timermanager.utils.DistanceUtils;
@@ -122,7 +130,16 @@ public class MainActivity extends BaseActivity {
     private String jsonFirstGet;
     private boolean flag = true;
     private boolean isGetFirst = true;
+    private List<Schedule> scheduleFirstList;
     private Schedule scheduleFirst;
+
+    private AlarmManager alarmManager;
+
+    private Gson gsonCurrent;
+    private String jsonCurSav;
+    private String jsonCurGet;
+    private Schedule currentSch;
+
 
     // 日期、时间选择相关
     private AddDialog addDialog;
@@ -750,18 +767,17 @@ public class MainActivity extends BaseActivity {
             }
         }
 
+        getScheduleFirstItem();
+
     }
 
+    // 获取日程列表中的第一个日程
     private void getScheduleFirstItem() {
+
         gsonFirst = new Gson();
         sharedPreferences = getSharedPreferences("login_info", MODE_PRIVATE);
         asyncGetScheduleWithXHttp22(sharedPreferences.getString("telephone", ""));
 
-        jsonFirstGet = sharedPreferences.getString("schedule_first", "");
-        Log.d("testtttt", jsonFirstGet);
-        Type type = new TypeToken<Schedule>() {}.getType();
-        scheduleFirst = gsonFirst.fromJson(jsonFirstGet, type);
-        Log.d("testtttt", scheduleFirst.getLongitude() + "//");
     }
 
     private void getFirstSchedule(double longitudeCurrent, double latitudeCurrent) {
@@ -769,6 +785,12 @@ public class MainActivity extends BaseActivity {
             getScheduleFirstItem();
             isGetFirst = false;
         }
+
+        jsonFirstGet = sharedPreferences.getString("schedule_first", "");
+        Type type = new TypeToken<List<Schedule>>() {}.getType();
+        scheduleFirstList = gsonFirst.fromJson(jsonFirstGet, type);
+        scheduleFirst = scheduleFirstList.get(0);
+
         if (scheduleFirst == null) {
             Log.d(TAG, "schedule list first is empty");
         } else {
@@ -777,31 +799,113 @@ public class MainActivity extends BaseActivity {
             SimpleDateFormat dateFormatJudge = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             Long timeString = DateUtils.getString2Time(dateFormatJudge.format(dateJudge), "yyyy-MM-dd HH:mm:ss");
 
-            Log.d(TAG, timeString+"-----------");
-            Log.d(TAG, scheduleFirst.getScheduleStartTime() + "[[[");
-
-            Log.d(TAG, "-----" + scheduleFirst.getLongitude() + "--" + scheduleFirst.getLatitude());
+            Log.d("testttt-----", scheduleFirst.getScheduleInfo());
 
             LatLng currentPoint = new LatLng(latitudeCurrent, longitudeCurrent);
             targetPoint = new LatLng(scheduleFirst.getLatitude().doubleValue(), scheduleFirst.getLongitude().doubleValue());
-            Log.d("testttt--", DistanceUtil.getDistance(currentPoint, targetPoint) + "distance-------");
+            Log.d("testttt--", DistanceUtil.getDistance(currentPoint, targetPoint) + "distance--000");
             Log.d("testttt-----", DistanceUtils.calculateDistance(targetPoint.latitude, targetPoint.longitude,
-                    currentPoint.latitude, currentPoint.longitude) + "--111");
+                    currentPoint.latitude, currentPoint.longitude) + "distance--111");
             Log.d("testttt-----", DistanceUtils.distHaversineRAD(targetPoint.latitude, targetPoint.longitude,
-                    currentPoint.latitude, currentPoint.longitude) + "--222");
+                    currentPoint.latitude, currentPoint.longitude) + "distance--222");
             Log.d("testttt-----", DistanceUtils.distanceSimplify(targetPoint.latitude, targetPoint.longitude,
-                    currentPoint.latitude, currentPoint.longitude) + "--333");
+                    currentPoint.latitude, currentPoint.longitude) + "distance--333");
 
             // 计算两点间距离
             double dis = DistanceUtils.calculateDistance(targetPoint.latitude, targetPoint.longitude, currentPoint.latitude, currentPoint.longitude);
 
             // 判断时间是否到达列表最早日程开始时间点 前十分钟
-            if ((scheduleFirst.getScheduleStartTime() - timeString <= 1000 * 60 * 10) && dis >= 200 && flag) {
-                Toast.makeText(MainActivity.this, "到点了！！！", Toast.LENGTH_LONG).show();
-                flag = false;
-            } else if ((scheduleFirst.getScheduleStartTime() - timeString <= 1000 * 60 * 10) && dis < 200 && flag) {
-                Toast.makeText(MainActivity.this, "到位啦", Toast.LENGTH_SHORT).show();
-                flag = false;
+            if (scheduleFirst.getScheduleStartTime() - timeString > 0 && scheduleFirst.getScheduleStartTime() - timeString <= 1000 * 60 * 10) {
+
+                if (dis >= 200 && flag) {
+
+                    alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+                    Intent intent0 = new Intent(MainActivity.this, AlarmReceiver.class);
+                    PendingIntent pendingIntent0 = PendingIntent.getBroadcast(MainActivity.this, 0, intent0, PendingIntent.FLAG_CANCEL_CURRENT);
+                    alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), pendingIntent0);
+
+                    // 通知
+                    Toast.makeText(MainActivity.this, "到点了！！！", Toast.LENGTH_LONG).show();
+                    // 创建通知
+                    NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    Notification notification;
+
+                    Intent intent = new Intent(MainActivity.this, NotificationActivity.class);
+                    PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+                    NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext())
+                            .setSmallIcon(R.drawable.app_logo)
+                            .setContentTitle(scheduleFirst.getScheduleInfo())
+                            .setContentText(scheduleFirst.getScheduleTitle())
+                            .setWhen(System.currentTimeMillis())
+                            .setContentIntent(pendingIntent)
+                            .setDefaults(Notification.DEFAULT_ALL);
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        NotificationChannel channel = new NotificationChannel("to-do", "待办事项", NotificationManager.IMPORTANCE_HIGH);
+                        channel.enableVibration(true);
+                        channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+                        channel.setVibrationPattern(new long[]{500});
+                        manager.createNotificationChannel(channel);
+
+                        builder.setChannelId("to-do");
+                        notification = builder.build();
+                    } else {
+                        notification = builder.build();
+                    }
+
+                    manager.notify(1, notification);
+
+                    flag = false;
+
+                } else if (dis < 200 && flag) {
+
+                    Toast.makeText(MainActivity.this, "到位啦", Toast.LENGTH_LONG).show();
+
+                    // 创建通知
+                    NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    Notification notification;
+
+                    Intent intent = new Intent(MainActivity.this, NotificationActivity.class);
+                    PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+                    NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext())
+                            .setSmallIcon(R.drawable.app_logo)
+                            .setContentTitle(scheduleFirst.getScheduleTitle())
+                            .setContentText(scheduleFirst.getScheduleInfo())
+                            .setWhen(System.currentTimeMillis())
+                            .setContentIntent(pendingIntent)
+                            .setDefaults(Notification.DEFAULT_ALL);
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        NotificationChannel channel = new NotificationChannel("to-do", "待办事项", NotificationManager.IMPORTANCE_HIGH);
+                        channel.enableVibration(true);
+                        channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+                        channel.setVibrationPattern(new long[]{500});
+                        manager.createNotificationChannel(channel);
+
+                        builder.setChannelId("to-do");
+                        notification = builder.build();
+                    } else {
+                        notification = builder.build();
+                    }
+
+                    manager.notify(1, notification);
+
+                    flag = false;
+                }
+            } else if (scheduleFirst.getScheduleStartTime() - timeString < 0) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                fresh();
+                            }
+                        });
+                    }
+                }).start();
             }
         }
 
@@ -812,7 +916,7 @@ public class MainActivity extends BaseActivity {
         try {
             Thread.sleep(1000);
             initScheduleToShow();
-            getScheduleFirstItem();
+            isGetFirst = true;
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -825,12 +929,13 @@ public class MainActivity extends BaseActivity {
                 .execute(new SimpleCallBack<List<Schedule>>() {
                     @Override
                     public void onSuccess(List<Schedule> data) throws Throwable {
+
+                        Log.d(TAG, "请求URL成功：" + data);
+
                         if (data != null) {
-                            gsonFirst = new Gson();
+
                             editor = sharedPreferences.edit();
-                            jsonFirstSave = gsonFirst.toJson(data.get(0));
-                            Log.d("testtt", jsonFirstSave);
-                            editor.putString("schedule_first", jsonFirstSave);
+                            editor.putString("schedule_first", gsonFirst.toJson(data));
 
                             if (editor.commit()) {
                                 Log.d(TAG, "save first success!!!");
@@ -869,8 +974,7 @@ public class MainActivity extends BaseActivity {
 
                             // 把日程信息List放入sharedPreferences中
                             editor = sharedPreferences.edit();
-                            jsonToSave = gson.toJson(data);
-                            editor.putString("schedule_list", jsonToSave);
+                            editor.putString("schedule_list", gson.toJson(data));
 
                             if (editor.commit()) {
                                 Log.d(TAG, "save success!!!");
