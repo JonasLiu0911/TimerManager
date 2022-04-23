@@ -91,35 +91,4 @@
 
     </RelativeLayout>
 
-    <!--  事项列表  -->
-    <RelativeLayout
-        android:id="@+id/re_pop_after_check"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="150dp"
-        android:background="@drawable/view_background">
-
-        <ImageView
-            android:id="@+id/pack_up_list"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_alignParentTop="true"
-            android:background="@drawable/pack_up_background"
-            android:gravity="center"
-            android:src="@drawable/pack_up"
-            android:textSize="20sp" />
-
-        <GridView
-            android:id="@+id/grid_view_main"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="40dp"
-            android:layout_marginRight="5dp"
-            android:numColumns="1"
-            android:verticalSpacing="5dp" />
-    </RelativeLayout>
-
-
 </RelativeLayout>

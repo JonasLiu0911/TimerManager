@@ -1,7 +1,6 @@
 package cn.xtu.lhj.timermanager;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
@@ -20,17 +19,23 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.net.Uri;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.DatePicker;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -42,7 +47,6 @@ import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
-import com.baidu.mapapi.map.DotOptions;
 import com.baidu.mapapi.map.LogoPosition;
 import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdate;
@@ -50,7 +54,6 @@ import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
-import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.search.geocode.GeoCodeResult;
 import com.baidu.mapapi.search.geocode.GeoCoder;
@@ -75,7 +78,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
 import cn.xtu.lhj.timermanager.adapter.GridAdapter;
 import cn.xtu.lhj.timermanager.bean.Schedule;
@@ -97,7 +99,6 @@ public class MainActivity extends BaseActivity {
     private BaiduMap mBaiduMap;
     private LocationClient mLocationClient;
     private MapView mMapView;
-    private MyLocationListener myLocationListener = new MyLocationListener();
     private NotificationUtils mNotificationUtils;
     private Notification notification;
     // 是否首次定位
@@ -110,9 +111,10 @@ public class MainActivity extends BaseActivity {
     ImageView scheduleCheckedImg;           // 事项选项按钮点击后
     ImageView newTrip;                      // 新建日程
     ImageView checkTrip;                    // 查看列表
-    RelativeLayout rePopScheduleList;       // 事项列表
-    ImageView packUpImg;                    // 收起
 //    ImageView toBackStage;
+
+    PopupWindow popupWindow;
+    View contentView;
 
     private GridView gridView;
     private GridAdapter gridAdapter;
@@ -122,11 +124,9 @@ public class MainActivity extends BaseActivity {
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
     private Gson gson;
-    private String jsonToSave;
     private String jsonToGet;
 
     private Gson gsonFirst;
-    private String jsonFirstSave;
     private String jsonFirstGet;
     private boolean flag = true;
     private boolean isGetFirst = true;
@@ -140,6 +140,8 @@ public class MainActivity extends BaseActivity {
     private String jsonCurGet;
     private Schedule currentSch;
 
+    private Boolean isGetTime = false;
+    private Boolean isGetAddress = false;
 
     // 日期、时间选择相关
     private AddDialog addDialog;
@@ -158,6 +160,7 @@ public class MainActivity extends BaseActivity {
     private LocationClient locationClientInPick;
     private Double pointLongitude;
     private Double pointLatitude;
+
     private Gson gsonSaveLocation;
     private String jsonLocationToSave;
     private String jsonLocationToGet;
@@ -167,8 +170,6 @@ public class MainActivity extends BaseActivity {
     private String jsonSaveSchedule;
 
     private Integer detailScheduleId;
-    private Gson gsonUpdateSchedule;
-    private String jsonUpdateSchedule;
 
     // 日程详情查看相关
     private DetailDialog detailDialog;
@@ -207,7 +208,6 @@ public class MainActivity extends BaseActivity {
         // 地图初始化
         mMapView = findViewById(R.id.bd_map_view);
         mBaiduMap = mMapView.getMap();
-//        mBaiduMap.setMyLocationEnabled(true);
 
         mMapView.showZoomControls(false);
 
@@ -240,7 +240,7 @@ public class MainActivity extends BaseActivity {
                         ("适配android 8限制后台定位功能", "正在后台定位");
                 notification = builder2.build();
             } else {
-                //获取一个Notification构造器
+                // 获取一个Notification构造器
                 Notification.Builder builder = new Notification.Builder(MainActivity.this);
                 Intent nfIntent = new Intent(MainActivity.this, MainActivity.class);
 
@@ -258,8 +258,11 @@ public class MainActivity extends BaseActivity {
 
     }
 
-    // 页面控件及其显示 初始化
+    // 页面控件及其显示 初始化所有重要变量
     private void initPage() {
+
+        setPopWindow();
+
         // 头像按钮
         loginImg = findViewById(R.id.go_to_login);
         OnClickHead onClick = new OnClickHead();
@@ -288,18 +291,10 @@ public class MainActivity extends BaseActivity {
 //        OnClickToBack onClickToBack = new OnClickToBack();
 //        toBackStage.setOnClickListener(onClickToBack);
 
-        // 事项列表容器
-        rePopScheduleList = findViewById(R.id.re_pop_after_check);
-
-        packUpImg = findViewById(R.id.pack_up_list);
-        OnClickPackUp clickPackUp = new OnClickPackUp();
-        packUpImg.setOnClickListener(clickPackUp);
-
         scheduleCheckedImg.setVisibility(View.INVISIBLE);
         checkTrip.setVisibility(View.INVISIBLE);
         newTrip.setVisibility(View.INVISIBLE);
 //        toBackStage.setVisibility(View.INVISIBLE);
-        rePopScheduleList.setVisibility(View.INVISIBLE);
 
         sharedPreferences = getSharedPreferences("login_info", MODE_PRIVATE);
         editor = sharedPreferences.edit();
@@ -328,7 +323,7 @@ public class MainActivity extends BaseActivity {
         public void onClick(View v) {
             if (mLocationClient != null) {
                 if (isEnableLocInForeground) {
-                    //关闭后台定位（true：通知栏消失；false：通知栏可手动划除）
+                    // 关闭后台定位（true：通知栏消失；false：通知栏可手动划除）
                     mLocationClient.disableLocInForeground(true);
                     isEnableLocInForeground = false;
                     mLocationClient.stop();
@@ -354,15 +349,6 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    // 点击收起按钮
-    private class OnClickPackUp implements View.OnClickListener {
-
-        @Override
-        public void onClick(View v) {
-            rePopScheduleList.setVisibility(View.INVISIBLE);
-        }
-    }
-
     // 点击事项选项隐藏按钮
     private class OnClickChecked implements View.OnClickListener {
 
@@ -373,7 +359,6 @@ public class MainActivity extends BaseActivity {
             newTrip.setVisibility(View.INVISIBLE);
             checkTrip.setVisibility(View.INVISIBLE);
 //            toBackStage.setVisibility(View.INVISIBLE);
-            rePopScheduleList.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -394,7 +379,6 @@ public class MainActivity extends BaseActivity {
                     checkTrip.setVisibility(View.INVISIBLE);
 //                    toBackStage.setVisibility(View.INVISIBLE);
 
-                    rePopScheduleList.setVisibility(View.INVISIBLE);
                 } else {
                     Toast.makeText(MainActivity.this, "当前按钮无效", Toast.LENGTH_SHORT).show();
                 }
@@ -409,7 +393,6 @@ public class MainActivity extends BaseActivity {
                     checkTrip.setVisibility(View.INVISIBLE);
 //                    toBackStage.setVisibility(View.INVISIBLE);
 
-                    rePopScheduleList.setVisibility(View.INVISIBLE);
                 } else {
                     Toast.makeText(MainActivity.this, "当前按钮无效", Toast.LENGTH_SHORT).show();
                 }
@@ -432,10 +415,32 @@ public class MainActivity extends BaseActivity {
                     Toast.makeText(MainActivity.this, "当前按钮无效", Toast.LENGTH_SHORT).show();
                 }
             } else {
-                rePopScheduleList.setVisibility(View.VISIBLE);
+                popupWindow.showAtLocation(contentView, Gravity.BOTTOM, 0, 0);
             }
 
         }
+    }
+
+    private void setPopWindow() {
+        contentView = LayoutInflater.from(MainActivity.this).inflate(R.layout.popup_window, null);
+        ImageView imageViewInPop = contentView.findViewById(R.id.button_hidden);
+        imageViewInPop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                popupWindow.dismiss();
+            }
+        });
+
+        popupWindow = new PopupWindow(contentView,
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        popupWindow.setBackgroundDrawable(new BitmapDrawable());
+        popupWindow.setOutsideTouchable(true);
+        popupWindow.setTouchable(true);
+        popupWindow.setFocusable(true);
+
+        popupWindow.setAnimationStyle(R.style.pop_window_anim_style);
     }
     // ========================================== 按钮相关 end ==========================================
 
@@ -562,7 +567,6 @@ public class MainActivity extends BaseActivity {
                 Log.d(TAG, centerPoint.latitude + "/" + centerPoint.longitude);
                 // 把选择好的位置信息存入sharedPreferences中
                 LatLng locationToStock = new LatLng(pointLatitude, pointLongitude);
-                editor = sharedPreferences.edit();
                 jsonLocationToSave = gsonSaveLocation.toJson(locationToStock);
                 editor.putString("location_save", jsonLocationToSave);
                 Log.d("update--", centerPoint.latitude + "/" + centerPoint.longitude);
@@ -743,7 +747,7 @@ public class MainActivity extends BaseActivity {
     private void initScheduleToShow() {
 
         gson = new Gson();
-        sharedPreferences = getSharedPreferences("login_info", MODE_PRIVATE);
+
         asyncGetScheduleWithXHttp2(sharedPreferences.getString("telephone", ""));
 
         // 从sharedPreferences中取出日程信息List
@@ -775,7 +779,7 @@ public class MainActivity extends BaseActivity {
     private void getScheduleFirstItem() {
 
         gsonFirst = new Gson();
-        sharedPreferences = getSharedPreferences("login_info", MODE_PRIVATE);
+
         asyncGetScheduleWithXHttp22(sharedPreferences.getString("telephone", ""));
 
     }
@@ -828,7 +832,7 @@ public class MainActivity extends BaseActivity {
                     Toast.makeText(MainActivity.this, "到点了！！！", Toast.LENGTH_LONG).show();
                     // 创建通知
                     NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                    Notification notification;
+                    Notification notification1;
 
                     Intent intent = new Intent(MainActivity.this, NotificationActivity.class);
                     PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
@@ -849,12 +853,12 @@ public class MainActivity extends BaseActivity {
                         manager.createNotificationChannel(channel);
 
                         builder.setChannelId("to-do");
-                        notification = builder.build();
+                        notification1 = builder.build();
                     } else {
-                        notification = builder.build();
+                        notification1 = builder.build();
                     }
 
-                    manager.notify(1, notification);
+                    manager.notify(1, notification1);
 
                     flag = false;
 
@@ -864,7 +868,7 @@ public class MainActivity extends BaseActivity {
 
                     // 创建通知
                     NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                    Notification notification;
+                    Notification notification1;
 
                     Intent intent = new Intent(MainActivity.this, NotificationActivity.class);
                     PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
@@ -878,19 +882,19 @@ public class MainActivity extends BaseActivity {
                             .setDefaults(Notification.DEFAULT_ALL);
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        NotificationChannel channel = new NotificationChannel("to-do", "待办事项", NotificationManager.IMPORTANCE_HIGH);
+                        NotificationChannel channel = new NotificationChannel("to-do", "待办日程", NotificationManager.IMPORTANCE_HIGH);
                         channel.enableVibration(true);
                         channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
                         channel.setVibrationPattern(new long[]{500});
                         manager.createNotificationChannel(channel);
 
                         builder.setChannelId("to-do");
-                        notification = builder.build();
+                        notification1 = builder.build();
                     } else {
-                        notification = builder.build();
+                        notification1 = builder.build();
                     }
 
-                    manager.notify(1, notification);
+                    manager.notify(1, notification1);
 
                     flag = false;
                 }
@@ -934,7 +938,6 @@ public class MainActivity extends BaseActivity {
 
                         if (data != null) {
 
-                            editor = sharedPreferences.edit();
                             editor.putString("schedule_first", gsonFirst.toJson(data));
 
                             if (editor.commit()) {
@@ -973,7 +976,6 @@ public class MainActivity extends BaseActivity {
                         if (data != null) {
 
                             // 把日程信息List放入sharedPreferences中
-                            editor = sharedPreferences.edit();
                             editor.putString("schedule_list", gson.toJson(data));
 
                             if (editor.commit()) {
@@ -984,7 +986,7 @@ public class MainActivity extends BaseActivity {
 
                             setDateAndTimePickDialog();
 
-                            gridView = findViewById(R.id.grid_view_main);
+                            gridView = contentView.findViewById(R.id.schedule_pop_list);
                             gridAdapter = new GridAdapter(MainActivity.this, data, onClickListener);  // 实例化适配器
                             gridView.setAdapter(gridAdapter);
 
@@ -994,6 +996,21 @@ public class MainActivity extends BaseActivity {
 
                                     Schedule scheduleDetail = gridAdapter.getItem(position);
                                     detailScheduleId = scheduleDetail.getId();
+
+                                    Gson gsonUpdateLoc = new Gson();
+
+                                    Date dateTemp = new Date(scheduleDetail.getScheduleStartTime());
+
+                                    editor.putInt("year", dateTemp.getYear());
+                                    editor.putInt("month", dateTemp.getMonth());
+                                    editor.putInt("day", dateTemp.getDate());
+                                    editor.putInt("hour", dateTemp.getHours());
+                                    editor.putInt("minute", dateTemp.getMinutes());
+
+                                    LatLng locationDe = new LatLng(scheduleDetail.getLatitude().doubleValue(), scheduleDetail.getLongitude().doubleValue());
+                                    editor.putString("location_save", gsonUpdateLoc.toJson(locationDe));
+
+                                    editor.commit();
 
                                     // 在这里写，弹出日程详情的dialog
                                     detailDialog = new DetailDialog(MainActivity.this, R.style.dialog);
@@ -1013,7 +1030,6 @@ public class MainActivity extends BaseActivity {
 
                                         @Override
                                         public void updateAddressClick() {
-//                                            Toast.makeText(MainActivity.this, "更新地址", Toast.LENGTH_SHORT).show();
                                             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                                             imm.hideSoftInputFromWindow(detailDialog.detailTimeStr.getWindowToken(), 0);
 
@@ -1069,7 +1085,6 @@ public class MainActivity extends BaseActivity {
                                             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                                             imm.hideSoftInputFromWindow(detailDialog.detailTimeStr.getWindowToken(), 0);
 
-                                            editor = sharedPreferences.edit();
                                             // 取出电话号码
                                             String telephone = sharedPreferences.getString("telephone", "");
 
@@ -1365,8 +1380,9 @@ public class MainActivity extends BaseActivity {
 
                             @Override
                             public void onSubmitAddressClick() {
-                                Log.d(TAG, sharedPreferences.getString("location_save", "") + "kkkkk");
                                 editor.commit();
+                                isGetAddress = true;
+                                Log.d(TAG, sharedPreferences.getString("location_save", "") + "kkkkk");
                             }
                         }).show();
                         pickAddressDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);  // 点击EditText 弹出软键盘
@@ -1437,11 +1453,28 @@ public class MainActivity extends BaseActivity {
                         scheduleToServer.setScheduleInfo(inputDesc);
                         scheduleToServer.setScheduleStartTime(timeString);
                         Log.d(TAG, "-------：" + scheduleToServer.getScheduleStartTime());
+                        Log.d(TAG, "-------：" + scheduleToServer.getScheduleInfo());
+                        Log.d(TAG, "-------：" + scheduleToServer.getScheduleTitle());
+                        Log.d(TAG, "-------：" + scheduleToServer.getLatitude());
 
-                        gsonSaveSchedule = new Gson();
-                        jsonSaveSchedule = gsonSaveSchedule.toJson(scheduleToServer);
+                        if (scheduleToServer.getScheduleTitle().length() == 0
+                                || scheduleToServer.getScheduleInfo().length() == 0
+                                || !isGetTime
+                                || !isGetAddress) {
+                            Toast.makeText(MainActivity.this, "日程设置不能为空", Toast.LENGTH_SHORT).show();
+                            isGetTime = false;
+                            isGetAddress = false;
+                        } else {
 
-                        asyncAddScheduleWithXHttp2(jsonSaveSchedule);
+                            Toast.makeText(MainActivity.this, "无设置为空", Toast.LENGTH_SHORT).show();
+                            isGetTime = false;
+                            isGetAddress = false;
+                            addDialog.dismiss();
+                            gsonSaveSchedule = new Gson();
+                            jsonSaveSchedule = gsonSaveSchedule.toJson(scheduleToServer);
+
+                            asyncAddScheduleWithXHttp2(jsonSaveSchedule);
+                        }
 
                     }
 
@@ -1486,6 +1519,7 @@ public class MainActivity extends BaseActivity {
                                 editor.putInt("hour", hourOfDay);
                                 editor.putInt("minute", minute);
                                 editor.commit();
+                                isGetTime = true;
                             }
                         }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true);
                 timePickerDialog.setTitle("请选择具体时间");

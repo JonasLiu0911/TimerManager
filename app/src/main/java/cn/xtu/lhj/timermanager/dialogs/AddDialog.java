@@ -109,7 +109,6 @@ public class AddDialog extends AlertDialog {
             if (onClickListener != null) {
                 onClickListener.onSubmitClick();
             }
-            dismiss();
         }
     }
     private class OnClickCancel implements View.OnClickListener {

@@ -4,8 +4,8 @@
     <solid android:color="#EDEDED" />
     <!--分别设置左上，右上，左下，右下-->
     <corners
-        android:bottomLeftRadius="30px"
-        android:bottomRightRadius="30px"
+        android:bottomLeftRadius="0px"
+        android:bottomRightRadius="0px"
         android:topLeftRadius="30px"
         android:topRightRadius="30px" />
 </shape>

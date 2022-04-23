@@ -65,34 +65,30 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
                 <Button
                     android:id="@+id/btn_pick_time"
                     android:layout_height="wrap_content"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_weight="1"
-                    android:background="@drawable/view_background"
+                    android:background="@drawable/button_background"
                     android:text="选择时间"
                     android:textColor="#fff"
                     android:textSize="16sp"
                     android:layout_marginTop="10dp"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="5dp"
-                    android:layout_marginBottom="10dp"/>
+                    android:layout_marginBottom="5dp"/>
 
                 <Button
                     android:id="@+id/btn_pick_address"
                     android:layout_height="wrap_content"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_weight="1"
-                    android:background="@drawable/view_background"
+                    android:background="@drawable/button_background"
                     android:text="选择地点"
                     android:textColor="#fff"
                     android:textSize="16sp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginEnd="10dp"
+                    android:layout_marginTop="5dp"
                     android:layout_marginBottom="10dp" />
             </LinearLayout>
 
