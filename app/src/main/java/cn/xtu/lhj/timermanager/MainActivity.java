@@ -143,6 +143,9 @@ public class MainActivity extends BaseActivity {
     private Boolean isGetTime = false;
     private Boolean isGetAddress = false;
 
+    private Boolean isUpdatingTime = false;
+    private Boolean isUpdatingAddress = false;
+
     // 日期、时间选择相关
     private AddDialog addDialog;
     private DatePickerDialog.OnDateSetListener datePicker;
@@ -431,9 +434,7 @@ public class MainActivity extends BaseActivity {
             }
         });
 
-        popupWindow = new PopupWindow(contentView,
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
+        popupWindow = new PopupWindow(contentView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
         popupWindow.setBackgroundDrawable(new BitmapDrawable());
         popupWindow.setOutsideTouchable(true);
@@ -755,9 +756,8 @@ public class MainActivity extends BaseActivity {
         Type type = new TypeToken<List<Schedule>>() {}.getType();
         scheduleList = gson.fromJson(jsonToGet, type);
 
-        if (scheduleList == null) {
-            Log.d(TAG, "schedule list is empty");
-        } else {
+        if (scheduleList != null) {
+
             Log.d(TAG, "schedule list is not empty");
 
             for (Schedule i : scheduleList) {
@@ -769,9 +769,11 @@ public class MainActivity extends BaseActivity {
                 Log.d(TAG, "latitude is " + i.getLatitude());
                 Log.d(TAG, "longitude is " + i.getLongitude());
             }
+
+            getScheduleFirstItem();
+
         }
 
-        getScheduleFirstItem();
 
     }
 
@@ -795,9 +797,8 @@ public class MainActivity extends BaseActivity {
         scheduleFirstList = gsonFirst.fromJson(jsonFirstGet, type);
         scheduleFirst = scheduleFirstList.get(0);
 
-        if (scheduleFirst == null) {
-            Log.d(TAG, "schedule list first is empty");
-        } else {
+        if (scheduleFirst != null) {
+
             Log.d("testttt--", scheduleFirst.getScheduleStartTime() + "");
             Date dateJudge = new Date(System.currentTimeMillis());
             SimpleDateFormat dateFormatJudge = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -945,15 +946,16 @@ public class MainActivity extends BaseActivity {
                             } else {
                                 Log.d(TAG, "save first fail......");
                             }
-                        } else {
-                            Toast.makeText(MainActivity.this, "暂无日程", Toast.LENGTH_SHORT).show();
                         }
                     }
 
                     @Override
                     public void onError(ApiException e) {
                         Log.d(TAG, "请求Url异常：" + e.toString());
-                        showToastInThread(MainActivity.this, e.getMessage());
+                        editor.putString("schedule_first", gsonFirst.toJson((Object) null));
+                        editor.commit();
+
+                        Log.d(TAG, e.getMessage());
                     }
                 });
     }
@@ -974,6 +976,8 @@ public class MainActivity extends BaseActivity {
                         Log.d(TAG, "请求URL成功：" + data);
 
                         if (data != null) {
+
+                            Log.d("schedule_list", gson.toJson(data));
 
                             // 把日程信息List放入sharedPreferences中
                             editor.putString("schedule_list", gson.toJson(data));
@@ -1021,6 +1025,9 @@ public class MainActivity extends BaseActivity {
                                             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                                             imm.hideSoftInputFromWindow(detailDialog.detailTimeStr.getWindowToken(), 0);
                                             // 弹出日期时间选择器（Dialog）
+
+                                            isUpdatingTime = true;
+
                                             DatePickerDialog datePickerDialog = new DatePickerDialog(MainActivity.this,
                                                     AlertDialog.THEME_HOLO_DARK,
                                                     datePicker, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
@@ -1032,6 +1039,8 @@ public class MainActivity extends BaseActivity {
                                         public void updateAddressClick() {
                                             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                                             imm.hideSoftInputFromWindow(detailDialog.detailTimeStr.getWindowToken(), 0);
+
+                                            isUpdatingAddress = true;
 
                                             // 弹出地图＋POI搜索栏（对话框Dialog），用户选择地点
                                             pickAddressDialog = new PickAddressDialog(MainActivity.this, R.style.dialog_address);
@@ -1049,13 +1058,21 @@ public class MainActivity extends BaseActivity {
 
                                                 @Override
                                                 public void onCancelAddressClick() {
-//                                                    Toast.makeText(MainActivity.this, "必须选择地点，请重新进入", Toast.LENGTH_SHORT).show();
+                                                    isUpdatingAddress = false;
                                                 }
 
                                                 @Override
                                                 public void onSubmitAddressClick() {
-                                                    Log.d(TAG, sharedPreferences.getString("location_save", "") + "kkkkk");
+
                                                     editor.commit();
+
+                                                    if (isUpdatingAddress) {
+                                                        String temp = sharedPreferences.getString("location_save", "");
+                                                        Type type = new TypeToken<LatLng>() {}.getType();
+                                                        LatLng haha = gson.fromJson(temp, type);
+                                                        initLocationInDetail(haha.longitude, haha.latitude);
+                                                        isUpdatingAddress = false;
+                                                    }
                                                 }
                                             }).show();
                                             pickAddressDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);  // 点击EditText 弹出软键盘
@@ -1068,7 +1085,6 @@ public class MainActivity extends BaseActivity {
 
                                         @Override
                                         public void beginUpdateClick() {
-//                                            Toast.makeText(MainActivity.this, "开始更新", Toast.LENGTH_SHORT).show();
                                             detailDialog.initEvent();
                                             detailDialog.setCanceledOnTouchOutside(false);
                                         }
@@ -1173,8 +1189,6 @@ public class MainActivity extends BaseActivity {
                                     return true;
                                 }
                             });
-                        } else {
-                            Toast.makeText(MainActivity.this, "暂无日程", Toast.LENGTH_SHORT).show();
                         }
 
                     }
@@ -1182,6 +1196,10 @@ public class MainActivity extends BaseActivity {
                     @Override
                     public void onError(ApiException e) {
                         Log.d(TAG, "请求Url异常：" + e.toString());
+                        editor.putString("schedule_first", gsonFirst.toJson((Object) null));
+                        editor.commit();
+                        gridView = contentView.findViewById(R.id.schedule_pop_list);
+                        gridView.setAdapter(null);
                         showToastInThread(MainActivity.this, e.getMessage());
                     }
                 });
@@ -1382,6 +1400,19 @@ public class MainActivity extends BaseActivity {
                             public void onSubmitAddressClick() {
                                 editor.commit();
                                 isGetAddress = true;
+
+                                BDMapUtils.reverseGeoParse(pointLongitude, pointLatitude, new OnGetGeoCoderResultListener() {
+                                    @Override
+                                    public void onGetGeoCodeResult(GeoCodeResult geoCodeResult) {
+
+                                    }
+
+                                    @Override
+                                    public void onGetReverseGeoCodeResult(ReverseGeoCodeResult reverseGeoCodeResult) {
+//                                        addDialog.btPickAddress.setText(reverseGeoCodeResult.getAddress());
+                                        addDialog.btPickAddress.setText(reverseGeoCodeResult.getAddress() + "\n" + reverseGeoCodeResult.getSematicDescription());
+                                    }
+                                });
                                 Log.d(TAG, sharedPreferences.getString("location_save", "") + "kkkkk");
                             }
                         }).show();
@@ -1466,7 +1497,6 @@ public class MainActivity extends BaseActivity {
                             isGetAddress = false;
                         } else {
 
-                            Toast.makeText(MainActivity.this, "无设置为空", Toast.LENGTH_SHORT).show();
                             isGetTime = false;
                             isGetAddress = false;
                             addDialog.dismiss();
@@ -1520,12 +1550,37 @@ public class MainActivity extends BaseActivity {
                                 editor.putInt("minute", minute);
                                 editor.commit();
                                 isGetTime = true;
+
+                                int year = sharedPreferences.getInt("year", 2000);
+                                int month = sharedPreferences.getInt("month", 8);
+                                int day = sharedPreferences.getInt("day", 28);
+                                int hour = sharedPreferences.getInt("hour", 12);
+                                int minute1 = sharedPreferences.getInt("minute", 28);
+                                int second = 0;
+
+                                Log.d(TAG, "-------：" + year + "/" + month + "/" + day + "/" + hour + "/" + minute);
+
+                                // 事项时间（要提交）
+                                Date date11 = new Date();
+                                date11.setYear(year);
+                                date11.setMonth(month);
+                                date11.setDate(day);
+                                date11.setHours(hour);
+                                date11.setMinutes(minute1);
+                                date11.setSeconds(second);
+                                SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                addDialog.btPickTime.setText(f.format(date11));
+                                if (isUpdatingTime) {
+                                    detailDialog.detailTimeStr.setText(f.format(date11));
+                                    isUpdatingTime = false;
+                                }
                             }
                         }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true);
                 timePickerDialog.setTitle("请选择具体时间");
                 timePickerDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "取消", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        isUpdatingTime = false;
                         Toast.makeText(MainActivity.this, "必须选择具体时间，请重新进入", Toast.LENGTH_SHORT).show();
                     }
                 });
