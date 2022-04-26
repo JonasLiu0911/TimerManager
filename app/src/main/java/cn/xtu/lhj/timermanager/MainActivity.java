@@ -6,6 +6,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.animation.ValueAnimator;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -30,6 +31,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.DatePicker;
@@ -47,11 +49,14 @@ import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.map.BitmapDescriptor;
+import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.LogoPosition;
 import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
+import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
@@ -107,11 +112,9 @@ public class MainActivity extends BaseActivity {
 
     // 相关按钮
     ShapeableImageView loginImg;            // 头像按钮
-    ImageView scheduleNotCheckImg;          // 事项选项按钮点击前
-    ImageView scheduleCheckedImg;           // 事项选项按钮点击后
     ImageView newTrip;                      // 新建日程
     ImageView checkTrip;                    // 查看列表
-//    ImageView toBackStage;
+    ImageView toBackStage;
 
     PopupWindow popupWindow;
     View contentView;
@@ -134,6 +137,8 @@ public class MainActivity extends BaseActivity {
     private Schedule scheduleFirst;
 
     private AlarmManager alarmManager;
+
+    private BitmapDescriptor bitmapDescriptor;
 
     private Gson gsonCurrent;
     private String jsonCurSav;
@@ -271,14 +276,6 @@ public class MainActivity extends BaseActivity {
         OnClickHead onClick = new OnClickHead();
         loginImg.setOnClickListener(onClick);
 
-        scheduleNotCheckImg = findViewById(R.id.ai_schedule_not_check);
-        OnClickNotCheck clickNotCheck = new OnClickNotCheck();
-        scheduleNotCheckImg.setOnClickListener(clickNotCheck);
-
-        scheduleCheckedImg = findViewById(R.id.ai_schedule_checked);
-        OnClickChecked clickChecked = new OnClickChecked();
-        scheduleCheckedImg.setOnClickListener(clickChecked);
-
         // 事项列表按钮
         checkTrip = findViewById(R.id.iv_check_trip);
         OnClickList onClickList = new OnClickList();
@@ -293,11 +290,6 @@ public class MainActivity extends BaseActivity {
 //        toBackStage = findViewById(R.id.iv_to_backstage);
 //        OnClickToBack onClickToBack = new OnClickToBack();
 //        toBackStage.setOnClickListener(onClickToBack);
-
-        scheduleCheckedImg.setVisibility(View.INVISIBLE);
-        checkTrip.setVisibility(View.INVISIBLE);
-        newTrip.setVisibility(View.INVISIBLE);
-//        toBackStage.setVisibility(View.INVISIBLE);
 
         sharedPreferences = getSharedPreferences("login_info", MODE_PRIVATE);
         editor = sharedPreferences.edit();
@@ -339,31 +331,6 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    // 点击事项选项展示按钮
-    private class OnClickNotCheck implements View.OnClickListener {
-
-        @Override
-        public void onClick(View v) {
-            scheduleNotCheckImg.setVisibility(View.INVISIBLE);
-            scheduleCheckedImg.setVisibility(View.VISIBLE);
-            newTrip.setVisibility(View.VISIBLE);
-            checkTrip.setVisibility(View.VISIBLE);
-//            toBackStage.setVisibility(View.VISIBLE);
-        }
-    }
-
-    // 点击事项选项隐藏按钮
-    private class OnClickChecked implements View.OnClickListener {
-
-        @Override
-        public void onClick(View v) {
-            scheduleCheckedImg.setVisibility(View.INVISIBLE);
-            scheduleNotCheckImg.setVisibility(View.VISIBLE);
-            newTrip.setVisibility(View.INVISIBLE);
-            checkTrip.setVisibility(View.INVISIBLE);
-//            toBackStage.setVisibility(View.INVISIBLE);
-        }
-    }
 
     // 点击头像跳转登录页---------加拦截器
     private class OnClickHead implements View.OnClickListener {
@@ -376,12 +343,6 @@ public class MainActivity extends BaseActivity {
                 if (intent != null) {
                     startActivity(intent);
 
-                    scheduleCheckedImg.setVisibility(View.INVISIBLE);
-                    scheduleNotCheckImg.setVisibility(View.VISIBLE);
-                    newTrip.setVisibility(View.INVISIBLE);
-                    checkTrip.setVisibility(View.INVISIBLE);
-//                    toBackStage.setVisibility(View.INVISIBLE);
-
                 } else {
                     Toast.makeText(MainActivity.this, "当前按钮无效", Toast.LENGTH_SHORT).show();
                 }
@@ -389,12 +350,6 @@ public class MainActivity extends BaseActivity {
                 Intent intent = new Intent(MainActivity.this, UserActivity.class);
                 if (intent != null) {
                     startActivity(intent);
-
-                    scheduleCheckedImg.setVisibility(View.INVISIBLE);
-                    scheduleNotCheckImg.setVisibility(View.VISIBLE);
-                    newTrip.setVisibility(View.INVISIBLE);
-                    checkTrip.setVisibility(View.INVISIBLE);
-//                    toBackStage.setVisibility(View.INVISIBLE);
 
                 } else {
                     Toast.makeText(MainActivity.this, "当前按钮无效", Toast.LENGTH_SHORT).show();
@@ -427,11 +382,9 @@ public class MainActivity extends BaseActivity {
     private void setPopWindow() {
         contentView = LayoutInflater.from(MainActivity.this).inflate(R.layout.popup_window, null);
         ImageView imageViewInPop = contentView.findViewById(R.id.button_hidden);
-        imageViewInPop.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popupWindow.dismiss();
-            }
+        imageViewInPop.setOnClickListener(v -> {
+            gridAdapter.setIsShowDelete(false);
+            popupWindow.dismiss();
         });
 
         popupWindow = new PopupWindow(contentView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -484,7 +437,7 @@ public class MainActivity extends BaseActivity {
                                 .setContentText("正在后台定位")                       // 设置上下文内容
                                 .setWhen(System.currentTimeMillis());               // 设置该通知发生的时间
 
-                        notification = builder.build(); // 获取构建好的Notification
+                        notification = builder.build();                             // 获取构建好的Notification
                     }
                     notification.defaults = Notification.DEFAULT_SOUND;             //设置为默认的声音
                 } else {
@@ -547,7 +500,7 @@ public class MainActivity extends BaseActivity {
         baiduMapInPick.setOnMapStatusChangeListener(new BaiduMap.OnMapStatusChangeListener() {
             @Override
             public void onMapStatusChangeStart(MapStatus mapStatus) {
-
+                setTranslateAnimation(pickAddressDialog.movePickPoint);
             }
 
             @Override
@@ -617,6 +570,22 @@ public class MainActivity extends BaseActivity {
         locationClientInPick.start();
     }
 
+    // 图片上下浮动
+    private void setTranslateAnimation(ImageView iv) {
+        ValueAnimator animator = ValueAnimator.ofInt(0, -25, 0);
+        animator.addUpdateListener(animation -> {
+            int currentValue = (Integer) animation.getAnimatedValue();
+            System.out.println(currentValue);
+            iv.setTranslationY(currentValue);
+            iv.requestLayout();
+        });
+        animator.setRepeatMode(ValueAnimator.RESTART);
+        animator.setRepeatCount(1);
+        animator.setInterpolator(new AccelerateDecelerateInterpolator());
+        animator.setDuration(500);
+        animator.start();
+    }
+
     // 详情框中定位初始化 ccc
     private void initLocationInDetail(double longitude, double latitude) {
         mapViewInDetail = detailDialog.detailAddressBaiduMap;
@@ -640,10 +609,19 @@ public class MainActivity extends BaseActivity {
 
         detailDialog.detailPoint.setVisibility(View.VISIBLE);
 
-        // 标记点加不上啊！！！呜呜呜
-//        BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.marker_small);
-//        OverlayOptions markerOptions = new MarkerOptions().position(point).icon(bitmapDescriptor);
-//        baiduMapInDetail.addOverlay(markerOptions);
+//        baiduMapInDetail.setOnMapLoadedCallback(() -> {
+//                createMarker(point);
+//        });
+    }
+
+    private void createMarker(LatLng latLng) {
+        Log.d("debug--", "11111111111");
+        bitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.icon_mark);
+        Log.d("debug--", "22222222222");
+        MarkerOptions markerOptions = new MarkerOptions().position(latLng).icon(bitmapDescriptor);
+        Log.d("debug--", "33333333333");
+        baiduMapInDetail.addOverlay(markerOptions);
+        Log.d("debug--", "44444444444");
     }
 
     // 首页的位置监听，定位到当前位置 ccc
@@ -660,7 +638,7 @@ public class MainActivity extends BaseActivity {
                 MapStatusUpdate update = MapStatusUpdateFactory.newLatLng(ll);
                 mBaiduMap.animateMapStatus(update);
 
-                update = MapStatusUpdateFactory.zoomTo(19.0f);
+                update = MapStatusUpdateFactory.zoomTo(18.0f);
                 mBaiduMap.animateMapStatus(update);
 
                 if (mBaiduMap.getLocationData() != null) {
@@ -720,14 +698,6 @@ public class MainActivity extends BaseActivity {
         mMapView.onDestroy();
         mBaiduMap.setMyLocationEnabled(false);    // 关闭定位图层
         mLocationClient.stop();                   // 停止定位服务
-
-        mapViewInPick.onDestroy();
-        baiduMapInPick.setMyLocationEnabled(false);
-        locationClientInPick.stop();
-        if (geoCoderInPick != null) {
-            geoCoderInPick.destroy();
-        }
-        mapViewInPick = null;
     }
 
     @Override
@@ -820,7 +790,7 @@ public class MainActivity extends BaseActivity {
             double dis = DistanceUtils.calculateDistance(targetPoint.latitude, targetPoint.longitude, currentPoint.latitude, currentPoint.longitude);
 
             // 判断时间是否到达列表最早日程开始时间点 前十分钟
-            if (scheduleFirst.getScheduleStartTime() - timeString > 0 && scheduleFirst.getScheduleStartTime() - timeString <= 1000 * 60 * 10) {
+            if (scheduleFirst.getScheduleStartTime() - timeString > 0 && scheduleFirst.getScheduleStartTime() - timeString <= 1000 * 60 * 20) {
 
                 if (dis >= 200 && flag) {
 
@@ -829,8 +799,6 @@ public class MainActivity extends BaseActivity {
                     PendingIntent pendingIntent0 = PendingIntent.getBroadcast(MainActivity.this, 0, intent0, PendingIntent.FLAG_CANCEL_CURRENT);
                     alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), pendingIntent0);
 
-                    // 通知
-                    Toast.makeText(MainActivity.this, "到点了！！！", Toast.LENGTH_LONG).show();
                     // 创建通知
                     NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                     Notification notification1;
@@ -865,13 +833,11 @@ public class MainActivity extends BaseActivity {
 
                 } else if (dis < 200 && flag) {
 
-                    Toast.makeText(MainActivity.this, "到位啦", Toast.LENGTH_LONG).show();
-
                     // 创建通知
                     NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                     Notification notification1;
 
-                    Intent intent = new Intent(MainActivity.this, NotificationActivity.class);
+                    Intent intent = new Intent(MainActivity.this, ArrivedActivity.class);
                     PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
                     NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext())
@@ -899,18 +865,9 @@ public class MainActivity extends BaseActivity {
 
                     flag = false;
                 }
+
             } else if (scheduleFirst.getScheduleStartTime() - timeString < 0) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                fresh();
-                            }
-                        });
-                    }
-                }).start();
+                new Thread(() -> runOnUiThread(() -> fresh())).start();
             }
         }
 
@@ -997,6 +954,8 @@ public class MainActivity extends BaseActivity {
                             gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                                 @Override
                                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                                    gridAdapter.setIsShowDelete(false);
 
                                     Schedule scheduleDetail = gridAdapter.getItem(position);
                                     detailScheduleId = scheduleDetail.getId();
@@ -1175,19 +1134,16 @@ public class MainActivity extends BaseActivity {
                                 }
                             });
 
-                            gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-                                @Override
-                                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                            gridView.setOnItemLongClickListener((parent, view, position, id) -> {
 
-                                    if (gridAdapter.getIsShowDelete()) {
-                                        isShowDelete = false;
-                                    } else {
-                                        isShowDelete = true;
-                                    }
-                                    gridAdapter.setIsShowDelete(isShowDelete);
-
-                                    return true;
+                                if (gridAdapter.getIsShowDelete()) {
+                                    isShowDelete = false;
+                                } else {
+                                    isShowDelete = true;
                                 }
+                                gridAdapter.setIsShowDelete(isShowDelete);
+
+                                return true;
                             });
                         }
 
@@ -1232,20 +1188,10 @@ public class MainActivity extends BaseActivity {
                 .syncRequest(false)
                 .execute(new SimpleCallBack<Object>() {
                     @Override
-                    public void onSuccess(Object response) throws Throwable {
+                    public void onSuccess(Object response) {
                         Toast.makeText(MainActivity.this, "添加成功", Toast.LENGTH_SHORT).show();
 
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        fresh();
-                                    }
-                                });
-                            }
-                        }).start();
+                        new Thread(() -> runOnUiThread(() -> fresh())).start();
                     }
 
                     @Override
@@ -1262,20 +1208,10 @@ public class MainActivity extends BaseActivity {
                 .syncRequest(false)
                 .execute(new SimpleCallBack<Object>() {
                     @Override
-                    public void onSuccess(Object response) throws Throwable {
+                    public void onSuccess(Object response) {
                         Toast.makeText(MainActivity.this, "修改成功", Toast.LENGTH_SHORT).show();
 
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        fresh();
-                                    }
-                                });
-                            }
-                        }).start();
+                        new Thread(() -> runOnUiThread(() -> fresh())).start();
                     }
 
                     @Override
@@ -1297,20 +1233,10 @@ public class MainActivity extends BaseActivity {
                 .syncRequest(false)
                 .execute(new SimpleCallBack<Object>() {
                     @Override
-                    public void onSuccess(Object response) throws Throwable {
+                    public void onSuccess(Object response) {
                         Toast.makeText(MainActivity.this, "删除成功", Toast.LENGTH_SHORT).show();
 
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        fresh();
-                                    }
-                                });
-                            }
-                        }).start();
+                        new Thread(() -> runOnUiThread(() -> fresh())).start();
                     }
 
                     @Override

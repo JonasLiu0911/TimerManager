@@ -6,11 +6,101 @@
     android:layout_height="match_parent"
     tools:context=".NotificationActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:textSize="24sp"
-        android:text="这是通知点击后的界面" />
+        <com.baidu.mapapi.map.MapView
+            android:id="@+id/here_map"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:alpha="0.6"
+            android:background="#fff" />
+
+        <TextView
+            android:id="@+id/here_title"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:text="事项标题"
+            android:textSize="26sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="60dp"
+            android:alpha="0.8"
+            android:background="#fff" />
+
+        <TextView
+            android:id="@+id/here_time_down"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="65dp"
+            android:gravity="center"
+            android:text="倒计时"
+            android:textColor="#FF5B4F"
+            android:textSize="30sp" />
+
+        <TextView
+            android:id="@+id/here_dis_down"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="110dp"
+            android:gravity="center"
+            android:text="距离"
+            android:textColor="#30BA4D"
+            android:textSize="30sp" />
+
+        <ImageView
+            android:id="@+id/here_center_point"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_centerInParent="true"
+            android:layout_marginBottom="10dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/marker" />
+
+        <TextView
+            android:id="@+id/not_arrive"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/no_btn_bg"
+            android:clickable="true"
+            android:gravity="center"
+            android:onClick="noHere"
+            android:text="未到达"
+            android:textColor="#fff"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/had_arrived"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/yes_btn_bg"
+            android:clickable="true"
+            android:gravity="center"
+            android:onClick="yesHere"
+            android:text="已到达"
+            android:textColor="#fff"
+            android:textSize="24sp" />
 
 </RelativeLayout>

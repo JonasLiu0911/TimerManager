@@ -120,6 +120,7 @@ public class HistoryAdapter extends BaseAdapter {
         });
         Log.d("Longitude Latitude", scheduleLongitude + " " + scheduleLatitude);
 
+        viewHolder.ivDeleteSchedule.bringToFront();
         viewHolder.ivDeleteSchedule.setVisibility(isShowDelete ? View.VISIBLE : View.GONE);
         viewHolder.ivDeleteSchedule.setTag(position);
         viewHolder.ivDeleteSchedule.setOnClickListener(this.onClickListener);

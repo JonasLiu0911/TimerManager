@@ -21,7 +21,7 @@
             android:layout_height="80dp">
 
             <LinearLayout
-                android:layout_width="220dp"
+                android:layout_width="175dp"
                 android:layout_height="60dp"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"
@@ -29,29 +29,10 @@
                 android:layout_marginTop="10dp"
                 android:orientation="horizontal">
 
-                <RelativeLayout
-                    android:layout_width="60dp"
-                    android:layout_height="60dp">
-
-                    <ImageView
-                        android:id="@+id/ai_schedule_not_check"
-                        android:layout_width="60dp"
-                        android:layout_height="60dp"
-                        android:layout_centerVertical="true"
-                        android:src="@drawable/schedule_not_check" />
-
-                    <ImageView
-                        android:id="@+id/ai_schedule_checked"
-                        android:layout_width="60dp"
-                        android:layout_height="60dp"
-                        android:layout_centerVertical="true"
-                        android:src="@drawable/schedule_checked" />
-                </RelativeLayout>
-
                 <ImageView
                     android:id="@+id/iv_new_trip"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="45dp"
+                    android:layout_height="45dp"
                     android:layout_gravity="center"
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="5dp"
@@ -59,20 +40,20 @@
 
                 <ImageView
                     android:id="@+id/iv_check_trip"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="45dp"
+                    android:layout_height="45dp"
                     android:layout_gravity="center"
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="10dp"
                     android:src="@drawable/list" />
 
-<!--                <ImageView-->
-<!--                    android:id="@+id/iv_to_backstage"-->
-<!--                    android:layout_width="40dp"-->
-<!--                    android:layout_height="40dp"-->
-<!--                    android:layout_gravity="center"-->
-<!--                    android:layout_marginRight="10dp"-->
-<!--                    android:src="@drawable/to_back_stage" />-->
+                <ImageView
+                    android:id="@+id/iv_to_backstage"
+                    android:layout_width="45dp"
+                    android:layout_height="45dp"
+                    android:layout_gravity="center"
+                    android:layout_marginRight="10dp"
+                    android:src="@drawable/to_back_stage" />
 
             </LinearLayout>
 

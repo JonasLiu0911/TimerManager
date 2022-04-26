@@ -133,6 +133,8 @@ public class HistoryActivity extends BaseActivity {
                             });
 
                             gridView.setOnItemClickListener((parent, view, position, id) -> {
+
+                                historyAdapter.setIsShowDelete(false);
                                 Schedule scheduleHistory = historyAdapter.getItem(position);
 
                                 historyDialog = new HistoryDialog(HistoryActivity.this, R.style.dialog);

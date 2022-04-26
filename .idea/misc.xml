@@ -42,29 +42,35 @@
         <entry key="..\:/ZZZ_Project_COPY/TimerManager/app/src/main/res/menu/user_title_menu.xml" value="0.1609375" />
         <entry key="..\:/ZZZ_Project_COPY/TimerManager/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.1835" />
         <entry key="..\:/ZZZ_Project_COPY/TimerManager/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.1835" />
+        <entry key="..\:/ZZZ_Project_jonas/TimerManager/app/src/main/res/drawable/arrived_btn_bg.xml" value="0.1865" />
         <entry key="..\:/ZZZ_Project_jonas/TimerManager/app/src/main/res/drawable/bars_background.xml" value="0.148" />
         <entry key="..\:/ZZZ_Project_jonas/TimerManager/app/src/main/res/drawable/button_background.xml" value="0.2235" />
         <entry key="..\:/ZZZ_Project_jonas/TimerManager/app/src/main/res/drawable/dialog_bg.xml" value="0.2085" />
         <entry key="..\:/ZZZ_Project_jonas/TimerManager/app/src/main/res/drawable/edittext_background.xml" value="0.2195" />
         <entry key="..\:/ZZZ_Project_jonas/TimerManager/app/src/main/res/drawable/edittext_cursor.xml" value="0.207" />
         <entry key="..\:/ZZZ_Project_jonas/TimerManager/app/src/main/res/drawable/edittext_selector.xml" value="0.207" />
+        <entry key="..\:/ZZZ_Project_jonas/TimerManager/app/src/main/res/drawable/nfc_btn_bg.xml" value="0.1945" />
+        <entry key="..\:/ZZZ_Project_jonas/TimerManager/app/src/main/res/drawable/no_btn_bg.xml" value="0.1895" />
         <entry key="..\:/ZZZ_Project_jonas/TimerManager/app/src/main/res/drawable/pack_up_background.xml" value="0.1775" />
         <entry key="..\:/ZZZ_Project_jonas/TimerManager/app/src/main/res/drawable/popwindow_bg.xml" value="0.2135" />
         <entry key="..\:/ZZZ_Project_jonas/TimerManager/app/src/main/res/drawable/shape_gradient.xml" value="0.2085" />
         <entry key="..\:/ZZZ_Project_jonas/TimerManager/app/src/main/res/drawable/shape_radius_button.xml" value="0.191" />
         <entry key="..\:/ZZZ_Project_jonas/TimerManager/app/src/main/res/drawable/time_addr_background.xml" value="0.2105" />
+        <entry key="..\:/ZZZ_Project_jonas/TimerManager/app/src/main/res/drawable/title_background.xml" value="0.217" />
         <entry key="..\:/ZZZ_Project_jonas/TimerManager/app/src/main/res/drawable/up_view_background.xml" value="0.2235" />
         <entry key="..\:/ZZZ_Project_jonas/TimerManager/app/src/main/res/drawable/view_background.xml" value="0.2025" />
+        <entry key="..\:/ZZZ_Project_jonas/TimerManager/app/src/main/res/drawable/yes_btn_bg.xml" value="0.22" />
         <entry key="..\:/ZZZ_Project_jonas/TimerManager/app/src/main/res/layout/action_bar.xml" value="0.19537037037037036" />
         <entry key="..\:/ZZZ_Project_jonas/TimerManager/app/src/main/res/layout/activity_age_change.xml" value="0.23802083333333332" />
+        <entry key="..\:/ZZZ_Project_jonas/TimerManager/app/src/main/res/layout/activity_arrived.xml" value="0.23802083333333332" />
         <entry key="..\:/ZZZ_Project_jonas/TimerManager/app/src/main/res/layout/activity_count_down.xml" value="0.19537037037037036" />
         <entry key="..\:/ZZZ_Project_jonas/TimerManager/app/src/main/res/layout/activity_gender_change.xml" value="0.23802083333333332" />
         <entry key="..\:/ZZZ_Project_jonas/TimerManager/app/src/main/res/layout/activity_history.xml" value="0.264" />
         <entry key="..\:/ZZZ_Project_jonas/TimerManager/app/src/main/res/layout/activity_info_change.xml" value="0.4" />
         <entry key="..\:/ZZZ_Project_jonas/TimerManager/app/src/main/res/layout/activity_login.xml" value="0.264" />
-        <entry key="..\:/ZZZ_Project_jonas/TimerManager/app/src/main/res/layout/activity_main.xml" value="0.264" />
+        <entry key="..\:/ZZZ_Project_jonas/TimerManager/app/src/main/res/layout/activity_main.xml" value="0.49149922720247297" />
         <entry key="..\:/ZZZ_Project_jonas/TimerManager/app/src/main/res/layout/activity_name_change.xml" value="0.25364583333333335" />
-        <entry key="..\:/ZZZ_Project_jonas/TimerManager/app/src/main/res/layout/activity_notification.xml" value="0.23802083333333332" />
+        <entry key="..\:/ZZZ_Project_jonas/TimerManager/app/src/main/res/layout/activity_notification.xml" value="0.4" />
         <entry key="..\:/ZZZ_Project_jonas/TimerManager/app/src/main/res/layout/activity_pwd_change.xml" value="0.23802083333333332" />
         <entry key="..\:/ZZZ_Project_jonas/TimerManager/app/src/main/res/layout/activity_register.xml" value="0.264" />
         <entry key="..\:/ZZZ_Project_jonas/TimerManager/app/src/main/res/layout/activity_test.xml" value="0.23802083333333332" />
