@@ -20,9 +20,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -38,7 +36,6 @@ import android.widget.DatePicker;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -186,7 +183,6 @@ public class MainActivity extends BaseActivity {
     private BaiduMap baiduMapInDetail;
 
     LatLng targetPoint;
-
 
     private LatLng latLngInPick;
     private String cityInPick;
@@ -382,10 +378,16 @@ public class MainActivity extends BaseActivity {
     private void setPopWindow() {
         contentView = LayoutInflater.from(MainActivity.this).inflate(R.layout.popup_window, null);
         ImageView imageViewInPop = contentView.findViewById(R.id.button_hidden);
-        imageViewInPop.setOnClickListener(v -> {
-            gridAdapter.setIsShowDelete(false);
-            popupWindow.dismiss();
-        });
+        if (scheduleFirst != null) {
+            imageViewInPop.setOnClickListener(v -> {
+                gridAdapter.setIsShowDelete(false);
+                popupWindow.dismiss();
+            });
+        } else {
+            imageViewInPop.setOnClickListener(v -> {
+                popupWindow.dismiss();
+            });
+        }
 
         popupWindow = new PopupWindow(contentView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
@@ -765,7 +767,11 @@ public class MainActivity extends BaseActivity {
         jsonFirstGet = sharedPreferences.getString("schedule_first", "");
         Type type = new TypeToken<List<Schedule>>() {}.getType();
         scheduleFirstList = gsonFirst.fromJson(jsonFirstGet, type);
-        scheduleFirst = scheduleFirstList.get(0);
+        if (scheduleFirstList != null) {
+            scheduleFirst = scheduleFirstList.get(0);
+        } else {
+            scheduleFirst = null;
+        }
 
         if (scheduleFirst != null) {
 
