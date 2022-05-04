@@ -219,7 +219,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                     @Override
                     public void onError(ApiException e) {
                         Log.d(TAG, "请求Url异常：" + e.toString());
-                        showToastInThread(RegisterActivity.this, e.getMessage());
+//                        showToastInThread(RegisterActivity.this, e.getMessage());
                     }
                 });
     }

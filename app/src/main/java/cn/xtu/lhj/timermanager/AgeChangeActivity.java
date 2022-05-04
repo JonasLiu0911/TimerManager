@@ -94,7 +94,7 @@ public class AgeChangeActivity extends BaseActivity {
                     @Override
                     public void onError(ApiException e) {
                         Log.d(TAG, "请求Url异常：" + e.toString());
-                        showToastInThread(AgeChangeActivity.this, e.getMessage());
+//                        showToastInThread(AgeChangeActivity.this, e.getMessage());
                     }
                 });
     }

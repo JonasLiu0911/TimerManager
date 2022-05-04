@@ -92,6 +92,8 @@ public class InfoChangeActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info_change);
 
+        sharedPreferences = getSharedPreferences("login_info", MODE_PRIVATE);
+
         initPage();
 
         actionBar = getSupportActionBar();
@@ -107,9 +109,6 @@ public class InfoChangeActivity extends BaseActivity {
         nickNameToFill = findViewById(R.id.change_et_nickname);
         genderToFill = findViewById(R.id.change_et_gender);
         ageToFill = findViewById(R.id.change_et_age);
-
-
-        sharedPreferences = getSharedPreferences("login_info", MODE_PRIVATE);
 
         nickNameToFill.setText(sharedPreferences.getString("name", ""));
         genderToFill.setText(sharedPreferences.getString("gender", ""));
@@ -149,7 +148,7 @@ public class InfoChangeActivity extends BaseActivity {
                     @Override
                     public void onError(ApiException e) {
                         Log.d(TAG, "请求Url异常：" + e.toString());
-                        showToastInThread(InfoChangeActivity.this, e.getMessage());
+//                        showToastInThread(InfoChangeActivity.this, e.getMessage());
                     }
                 });
     }
@@ -209,18 +208,18 @@ public class InfoChangeActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
-            //打开相册后返回
+            // 打开相册后返回
             case SELECT_PHOTO:
                 if (resultCode == RESULT_OK) {
                     String imagePath;
-                    //判断手机系统版本号
+                    // 判断手机系统版本号
                     if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {
-                        //4.4及以上系统使用这个方法处理图片
+                        // 4.4及以上系统使用这个方法处理图片
                         imagePath = CameraUtils.getImageOnKitKatPath(data, this);
                     } else {
                         imagePath = CameraUtils.getImageBeforeKitKatPath(data, this);
                     }
-                    //显示图片
+                    // 显示图片
                     displayImage(imagePath);
                 }
                 break;

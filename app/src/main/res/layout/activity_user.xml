@@ -97,66 +97,66 @@
             android:textSize="16sp" />
     </RelativeLayout>
 
-    <RelativeLayout
-        android:id="@+id/re_about_us"
-        android:layout_width="match_parent"
-        android:layout_height="65dp"
-        android:background="@drawable/bars_background"
-        android:clickable="true"
-        android:paddingLeft="12dp"
-        android:layout_marginBottom="10dp">
-        <ImageView
-            android:id="@+id/iv_about_us"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="12dp"
-            android:src="@drawable/about_us"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="20dp"
-            android:layout_toRightOf="@id/iv_about_us"
-            android:text="关于我们"
-            android:textColor="#353535"
-            android:textSize="16sp" />
-    </RelativeLayout>
+<!--    <RelativeLayout-->
+<!--        android:id="@+id/re_about_us"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="65dp"-->
+<!--        android:background="@drawable/bars_background"-->
+<!--        android:clickable="true"-->
+<!--        android:paddingLeft="12dp"-->
+<!--        android:layout_marginBottom="10dp">-->
+<!--        <ImageView-->
+<!--            android:id="@+id/iv_about_us"-->
+<!--            android:layout_width="24dp"-->
+<!--            android:layout_height="24dp"-->
+<!--            android:layout_alignParentLeft="true"-->
+<!--            android:layout_centerVertical="true"-->
+<!--            android:layout_marginLeft="12dp"-->
+<!--            android:src="@drawable/about_us"/>-->
+<!--        <TextView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_centerVertical="true"-->
+<!--            android:layout_marginLeft="20dp"-->
+<!--            android:layout_toRightOf="@id/iv_about_us"-->
+<!--            android:text="关于我们"-->
+<!--            android:textColor="#353535"-->
+<!--            android:textSize="16sp" />-->
+<!--    </RelativeLayout>-->
 
-    <RelativeLayout
-        android:id="@+id/re_help"
-        android:layout_width="match_parent"
-        android:layout_height="65dp"
-        android:background="@drawable/bars_background"
-        android:clickable="true"
-        android:paddingLeft="12dp"
-        android:layout_marginBottom="20dp">
-        <ImageView
-            android:id="@+id/iv_help_callback"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="12dp"
-            android:src="@drawable/help_callback" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="20dp"
-            android:layout_toRightOf="@id/iv_help_callback"
-            android:text="帮助与反馈"
-            android:textColor="#353535"
-            android:textSize="16sp" />
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0.2dp"
-            android:layout_alignParentBottom="true"
-            android:layout_marginRight="12dp"
-            android:background="#dadada" />
+<!--    <RelativeLayout-->
+<!--        android:id="@+id/re_help"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="65dp"-->
+<!--        android:background="@drawable/bars_background"-->
+<!--        android:clickable="true"-->
+<!--        android:paddingLeft="12dp"-->
+<!--        android:layout_marginBottom="20dp">-->
+<!--        <ImageView-->
+<!--            android:id="@+id/iv_help_callback"-->
+<!--            android:layout_width="24dp"-->
+<!--            android:layout_height="24dp"-->
+<!--            android:layout_alignParentLeft="true"-->
+<!--            android:layout_centerVertical="true"-->
+<!--            android:layout_marginLeft="12dp"-->
+<!--            android:src="@drawable/help_callback" />-->
+<!--        <TextView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_centerVertical="true"-->
+<!--            android:layout_marginLeft="20dp"-->
+<!--            android:layout_toRightOf="@id/iv_help_callback"-->
+<!--            android:text="帮助与反馈"-->
+<!--            android:textColor="#353535"-->
+<!--            android:textSize="16sp" />-->
+<!--        <View-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="0.2dp"-->
+<!--            android:layout_alignParentBottom="true"-->
+<!--            android:layout_marginRight="12dp"-->
+<!--            android:background="#dadada" />-->
 
-    </RelativeLayout>
+<!--    </RelativeLayout>-->
 
 
     <Button

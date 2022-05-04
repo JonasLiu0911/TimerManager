@@ -102,7 +102,6 @@ public class NotificationActivity extends BaseActivity {
 
     }
 
-
     private void initLocation(double longitude, double latitude) {
         hereMapView = findViewById(R.id.here_map);
         hereBaiduMap = hereMapView.getMap();
@@ -176,11 +175,9 @@ public class NotificationActivity extends BaseActivity {
                 flag = false;
             }
 
-
-
         } else {
             if (disNow > 100) {
-                Toast.makeText(NotificationActivity.this, "您仍未到达日程点", Toast.LENGTH_LONG).show();
+                Toast.makeText(NotificationActivity.this, "您仍未到达日程点，请抓紧时间", Toast.LENGTH_LONG).show();
             }
         }
 

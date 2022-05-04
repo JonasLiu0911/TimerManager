@@ -34,7 +34,7 @@ public class CameraUtils {
                 Uri uri = Uri.fromFile(outputImagePath);
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
             } else {
-                //兼容android7.0 使用共享文件的形式
+                // 兼容android7.0 使用共享文件的形式
                 ContentValues contentValues = new ContentValues(1);
                 contentValues.put(MediaStore.Images.Media.DATA, outputImagePath.getAbsolutePath());
                 Uri uri = context.getApplicationContext().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);

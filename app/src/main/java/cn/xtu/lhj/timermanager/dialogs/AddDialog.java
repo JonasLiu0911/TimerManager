@@ -1,7 +1,6 @@
 package cn.xtu.lhj.timermanager.dialogs;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
@@ -18,9 +17,6 @@ import cn.xtu.lhj.timermanager.R;
 public class AddDialog extends AlertDialog {
 
     private OnClickListener onClickListener;
-
-    private SharedPreferences sharedPreferences;
-    private SharedPreferences.Editor editor;
 
     public EditText edtTitle;
     public EditText edtDesc;

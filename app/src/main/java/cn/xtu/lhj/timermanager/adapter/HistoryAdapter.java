@@ -76,14 +76,11 @@ public class HistoryAdapter extends BaseAdapter {
         if (convertView == null) {
             view = LayoutInflater.from(context).inflate(R.layout.item_in_history, null);
             viewHolder = new ViewHolder();
-
             viewHolder.tvScheduleTitle = view.findViewById(R.id.tv_schedule_title);
             viewHolder.tvScheduleInfo = view.findViewById(R.id.tv_schedule_info);
             viewHolder.tvScheduleStartTime = view.findViewById(R.id.tv_start_time);
             viewHolder.tvScheduleLocation = view.findViewById(R.id.tv_location);
-
             viewHolder.ivDeleteSchedule = view.findViewById(R.id.iv_delete_item);     // 删除按钮（图片）
-
             view.setTag(viewHolder);
         } else {
             view = convertView;
@@ -98,7 +95,6 @@ public class HistoryAdapter extends BaseAdapter {
 
         long scheduleTimeString = schedule.getScheduleStartTime();
         String scheduleStartTime = DateUtils.getTime2String(scheduleTimeString, "yyyy-MM-dd HH:mm");
-        Log.d("check", schedule.getScheduleStartTime().toString());
         viewHolder.tvScheduleStartTime.setText(scheduleStartTime);
 
         Double scheduleLongitude = (Double) schedule.getLongitude().doubleValue();
@@ -118,7 +114,6 @@ public class HistoryAdapter extends BaseAdapter {
                 }
             }
         });
-        Log.d("Longitude Latitude", scheduleLongitude + " " + scheduleLatitude);
 
         viewHolder.ivDeleteSchedule.bringToFront();
         viewHolder.ivDeleteSchedule.setVisibility(isShowDelete ? View.VISIBLE : View.GONE);

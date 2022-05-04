@@ -19,7 +19,6 @@ import com.xuexiang.xhttp2.exception.ApiException;
 import cn.xtu.lhj.timermanager.bean.UserInfo;
 import cn.xtu.lhj.timermanager.constant.NetConstant;
 import cn.xtu.lhj.timermanager.databinding.ActivityLoginBinding;
-import cn.xtu.lhj.timermanager.utils.SPUtils;
 import cn.xtu.lhj.timermanager.utils.ValidUtils;
 
 public class LoginActivity extends BaseActivity implements View.OnClickListener {
@@ -41,6 +40,10 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         getSupportActionBar().hide();
 
         loginBinding = DataBindingUtil.setContentView(this, R.layout.activity_login);
+
+        sharedPreferences = getSharedPreferences("login_info", MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+
         setOnClickListener();
 
         setOnFocusChangeErrMsg(loginBinding.etAccount, "phone", "手机号码格式不正确");
@@ -108,7 +111,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 startActivity(intent);
                 break;
 
-            // 以下都暂未实现
+            // 以下都未实现
             // 忘记密码
             case R.id.tv_forget_password:
                 break;
@@ -150,8 +153,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     public void onSuccess(Object obj) throws Throwable {
                         Log.d(TAG, "请求Url成功，登录成功");
                         String encryptedPassword = ValidUtils.encodeByMD5(password);
-                        sharedPreferences = getSharedPreferences("login_info", MODE_PRIVATE);
-                        editor = sharedPreferences.edit();
+
                         editor.putString("telephone", telephone);
                         editor.putString("encryptedPassword", encryptedPassword);
 
@@ -162,7 +164,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     @Override
                     public void onError(ApiException e) {
                         Log.d(TAG, "请求Url失败：" + e.getMessage());
-                        showToastInThread(LoginActivity.this, e.getMessage());
+//                        showToastInThread(LoginActivity.this, e.getMessage());
                     }
                 });
     }
@@ -175,11 +177,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     @Override
                     public void onSuccess(UserInfo data) {
                         Log.d(TAG, "请求URL成功：" + data);
-                        Log.d(TAG, "name: " + data.getName());
-                        Log.d(TAG, "age: " + data.getAge());
-                        Log.d(TAG, "gender: " + data.getGender());
-                        Log.d(TAG, "head: " + data.getHeadUrl());
-
 
                         editor.putString("name", data.getName());
                         editor.putString("age", data.getAge().toString());
@@ -193,15 +190,12 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                         } else {
                             showToastInThread(LoginActivity.this, "验证失败，请重新登录");
                         }
-
-//                        SPUtils.putString("imageUrl", data.getHeadUrl(), LoginActivity.this);
-                        Log.d(TAG, "head: " + sharedPreferences.getString("imageUrl", "0"));
                     }
 
                     @Override
                     public void onError(ApiException e) {
                         Log.d(TAG, "请求Url异常：" + e.toString());
-                        showToastInThread(LoginActivity.this, e.getMessage());
+//                        showToastInThread(LoginActivity.this, e.getMessage());
                     }
                 });
     }

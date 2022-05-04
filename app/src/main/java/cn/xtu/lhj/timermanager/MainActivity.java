@@ -7,6 +7,7 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -80,6 +81,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import cn.xtu.lhj.timermanager.adapter.GridAdapter;
 import cn.xtu.lhj.timermanager.bean.Schedule;
@@ -201,7 +203,7 @@ public class MainActivity extends BaseActivity {
         SDKInitializer.initialize(getApplicationContext());
 
         fullScreenConfig();
-        getSupportActionBar().hide();
+        Objects.requireNonNull(getSupportActionBar()).hide();
 
         setContentView(R.layout.activity_main);
 
@@ -283,7 +285,8 @@ public class MainActivity extends BaseActivity {
         newTrip.setOnClickListener(onClickLog);
 
         // 跳转后台
-//        toBackStage = findViewById(R.id.iv_to_backstage);
+        toBackStage = findViewById(R.id.iv_to_backstage);
+        toBackStage.setVisibility(View.INVISIBLE);
 //        OnClickToBack onClickToBack = new OnClickToBack();
 //        toBackStage.setOnClickListener(onClickToBack);
 
@@ -338,7 +341,6 @@ public class MainActivity extends BaseActivity {
                 Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                 if (intent != null) {
                     startActivity(intent);
-
                 } else {
                     Toast.makeText(MainActivity.this, "当前按钮无效", Toast.LENGTH_SHORT).show();
                 }
@@ -346,7 +348,6 @@ public class MainActivity extends BaseActivity {
                 Intent intent = new Intent(MainActivity.this, UserActivity.class);
                 if (intent != null) {
                     startActivity(intent);
-
                 } else {
                     Toast.makeText(MainActivity.this, "当前按钮无效", Toast.LENGTH_SHORT).show();
                 }
@@ -390,20 +391,16 @@ public class MainActivity extends BaseActivity {
         }
 
         popupWindow = new PopupWindow(contentView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-
         popupWindow.setBackgroundDrawable(new BitmapDrawable());
         popupWindow.setOutsideTouchable(true);
         popupWindow.setTouchable(true);
         popupWindow.setFocusable(true);
-
         popupWindow.setAnimationStyle(R.style.pop_window_anim_style);
     }
     // ========================================== 按钮相关 end ==========================================
 
 
-
     // ========================================== 定位相关 begin ==========================================
-
     // 请求权限的结果
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -428,16 +425,16 @@ public class MainActivity extends BaseActivity {
                                 ("适配android 8限制后台定位功能", "正在后台定位");
                         notification = builder2.build();
                     } else {
-                        //获取一个Notification构造器
+                        // 获取一个Notification构造器
                         Notification.Builder builder = new Notification.Builder(MainActivity.this);
                         Intent nfIntent = new Intent(MainActivity.this, MainActivity.class);
 
                         builder.setContentIntent(PendingIntent.
-                                getActivity(MainActivity.this, 0, nfIntent, 0)) // 设置PendingIntent
-                                .setContentTitle("适配android限制后台定位功能")         // 设置下拉列表里的标题
-                                .setSmallIcon(R.drawable.logo)                      // 设置状态栏内的小图标
-                                .setContentText("正在后台定位")                       // 设置上下文内容
-                                .setWhen(System.currentTimeMillis());               // 设置该通知发生的时间
+                                getActivity(MainActivity.this, 0, nfIntent, 0))  // 设置PendingIntent
+                                .setContentTitle("适配android限制后台定位功能")                               // 设置下拉列表里的标题
+                                .setSmallIcon(R.drawable.logo)                                            // 设置状态栏内的小图标
+                                .setContentText("正在后台定位")                                             // 设置上下文内容
+                                .setWhen(System.currentTimeMillis());                                    // 设置该通知发生的时间
 
                         notification = builder.build();                             // 获取构建好的Notification
                     }
@@ -520,14 +517,10 @@ public class MainActivity extends BaseActivity {
                 LatLng centerPoint = mapStatus.target;
                 pointLongitude = centerPoint.longitude;
                 pointLatitude = centerPoint.latitude;
-                Log.d(TAG, centerPoint.latitude + "/" + centerPoint.longitude);
                 // 把选择好的位置信息存入sharedPreferences中
                 LatLng locationToStock = new LatLng(pointLatitude, pointLongitude);
                 jsonLocationToSave = gsonSaveLocation.toJson(locationToStock);
                 editor.putString("location_save", jsonLocationToSave);
-                Log.d("update--", centerPoint.latitude + "/" + centerPoint.longitude);
-                Log.d("update--", pointLatitude.toString());
-                Log.d("update--", Double.valueOf(pointLatitude.toString()) + "--");
 
                 BDMapUtils.reverseGeoParse(pointLongitude, pointLatitude, new OnGetGeoCoderResultListener() {
                     @Override
@@ -603,7 +596,6 @@ public class MainActivity extends BaseActivity {
         mapViewInDetail.setLogoPosition(LogoPosition.logoPostionleftBottom);
 
         LatLng point = new LatLng(latitude, longitude);
-        Log.d(TAG, point.latitude + "/" + point.longitude);
 
         MapStatus.Builder builder = new MapStatus.Builder();
         builder.target(point).zoom(19.5f);
@@ -617,13 +609,9 @@ public class MainActivity extends BaseActivity {
     }
 
     private void createMarker(LatLng latLng) {
-        Log.d("debug--", "11111111111");
         bitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.icon_mark);
-        Log.d("debug--", "22222222222");
         MarkerOptions markerOptions = new MarkerOptions().position(latLng).icon(bitmapDescriptor);
-        Log.d("debug--", "33333333333");
         baiduMapInDetail.addOverlay(markerOptions);
-        Log.d("debug--", "44444444444");
     }
 
     // 首页的位置监听，定位到当前位置 ccc
@@ -634,7 +622,6 @@ public class MainActivity extends BaseActivity {
             if (bdLocation == null || mMapView == null) {
                 return;
             }
-
             if (isFirstLocated) {
                 LatLng ll = new LatLng(bdLocation.getLatitude(), bdLocation.getLongitude());
                 MapStatusUpdate update = MapStatusUpdateFactory.newLatLng(ll);
@@ -729,21 +716,7 @@ public class MainActivity extends BaseActivity {
         scheduleList = gson.fromJson(jsonToGet, type);
 
         if (scheduleList != null) {
-
-            Log.d(TAG, "schedule list is not empty");
-
-            for (Schedule i : scheduleList) {
-                Log.d(TAG, "title is " + i.getScheduleTitle());
-                Log.d(TAG, "info is " + i.getScheduleInfo());
-                Log.d(TAG, "startTime is " + i.getScheduleStartTime());
-                Log.d(TAG, "id is " + i.getId());
-                Log.d(TAG, "telephone is " + sharedPreferences.getString("telephone", ""));
-                Log.d(TAG, "latitude is " + i.getLatitude());
-                Log.d(TAG, "longitude is " + i.getLongitude());
-            }
-
             getScheduleFirstItem();
-
         }
 
 
@@ -774,31 +747,21 @@ public class MainActivity extends BaseActivity {
         }
 
         if (scheduleFirst != null) {
-
-            Log.d("testttt--", scheduleFirst.getScheduleStartTime() + "");
             Date dateJudge = new Date(System.currentTimeMillis());
             SimpleDateFormat dateFormatJudge = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             Long timeString = DateUtils.getString2Time(dateFormatJudge.format(dateJudge), "yyyy-MM-dd HH:mm:ss");
 
-            Log.d("testttt-----", scheduleFirst.getScheduleInfo());
-
             LatLng currentPoint = new LatLng(latitudeCurrent, longitudeCurrent);
             targetPoint = new LatLng(scheduleFirst.getLatitude().doubleValue(), scheduleFirst.getLongitude().doubleValue());
-            Log.d("testttt--", DistanceUtil.getDistance(currentPoint, targetPoint) + "distance--000");
-            Log.d("testttt-----", DistanceUtils.calculateDistance(targetPoint.latitude, targetPoint.longitude,
-                    currentPoint.latitude, currentPoint.longitude) + "distance--111");
-            Log.d("testttt-----", DistanceUtils.distHaversineRAD(targetPoint.latitude, targetPoint.longitude,
-                    currentPoint.latitude, currentPoint.longitude) + "distance--222");
-            Log.d("testttt-----", DistanceUtils.distanceSimplify(targetPoint.latitude, targetPoint.longitude,
-                    currentPoint.latitude, currentPoint.longitude) + "distance--333");
 
             // 计算两点间距离
             double dis = DistanceUtils.calculateDistance(targetPoint.latitude, targetPoint.longitude, currentPoint.latitude, currentPoint.longitude);
+            Log.d("distance", dis + "--");
 
             // 判断时间是否到达列表最早日程开始时间点 前十分钟
-            if (scheduleFirst.getScheduleStartTime() - timeString > 0 && scheduleFirst.getScheduleStartTime() - timeString <= 1000 * 60 * 20) {
+            if (scheduleFirst.getScheduleStartTime() - timeString > 0 && scheduleFirst.getScheduleStartTime() - timeString <= 1000 * 60 * 10) {
 
-                if (dis >= 200 && flag) {
+                if (dis >= 300 && flag) {
 
                     alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
                     Intent intent0 = new Intent(MainActivity.this, AlarmReceiver.class);
@@ -828,16 +791,14 @@ public class MainActivity extends BaseActivity {
                         manager.createNotificationChannel(channel);
 
                         builder.setChannelId("to-do");
-                        notification1 = builder.build();
-                    } else {
-                        notification1 = builder.build();
                     }
+                    notification1 = builder.build();
 
                     manager.notify(1, notification1);
 
                     flag = false;
 
-                } else if (dis < 200 && flag) {
+                } else if (dis < 300 && flag) {
 
                     // 创建通知
                     NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -862,10 +823,8 @@ public class MainActivity extends BaseActivity {
                         manager.createNotificationChannel(channel);
 
                         builder.setChannelId("to-do");
-                        notification1 = builder.build();
-                    } else {
-                        notification1 = builder.build();
                     }
+                    notification1 = builder.build();
 
                     manager.notify(1, notification1);
 
@@ -896,14 +855,11 @@ public class MainActivity extends BaseActivity {
                 .syncRequest(false)
                 .execute(new SimpleCallBack<List<Schedule>>() {
                     @Override
-                    public void onSuccess(List<Schedule> data) throws Throwable {
+                    public void onSuccess(List<Schedule> data) {
 
                         Log.d(TAG, "请求URL成功：" + data);
-
                         if (data != null) {
-
                             editor.putString("schedule_first", gsonFirst.toJson(data));
-
                             if (editor.commit()) {
                                 Log.d(TAG, "save first success!!!");
                             } else {
@@ -917,7 +873,6 @@ public class MainActivity extends BaseActivity {
                         Log.d(TAG, "请求Url异常：" + e.toString());
                         editor.putString("schedule_first", gsonFirst.toJson((Object) null));
                         editor.commit();
-
                         Log.d(TAG, e.getMessage());
                     }
                 });
@@ -934,210 +889,185 @@ public class MainActivity extends BaseActivity {
                 .syncRequest(false)
                 .execute(new SimpleCallBack<List<Schedule>>() {
                     @Override
-                    public void onSuccess(List<Schedule> data) throws Throwable {
+                    public void onSuccess(List<Schedule> data) {
 
                         Log.d(TAG, "请求URL成功：" + data);
-
                         if (data != null) {
-
-                            Log.d("schedule_list", gson.toJson(data));
-
                             // 把日程信息List放入sharedPreferences中
                             editor.putString("schedule_list", gson.toJson(data));
-
                             if (editor.commit()) {
                                 Log.d(TAG, "save success!!!");
                             } else {
                                 Log.d(TAG, "save fail......");
                             }
-
                             setDateAndTimePickDialog();
 
                             gridView = contentView.findViewById(R.id.schedule_pop_list);
                             gridAdapter = new GridAdapter(MainActivity.this, data, onClickListener);  // 实例化适配器
                             gridView.setAdapter(gridAdapter);
 
-                            gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                                @Override
-                                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            gridView.setOnItemClickListener((parent, view, position, id) -> {
 
-                                    gridAdapter.setIsShowDelete(false);
+                                gridAdapter.setIsShowDelete(false);
 
-                                    Schedule scheduleDetail = gridAdapter.getItem(position);
-                                    detailScheduleId = scheduleDetail.getId();
+                                Schedule scheduleDetail = gridAdapter.getItem(position);
+                                detailScheduleId = scheduleDetail.getId();
 
-                                    Gson gsonUpdateLoc = new Gson();
+                                Gson gsonUpdateLoc = new Gson();
 
-                                    Date dateTemp = new Date(scheduleDetail.getScheduleStartTime());
+                                Date dateTemp = new Date(scheduleDetail.getScheduleStartTime());
 
-                                    editor.putInt("year", dateTemp.getYear());
-                                    editor.putInt("month", dateTemp.getMonth());
-                                    editor.putInt("day", dateTemp.getDate());
-                                    editor.putInt("hour", dateTemp.getHours());
-                                    editor.putInt("minute", dateTemp.getMinutes());
+                                editor.putInt("year", dateTemp.getYear());
+                                editor.putInt("month", dateTemp.getMonth());
+                                editor.putInt("day", dateTemp.getDate());
+                                editor.putInt("hour", dateTemp.getHours());
+                                editor.putInt("minute", dateTemp.getMinutes());
 
-                                    LatLng locationDe = new LatLng(scheduleDetail.getLatitude().doubleValue(), scheduleDetail.getLongitude().doubleValue());
-                                    editor.putString("location_save", gsonUpdateLoc.toJson(locationDe));
+                                LatLng locationDe = new LatLng(scheduleDetail.getLatitude().doubleValue(), scheduleDetail.getLongitude().doubleValue());
+                                editor.putString("location_save", gsonUpdateLoc.toJson(locationDe));
 
-                                    editor.commit();
+                                editor.commit();
 
-                                    // 在这里写，弹出日程详情的dialog
-                                    detailDialog = new DetailDialog(MainActivity.this, R.style.dialog);
+                                // 在这里写，弹出日程详情的dialog
+                                detailDialog = new DetailDialog(MainActivity.this, R.style.dialog);
 
-                                    detailDialog.setOnClickListener(new DetailDialog.OnClickListener() {
-                                        @Override
-                                        public void updateTimeClick() {
-                                            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                                            imm.hideSoftInputFromWindow(detailDialog.detailTimeStr.getWindowToken(), 0);
-                                            // 弹出日期时间选择器（Dialog）
+                                detailDialog.setOnClickListener(new DetailDialog.OnClickListener() {
+                                    @Override
+                                    public void updateTimeClick() {
+                                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                                        imm.hideSoftInputFromWindow(detailDialog.detailTimeStr.getWindowToken(), 0);
+                                        // 弹出日期时间选择器（Dialog）
 
-                                            isUpdatingTime = true;
+                                        isUpdatingTime = true;
 
-                                            DatePickerDialog datePickerDialog = new DatePickerDialog(MainActivity.this,
-                                                    AlertDialog.THEME_HOLO_DARK,
-                                                    datePicker, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
-                                            datePickerDialog.setTitle("修改日期");
-                                            datePickerDialog.show();
-                                        }
+                                        DatePickerDialog datePickerDialog = new DatePickerDialog(MainActivity.this,
+                                                AlertDialog.THEME_HOLO_DARK,
+                                                datePicker, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+                                        datePickerDialog.setTitle("修改日期");
+                                        datePickerDialog.show();
+                                    }
 
-                                        @Override
-                                        public void updateAddressClick() {
-                                            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                                            imm.hideSoftInputFromWindow(detailDialog.detailTimeStr.getWindowToken(), 0);
+                                    @Override
+                                    public void updateAddressClick() {
+                                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                                        imm.hideSoftInputFromWindow(detailDialog.detailTimeStr.getWindowToken(), 0);
 
-                                            isUpdatingAddress = true;
+                                        isUpdatingAddress = true;
 
-                                            // 弹出地图＋POI搜索栏（对话框Dialog），用户选择地点
-                                            pickAddressDialog = new PickAddressDialog(MainActivity.this, R.style.dialog_address);
+                                        // 弹出地图＋POI搜索栏（对话框Dialog），用户选择地点
+                                        pickAddressDialog = new PickAddressDialog(MainActivity.this, R.style.dialog_address);
 
-                                            // 地点选择框的点击事件（还未完成）
-                                            pickAddressDialog.setOnClickListener(new PickAddressDialog.OnClickListener() {
-                                                @Override
-                                                public void onToSearchClick() {
-                                                    InputMethodManager imm1 = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                                                    imm1.hideSoftInputFromWindow(pickAddressDialog.ivToSearch.getWindowToken(), 0);
-                                                    pickAddressDialog.cvMove.setVisibility(View.INVISIBLE);
-                                                    pickAddressDialog.cvSearch.setVisibility(View.VISIBLE);
-                                                    pickAddressDialog.cvMap.setVisibility(View.INVISIBLE);
-                                                }
+                                        // 地点选择框的点击事件（还未完成）
+                                        pickAddressDialog.setOnClickListener(new PickAddressDialog.OnClickListener() {
+                                            @Override
+                                            public void onToSearchClick() {
+                                                InputMethodManager imm1 = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                                                imm1.hideSoftInputFromWindow(pickAddressDialog.ivToSearch.getWindowToken(), 0);
+                                                pickAddressDialog.cvMove.setVisibility(View.INVISIBLE);
+                                                pickAddressDialog.cvSearch.setVisibility(View.VISIBLE);
+                                                pickAddressDialog.cvMap.setVisibility(View.INVISIBLE);
+                                            }
 
-                                                @Override
-                                                public void onCancelAddressClick() {
+                                            @Override
+                                            public void onCancelAddressClick() {
+                                                isUpdatingAddress = false;
+                                            }
+
+                                            @Override
+                                            public void onSubmitAddressClick() {
+
+                                                editor.commit();
+
+                                                if (isUpdatingAddress) {
+                                                    String temp = sharedPreferences.getString("location_save", "");
+                                                    Type type = new TypeToken<LatLng>() {}.getType();
+                                                    LatLng haha = gson.fromJson(temp, type);
+                                                    initLocationInDetail(haha.longitude, haha.latitude);
                                                     isUpdatingAddress = false;
                                                 }
+                                            }
+                                        }).show();
+                                        pickAddressDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);  // 点击EditText 弹出软键盘
 
-                                                @Override
-                                                public void onSubmitAddressClick() {
+                                        initLocationInPick();
+                                        locationClientInPick.start();
 
-                                                    editor.commit();
+                                        isFirstLocatedInPick = true;
+                                    }
 
-                                                    if (isUpdatingAddress) {
-                                                        String temp = sharedPreferences.getString("location_save", "");
-                                                        Type type = new TypeToken<LatLng>() {}.getType();
-                                                        LatLng haha = gson.fromJson(temp, type);
-                                                        initLocationInDetail(haha.longitude, haha.latitude);
-                                                        isUpdatingAddress = false;
-                                                    }
-                                                }
-                                            }).show();
-                                            pickAddressDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);  // 点击EditText 弹出软键盘
+                                    @Override
+                                    public void beginUpdateClick() {
+                                        detailDialog.initEvent();
+                                        detailDialog.setCanceledOnTouchOutside(false);
+                                    }
 
-                                            initLocationInPick();
-                                            locationClientInPick.start();
+                                    @Override
+                                    public void cancelUpdateClick() {
+                                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                                        imm.hideSoftInputFromWindow(detailDialog.detailTimeStr.getWindowToken(), 0);
+                                    }
 
-                                            isFirstLocatedInPick = true;
-                                        }
+                                    @Override
+                                    public void submitUpdateClick() {
+                                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                                        imm.hideSoftInputFromWindow(detailDialog.detailTimeStr.getWindowToken(), 0);
 
-                                        @Override
-                                        public void beginUpdateClick() {
-                                            detailDialog.initEvent();
-                                            detailDialog.setCanceledOnTouchOutside(false);
-                                        }
+                                        // 取出电话号码
+                                        String telephone1 = sharedPreferences.getString("telephone", "");
+                                        // 事项标题（要提交）
+                                        String inputTitle = detailDialog.detailTitle.getText().toString();
+                                        // 事项详情（要提交）
+                                        String inputDesc = detailDialog.detailDesc.getText().toString();
 
-                                        @Override
-                                        public void cancelUpdateClick() {
-//                                            Toast.makeText(MainActivity.this, "取消修改", Toast.LENGTH_SHORT).show();
-                                            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                                            imm.hideSoftInputFromWindow(detailDialog.detailTimeStr.getWindowToken(), 0);
-                                        }
+                                        int year = sharedPreferences.getInt("year", 2000);
+                                        int month = sharedPreferences.getInt("month", 8);
+                                        int day = sharedPreferences.getInt("day", 28);
+                                        int hour = sharedPreferences.getInt("hour", 12);
+                                        int minute = sharedPreferences.getInt("minute", 28);
+                                        int second = 0;
+                                        // 事项时间（要提交）
+                                        date = new Date();
+                                        date.setYear(year);
+                                        date.setMonth(month);
+                                        date.setDate(day);
+                                        date.setHours(hour);
+                                        date.setMinutes(minute);
+                                        date.setSeconds(second);
+                                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                        Long timeString = DateUtils.getString2Time(dateFormat.format(date), "yyyy-MM-dd HH:mm:ss");
 
-                                        @Override
-                                        public void submitUpdateClick() {
-                                            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                                            imm.hideSoftInputFromWindow(detailDialog.detailTimeStr.getWindowToken(), 0);
+                                        // 从sharedPreferences中取出用户选择的位置
+                                        jsonLocationToGet = sharedPreferences.getString("location_save", "");
+                                        Type type = new TypeToken<LatLng>() {}.getType();
+                                        latLngGet = gson.fromJson(jsonLocationToGet, type);
 
-                                            // 取出电话号码
-                                            String telephone = sharedPreferences.getString("telephone", "");
+                                        // 事项经度（要提交）
+                                        BigDecimal longitudeToServer = BigDecimal.valueOf(latLngGet.longitude);
+                                        // 事项纬度（要提交）
+                                        BigDecimal latitudeToServer = BigDecimal.valueOf(latLngGet.latitude);
 
-                                            // 事项标题（要提交）
-                                            String inputTitle = detailDialog.detailTitle.getText().toString();
-                                            // 事项详情（要提交）
-                                            String inputDesc = detailDialog.detailDesc.getText().toString();
+                                        // 网络请求，将新建日程传到后端
+                                        Schedule scheduleToUpdate = new Schedule();
+                                        scheduleToUpdate.setId(detailScheduleId);
+                                        scheduleToUpdate.setTelephone(telephone1);
+                                        scheduleToUpdate.setLongitude(longitudeToServer);
+                                        scheduleToUpdate.setLatitude(latitudeToServer);
+                                        scheduleToUpdate.setScheduleTitle(inputTitle);
+                                        scheduleToUpdate.setScheduleInfo(inputDesc);
+                                        scheduleToUpdate.setScheduleStartTime(timeString);
 
-                                            int year = sharedPreferences.getInt("year", 2000);
-                                            int month = sharedPreferences.getInt("month", 8);
-                                            int day = sharedPreferences.getInt("day", 28);
-                                            int hour = sharedPreferences.getInt("hour", 12);
-                                            int minute = sharedPreferences.getInt("minute", 28);
-                                            int second = 0;
-                                            // 事项时间（要提交）
-                                            date = new Date();
-                                            date.setYear(year);
-                                            date.setMonth(month);
-                                            date.setDate(day);
-                                            date.setHours(hour);
-                                            date.setMinutes(minute);
-                                            date.setSeconds(second);
-                                            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                                            Long timeString = DateUtils.getString2Time(dateFormat.format(date), "yyyy-MM-dd HH:mm:ss");
+                                        gsonSaveSchedule = new Gson();
+                                        jsonSaveSchedule = gsonSaveSchedule.toJson(scheduleToUpdate);
+                                        // 继续写，异步更新
+                                        asyncUpdateScheduleWithXHttp2(jsonSaveSchedule);
 
-                                            // 从sharedPreferences中取出用户选择的位置
-                                            jsonLocationToGet = sharedPreferences.getString("location_save", "");
-                                            Log.d("test", "location" + jsonLocationToGet);
-                                            Type type = new TypeToken<LatLng>() {}.getType();
-                                            latLngGet = gson.fromJson(jsonLocationToGet, type);
-
-                                            Log.d("update--", latLngGet.longitude + "");
-                                            Log.d("update--", latLngGet.latitude + "");
-                                            // 事项经度（要提交）
-                                            BigDecimal longitudeToServer = BigDecimal.valueOf(latLngGet.longitude);
-                                            // 事项纬度（要提交）
-                                            BigDecimal latitudeToServer = BigDecimal.valueOf(latLngGet.latitude);
-
-                                            Log.d("update--", longitudeToServer + "");
-                                            Log.d("update--", latitudeToServer + "");
-
-                                            // 网络请求，将新建日程传到后端
-                                            Schedule scheduleToUpdate = new Schedule();
-                                            scheduleToUpdate.setId(detailScheduleId);
-                                            scheduleToUpdate.setTelephone(telephone);
-                                            scheduleToUpdate.setLongitude(longitudeToServer);
-                                            scheduleToUpdate.setLatitude(latitudeToServer);
-                                            scheduleToUpdate.setScheduleTitle(inputTitle);
-                                            scheduleToUpdate.setScheduleInfo(inputDesc);
-                                            scheduleToUpdate.setScheduleStartTime(timeString);
-                                            Log.d(TAG, "-------：" + scheduleToUpdate.getId());
-                                            Log.d(TAG, "-------：" + scheduleToUpdate.getTelephone());
-                                            Log.d(TAG, "-------：" + scheduleToUpdate.getLongitude());
-                                            Log.d(TAG, "-------：" + scheduleToUpdate.getLatitude());
-                                            Log.d(TAG, "-------：" + scheduleToUpdate.getScheduleTitle());
-                                            Log.d(TAG, "-------：" + scheduleToUpdate.getScheduleInfo());
-                                            Log.d(TAG, "-------：" + scheduleToUpdate.getScheduleStartTime());
-
-                                            gsonSaveSchedule = new Gson();
-                                            jsonSaveSchedule = gsonSaveSchedule.toJson(scheduleToUpdate);
-                                            // 继续写，异步更新
-                                            asyncUpdateScheduleWithXHttp2(jsonSaveSchedule);
-
-                                        }
-                                    }).show();
-                                    detailDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
-                                    detailDialog.detailTitle.setText(scheduleDetail.getScheduleTitle());
-                                    detailDialog.detailDesc.setText(scheduleDetail.getScheduleInfo());
-                                    detailDialog.detailTimeStr.setText(DateUtils.getTime2String(scheduleDetail.getScheduleStartTime(), "yyyy-MM-dd HH:mm"));
-                                    Log.d(TAG, scheduleDetail.getLongitude().doubleValue() + " " + scheduleDetail.getLatitude().doubleValue());
-                                    initLocationInDetail(scheduleDetail.getLongitude().doubleValue(), scheduleDetail.getLatitude().doubleValue());
-                                }
+                                    }
+                                }).show();
+                                detailDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+                                detailDialog.detailTitle.setText(scheduleDetail.getScheduleTitle());
+                                detailDialog.detailDesc.setText(scheduleDetail.getScheduleInfo());
+                                detailDialog.detailTimeStr.setText(DateUtils.getTime2String(scheduleDetail.getScheduleStartTime(), "yyyy-MM-dd HH:mm"));
+                                initLocationInDetail(scheduleDetail.getLongitude().doubleValue(), scheduleDetail.getLatitude().doubleValue());
                             });
 
                             gridView.setOnItemLongClickListener((parent, view, position, id) -> {
@@ -1162,7 +1092,7 @@ public class MainActivity extends BaseActivity {
                         editor.commit();
                         gridView = contentView.findViewById(R.id.schedule_pop_list);
                         gridView.setAdapter(null);
-                        showToastInThread(MainActivity.this, e.getMessage());
+//                        showToastInThread(MainActivity.this, e.getMessage());
                     }
                 });
     }
@@ -1175,11 +1105,7 @@ public class MainActivity extends BaseActivity {
             ImageView deleteItem = (ImageView) v;
             int pos = (Integer) deleteItem.getTag();
             Schedule scheduleToDelete = gridAdapter.getItem(pos);
-            Log.d(TAG, "id: " + scheduleToDelete.getId());
-            Log.d(TAG, "title: " + scheduleToDelete.getScheduleTitle());
-            Log.d(TAG, "删除键位置: " + pos);
             asyncDeleteScheduleWithXHttp2(scheduleToDelete.getId());
-
         }
     };
 
@@ -1203,7 +1129,7 @@ public class MainActivity extends BaseActivity {
                     @Override
                     public void onError(ApiException e) {
                         Log.d(TAG, "请求Url异常：" + e.toString());
-                        showToastInThread(MainActivity.this, e.getMessage());
+//                        showToastInThread(MainActivity.this, e.getMessage());
                     }
                 });
     }
@@ -1223,7 +1149,7 @@ public class MainActivity extends BaseActivity {
                     @Override
                     public void onError(ApiException e) {
                         Log.d(TAG, "请求Url异常：" + e.toString());
-                        showToastInThread(MainActivity.this, e.getMessage());
+//                        showToastInThread(MainActivity.this, e.getMessage());
                     }
                 });
     }
@@ -1248,7 +1174,7 @@ public class MainActivity extends BaseActivity {
                     @Override
                     public void onError(ApiException e) {
                         Log.d(TAG, "请求Url异常：" + e.toString());
-                        showToastInThread(MainActivity.this, e.getMessage());
+//                        showToastInThread(MainActivity.this, e.getMessage());
                     }
                 });
     }
@@ -1290,12 +1216,8 @@ public class MainActivity extends BaseActivity {
                                 AlertDialog.THEME_HOLO_DARK,
                                 datePicker, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
                         datePickerDialog.setTitle("请选择日期");
-                        datePickerDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "取消", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Toast.makeText(MainActivity.this, "必须选择时间，请重新进入", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                        datePickerDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "取消", (dialog, which) ->
+                                Toast.makeText(MainActivity.this, "必须选择时间，请重新进入", Toast.LENGTH_SHORT).show());
                         datePickerDialog.show();
                     }
 
@@ -1341,18 +1263,15 @@ public class MainActivity extends BaseActivity {
 
                                     @Override
                                     public void onGetReverseGeoCodeResult(ReverseGeoCodeResult reverseGeoCodeResult) {
-//                                        addDialog.btPickAddress.setText(reverseGeoCodeResult.getAddress());
                                         addDialog.btPickAddress.setText(reverseGeoCodeResult.getAddress() + "\n" + reverseGeoCodeResult.getSematicDescription());
                                     }
                                 });
-                                Log.d(TAG, sharedPreferences.getString("location_save", "") + "kkkkk");
                             }
                         }).show();
                         pickAddressDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);  // 点击EditText 弹出软键盘
 
                         initLocationInPick();
                         locationClientInPick.start();
-
                         isFirstLocatedInPick = true;
 
                     }
@@ -1368,32 +1287,21 @@ public class MainActivity extends BaseActivity {
 
                         // 事项标题（要提交）
                         String inputTitle = addDialog.edtTitle.getText().toString();
-                        Log.d(TAG, "标题：" + inputTitle);
                         // 事项详情（要提交）
                         String inputDesc = addDialog.edtDesc.getText().toString();
-                        Log.d(TAG, "详情：" + inputDesc);
-
-                        int year = sharedPreferences.getInt("year", 2000);
-                        int month = sharedPreferences.getInt("month", 8);
-                        int day = sharedPreferences.getInt("day", 28);
-                        int hour = sharedPreferences.getInt("hour", 12);
-                        int minute = sharedPreferences.getInt("minute", 28);
-                        int second = 0;
 
                         // 事项时间（要提交）
                         date = new Date();
-                        date.setYear(year);
-                        date.setMonth(month);
-                        date.setDate(day);
-                        date.setHours(hour);
-                        date.setMinutes(minute);
-                        date.setSeconds(second);
-                        Log.d(TAG, date + "------");
+                        date.setYear(sharedPreferences.getInt("year", 2000));
+                        date.setMonth(sharedPreferences.getInt("month", 8));
+                        date.setDate(sharedPreferences.getInt("day", 28));
+                        date.setHours(sharedPreferences.getInt("hour", 12));
+                        date.setMinutes(sharedPreferences.getInt("minute", 28));
+                        date.setSeconds(0);
+
+                        @SuppressLint("SimpleDateFormat")
                         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                         Long timeString = DateUtils.getString2Time(dateFormat.format(date), "yyyy-MM-dd HH:mm:ss");
-
-                        Log.d(TAG, "时间戳：" + timeString);
-                        Log.d(TAG, "转换后时间：" + DateUtils.getTime2String(timeString, "yyyy-MM-dd HH:mm"));
 
                         // 从sharedPreferences中取出用户选择的位置
                         jsonLocationToGet = sharedPreferences.getString("location_save", "");
@@ -1404,9 +1312,6 @@ public class MainActivity extends BaseActivity {
                         // 事项纬度（要提交）
                         BigDecimal latitudeToServer = BigDecimal.valueOf(latLngGet.latitude);
 
-                        Log.d(TAG, "经度：" + longitudeToServer);
-                        Log.d(TAG, "纬度：" + latitudeToServer);
-
                         // 网络请求，将新建日程传到后端
                         Schedule scheduleToServer = new Schedule();
                         scheduleToServer.setTelephone(telephone);
@@ -1415,10 +1320,6 @@ public class MainActivity extends BaseActivity {
                         scheduleToServer.setScheduleTitle(inputTitle);
                         scheduleToServer.setScheduleInfo(inputDesc);
                         scheduleToServer.setScheduleStartTime(timeString);
-                        Log.d(TAG, "-------：" + scheduleToServer.getScheduleStartTime());
-                        Log.d(TAG, "-------：" + scheduleToServer.getScheduleInfo());
-                        Log.d(TAG, "-------：" + scheduleToServer.getScheduleTitle());
-                        Log.d(TAG, "-------：" + scheduleToServer.getLatitude());
 
                         if (scheduleToServer.getScheduleTitle().length() == 0
                                 || scheduleToServer.getScheduleInfo().length() == 0
@@ -1442,7 +1343,6 @@ public class MainActivity extends BaseActivity {
 
                     @Override
                     public void onCancelClick() {
-//                        Toast.makeText(MainActivity.this,"取消添加",Toast.LENGTH_SHORT).show();
                     }
                 }).show();
                 addDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);  // 点击EditText 弹出软键盘
@@ -1455,70 +1355,53 @@ public class MainActivity extends BaseActivity {
      */
     public void setDateAndTimePickDialog() {
         calendar = Calendar.getInstance();
-        datePicker = new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+        datePicker = (view, year, month, dayOfMonth) -> {
 
-                calendar.set(Calendar.YEAR, year);
-                calendar.set(Calendar.MONTH, month);
-                calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+            calendar.set(Calendar.YEAR, year);
+            calendar.set(Calendar.MONTH, month);
+            calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
-                // 把日期值存入sharedPreferences中
-                editor.putInt("year", year - 1900);
-                editor.putInt("month", month);
-                editor.putInt("day", dayOfMonth);
-                editor.commit();
+            // 把日期值存入sharedPreferences中
+            editor.putInt("year", year - 1900);
+            editor.putInt("month", month);
+            editor.putInt("day", dayOfMonth);
+            editor.commit();
 
-                TimePickerDialog timePickerDialog = new TimePickerDialog(MainActivity.this,
-                        TimePickerDialog.THEME_HOLO_DARK,
-                        new TimePickerDialog.OnTimeSetListener() {
-                            @Override
-                            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                                calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                                calendar.set(Calendar.MINUTE, minute);
+            TimePickerDialog timePickerDialog = new TimePickerDialog(MainActivity.this,
+                    TimePickerDialog.THEME_HOLO_DARK,
+                    (view1, hourOfDay, minute) -> {
+                        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        calendar.set(Calendar.MINUTE, minute);
 
-                                // 把时间值存入sharedPreferences中
-                                editor.putInt("hour", hourOfDay);
-                                editor.putInt("minute", minute);
-                                editor.commit();
-                                isGetTime = true;
+                        // 把时间值存入sharedPreferences中
+                        editor.putInt("hour", hourOfDay);
+                        editor.putInt("minute", minute);
+                        editor.commit();
+                        isGetTime = true;
 
-                                int year = sharedPreferences.getInt("year", 2000);
-                                int month = sharedPreferences.getInt("month", 8);
-                                int day = sharedPreferences.getInt("day", 28);
-                                int hour = sharedPreferences.getInt("hour", 12);
-                                int minute1 = sharedPreferences.getInt("minute", 28);
-                                int second = 0;
+                        // 事项时间（要提交）
+                        Date date11 = new Date();
+                        date11.setYear(sharedPreferences.getInt("year", 2000));
+                        date11.setMonth(sharedPreferences.getInt("month", 8));
+                        date11.setDate(sharedPreferences.getInt("day", 28));
+                        date11.setHours(sharedPreferences.getInt("hour", 12));
+                        date11.setMinutes(sharedPreferences.getInt("minute", 28));
+                        date11.setSeconds(0);
+                        SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        addDialog.btPickTime.setText(f.format(date11));
+                        if (isUpdatingTime) {
+                            detailDialog.detailTimeStr.setText(f.format(date11));
+                            isUpdatingTime = false;
+                        }
+                    }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true);
+            timePickerDialog.setTitle("请选择具体时间");
 
-                                Log.d(TAG, "-------：" + year + "/" + month + "/" + day + "/" + hour + "/" + minute);
+            timePickerDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "取消", (dialog, which) -> {
+                isUpdatingTime = false;
+                Toast.makeText(MainActivity.this, "必须选择具体时间，请重新进入", Toast.LENGTH_SHORT).show();
+            });
+            timePickerDialog.show();
 
-                                // 事项时间（要提交）
-                                Date date11 = new Date();
-                                date11.setYear(year);
-                                date11.setMonth(month);
-                                date11.setDate(day);
-                                date11.setHours(hour);
-                                date11.setMinutes(minute1);
-                                date11.setSeconds(second);
-                                SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                                addDialog.btPickTime.setText(f.format(date11));
-                                if (isUpdatingTime) {
-                                    detailDialog.detailTimeStr.setText(f.format(date11));
-                                    isUpdatingTime = false;
-                                }
-                            }
-                        }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true);
-                timePickerDialog.setTitle("请选择具体时间");
-                timePickerDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "取消", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        isUpdatingTime = false;
-                        Toast.makeText(MainActivity.this, "必须选择具体时间，请重新进入", Toast.LENGTH_SHORT).show();
-                    }
-                });
-                timePickerDialog.show();
-
-            }
         };
 
     }

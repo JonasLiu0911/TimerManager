@@ -190,7 +190,7 @@ public class PwdChangeActivity extends BaseActivity {
                     @Override
                     public void onError(ApiException e) {
                         Log.d(TAG, "请求Url异常：" + e.toString());
-                        showToastInThread(PwdChangeActivity.this, e.getMessage());
+//                        showToastInThread(PwdChangeActivity.this, e.getMessage());
                     }
                 });
 

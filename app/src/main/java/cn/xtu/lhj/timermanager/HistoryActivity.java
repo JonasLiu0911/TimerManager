@@ -91,7 +91,6 @@ public class HistoryActivity extends BaseActivity {
     private void initScheduleToShow() {
 
         gson = new Gson();
-        sharedPreferences = getSharedPreferences("login_info", MODE_PRIVATE);
         asyncGetHistoryWithXHttp2(sharedPreferences.getString("telephone", ""));
 
     }
@@ -107,7 +106,6 @@ public class HistoryActivity extends BaseActivity {
 
                         if (data != null) {
                             // 把日程信息List放入sharedPreferences中
-                            editor = sharedPreferences.edit();
                             jsonSaveHistory = gson.toJson(data);
                             editor.putString("history_list", jsonSaveHistory);
 
@@ -153,7 +151,7 @@ public class HistoryActivity extends BaseActivity {
                     @Override
                     public void onError(ApiException e) {
                         Log.d(TAG, "请求Url异常：" + e.toString());
-                        showToastInThread(HistoryActivity.this, e.getMessage());
+//                        showToastInThread(HistoryActivity.this, e.getMessage());
                     }
                 });
     }
@@ -177,7 +175,7 @@ public class HistoryActivity extends BaseActivity {
                     @Override
                     public void onError(ApiException e) {
                         Log.d(TAG, "请求Url异常：" + e.toString());
-                        showToastInThread(HistoryActivity.this, e.getMessage());
+//                        showToastInThread(HistoryActivity.this, e.getMessage());
                     }
                 });
     }
@@ -189,9 +187,6 @@ public class HistoryActivity extends BaseActivity {
             ImageView deleteItem = (ImageView) v;
             int pos = (Integer) deleteItem.getTag();
             Schedule scheduleToDelete = historyAdapter.getItem(pos);
-            Log.d(TAG, "id: " + scheduleToDelete.getId());
-            Log.d(TAG, "title: " + scheduleToDelete.getScheduleTitle());
-            Log.d(TAG, "删除键位置: " + pos);
             asyncDeleteScheduleWithXHttp2(scheduleToDelete.getId());
 
         }

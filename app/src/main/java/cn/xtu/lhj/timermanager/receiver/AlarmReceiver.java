@@ -17,7 +17,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         Log.i("clock", "通知闹铃响了！！！");
 
         Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
-        vibrator.vibrate(10000);
+        vibrator.vibrate(5000);
 
         AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         audioManager.setStreamVolume(AudioManager.RINGER_MODE_NORMAL, 5, 0);

@@ -2,7 +2,6 @@ package cn.xtu.lhj.timermanager.dialogs;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
@@ -22,9 +21,6 @@ import cn.xtu.lhj.timermanager.R;
 public class PickAddressDialog extends AlertDialog {
 
     private OnClickListener onClickListener;
-
-    private SharedPreferences sharedPreferences;
-    private SharedPreferences.Editor editor;
 
     public EditText edtInputAddress;
     public ImageView ivToSearch;
@@ -85,6 +81,8 @@ public class PickAddressDialog extends AlertDialog {
         cancelAddress = findViewById(R.id.btn_cancel_address);
 
         cvSearch.setVisibility(View.INVISIBLE);
+        edtInputAddress.setVisibility(View.INVISIBLE);
+        ivToSearch.setVisibility(View.INVISIBLE);
     }
 
     private void initEvent() {

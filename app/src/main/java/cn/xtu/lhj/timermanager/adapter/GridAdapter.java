@@ -45,7 +45,6 @@ public class GridAdapter extends BaseAdapter {
     private Context context;
     private List<Schedule> scheduleList;
     private View.OnClickListener onClickListener;
-    private Schedule schedule2Item;
 
     private boolean isShowDelete;
 
@@ -101,7 +100,6 @@ public class GridAdapter extends BaseAdapter {
             viewHolder.tvScheduleInfo = view.findViewById(R.id.tv_schedule_info);
             viewHolder.tvScheduleStartTime = view.findViewById(R.id.tv_start_time);
             viewHolder.tvScheduleLocation = view.findViewById(R.id.tv_location);
-
             viewHolder.ivDeleteSchedule = view.findViewById(R.id.iv_delete_item);     // 删除按钮（图片）
 
             view.setTag(viewHolder);
@@ -118,7 +116,6 @@ public class GridAdapter extends BaseAdapter {
 
         long scheduleTimeString = schedule.getScheduleStartTime();
         String scheduleStartTime = DateUtils.getTime2String(scheduleTimeString, "yyyy-MM-dd HH:mm");
-        Log.d("check", schedule.getScheduleStartTime().toString());
         viewHolder.tvScheduleStartTime.setText(scheduleStartTime);
 
         Double scheduleLongitude = (Double) schedule.getLongitude().doubleValue();
@@ -138,7 +135,6 @@ public class GridAdapter extends BaseAdapter {
                 }
             }
         });
-        Log.d("Longitude Latitude", scheduleLongitude + " " + scheduleLatitude);
 
         viewHolder.ivDeleteSchedule.setVisibility(isShowDelete ? View.VISIBLE : View.GONE);
         viewHolder.ivDeleteSchedule.setTag(position);

@@ -104,7 +104,7 @@ public class NameChangeActivity extends BaseActivity {
                     @Override
                     public void onError(ApiException e) {
                         Log.d(TAG, "请求Url异常：" + e.toString());
-                        showToastInThread(NameChangeActivity.this, e.getMessage());
+//                        showToastInThread(NameChangeActivity.this, e.getMessage());
                     }
                 });
     }
