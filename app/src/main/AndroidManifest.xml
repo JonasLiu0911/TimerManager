@@ -43,6 +43,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TimerManager">
         <activity
+            android:name=".AnalyzeActivity"
+            android:exported="true" />
+        <activity
             android:name=".ArrivedActivity"
             android:exported="true" />
 

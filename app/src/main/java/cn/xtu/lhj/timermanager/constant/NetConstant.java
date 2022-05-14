@@ -22,6 +22,9 @@ public class NetConstant {
 
     private static final String getHistoryURL = "/schedule/getHistory";
 
+    private static final String postLocationURL = "/location/getLocations";
+    private static final String getResultsByTelURL = "/location/getResultsByTel";
+
     public static String getGetOtpCodeURL() {
         return getOtpCodeURL;
     }
@@ -76,5 +79,13 @@ public class NetConstant {
 
     public static String getUpdateHeadURL() {
         return updateHeadURL;
+    }
+
+    public static String getPostLocationURL() {
+        return postLocationURL;
+    }
+
+    public static String getGetResultsByTelURL() {
+        return getResultsByTelURL;
     }
 }

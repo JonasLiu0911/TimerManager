@@ -3,48 +3,41 @@ package cn.xtu.lhj.timermanager;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.imageview.ShapeableImageView;
-import com.xuexiang.xhttp2.XHttp;
-import com.xuexiang.xhttp2.callback.SimpleCallBack;
-import com.xuexiang.xhttp2.exception.ApiException;
 
-import cn.xtu.lhj.timermanager.bean.UserInfo;
 import cn.xtu.lhj.timermanager.constant.ModelConstant;
-import cn.xtu.lhj.timermanager.constant.NetConstant;
-import cn.xtu.lhj.timermanager.utils.SPUtils;
 
 public class UserActivity extends BaseActivity {
 
     private final String TAG = "UserActivity";
 
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor1;
+
     ActionBar actionBar;
     Button logoutBtn;
     RelativeLayout toChangeInfoPage;
     RelativeLayout toHistoryPage;
+    RelativeLayout toAnalyzePage;
     TextView nameToFill;
     TextView telephoneToFill;
     ShapeableImageView headToFill;
 
     private RequestOptions requestOptions = RequestOptions.circleCropTransform()
-            .diskCacheStrategy(DiskCacheStrategy.NONE)//不做磁盘缓存
-            .skipMemoryCache(true);//不做内存缓存
+            .diskCacheStrategy(DiskCacheStrategy.NONE)                           // 不做磁盘缓存
+            .skipMemoryCache(true);                                              // 不做内存缓存
 
 
     @Override
@@ -52,6 +45,9 @@ public class UserActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         fullScreenConfig();
         setContentView(R.layout.activity_user);
+
+        sharedPreferences = getSharedPreferences("login_info", MODE_PRIVATE);
+        editor1 = sharedPreferences.edit();
 
         initPage();
 
@@ -70,6 +66,10 @@ public class UserActivity extends BaseActivity {
         toHistoryPage = findViewById(R.id.re_history_trip);
         OnClickToHistory onClickToHistory = new OnClickToHistory();
         toHistoryPage.setOnClickListener(onClickToHistory);
+
+        toAnalyzePage = findViewById(R.id.re_analyze);
+        OnClickToAnalyze onClickToAnalyze = new OnClickToAnalyze();
+        toAnalyzePage.setOnClickListener(onClickToAnalyze);
 
 
         // 退出登录按钮
@@ -96,8 +96,6 @@ public class UserActivity extends BaseActivity {
         telephoneToFill = findViewById(R.id.user_telephone_to_fill);
         headToFill = findViewById(R.id.iv_avatar);
 
-        SharedPreferences sharedPreferences = getSharedPreferences("login_info", MODE_PRIVATE);
-
         nameToFill.setText(sharedPreferences.getString("name", ""));
         telephoneToFill.setText(sharedPreferences.getString("telephone", ""));
 
@@ -105,7 +103,7 @@ public class UserActivity extends BaseActivity {
     }
 
     public void initHead() {
-        String imageUrl = SPUtils.getString("imageUrl",null,UserActivity.this);
+        String imageUrl = sharedPreferences.getString("imageUrl", null);
         if(imageUrl != null){
             Glide.with(UserActivity.this).load(imageUrl).apply(requestOptions).into(headToFill);
         } else {
@@ -133,6 +131,15 @@ public class UserActivity extends BaseActivity {
         }
     }
 
+    private class OnClickToAnalyze implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(UserActivity.this, AnalyzeActivity.class);
+            startActivity(intent);
+        }
+    }
+
     // 退出登录按钮监听
     private class OnClickLogout implements View.OnClickListener {
 
@@ -147,10 +154,17 @@ public class UserActivity extends BaseActivity {
             builder.setPositiveButton("确认", (dialog, which) -> {
                 SharedPreferences sharedPreferences = getSharedPreferences(ModelConstant.LOGIN_INFO, MODE_PRIVATE);
                 sharedPreferences.edit().clear().apply();
+
+                editor1.putBoolean("isLogin", false);
+                editor1.putBoolean("isGetLoc", false);
+                editor1.commit();
+
                 // 跳转到登录页
                 Intent intent = new Intent(UserActivity.this, LoginActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
                 finish();
+
             });
             builder.setNegativeButton("取消", (dialog, which) -> dialog.dismiss());
             builder.create().show();

@@ -69,7 +69,7 @@ public class HistoryAdapter extends BaseAdapter {
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
 
-        Schedule schedule = (Schedule) getItem(position);
+        Schedule schedule = getItem(position);
         View view;
         ViewHolder viewHolder;
 

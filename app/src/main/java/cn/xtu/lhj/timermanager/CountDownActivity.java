@@ -10,16 +10,12 @@ import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.WindowManager;
 
-import com.bumptech.glide.Glide;
-import com.google.android.filament.View;
 import com.xuexiang.xhttp2.XHttp;
 import com.xuexiang.xhttp2.callback.SimpleCallBack;
 import com.xuexiang.xhttp2.exception.ApiException;
 
 import cn.xtu.lhj.timermanager.bean.UserInfo;
-import cn.xtu.lhj.timermanager.constant.ModelConstant;
 import cn.xtu.lhj.timermanager.constant.NetConstant;
-import cn.xtu.lhj.timermanager.utils.SPUtils;
 
 public class CountDownActivity extends BaseActivity {
 
@@ -45,6 +41,7 @@ public class CountDownActivity extends BaseActivity {
         setContentView(R.layout.activity_count_down);
 
         sharedPreferences = getSharedPreferences("login_info", MODE_PRIVATE);
+        editor = sharedPreferences.edit();
 
         autoLogin();
 
@@ -72,11 +69,15 @@ public class CountDownActivity extends BaseActivity {
                     @Override
                     public void onSuccess(Object data) {
                         Log.d(TAG, "请求Url成功，自动登录成功");
+                        editor.putBoolean("isLogin", true);
+                        editor.commit();
                     }
 
                     @Override
                     public void onError(ApiException e) {
                         Log.d(TAG, "请求Url异常，自动登录失败" + e.toString());
+                        editor.putBoolean("isLogin", false);
+                        editor.commit();
                     }
                 });
     }

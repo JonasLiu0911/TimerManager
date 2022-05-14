@@ -208,20 +208,7 @@ public class HistoryActivity extends BaseActivity {
             case android.R.id.home:
                 this.finish();
                 return true;
-            case R.id.up:
-                Toast.makeText(HistoryActivity.this, "按时间升序", Toast.LENGTH_SHORT).show();
-                break;
-            case R.id.down:
-                Toast.makeText(HistoryActivity.this, "按时间降序", Toast.LENGTH_SHORT).show();
-                break;
         }
         return super.onOptionsItemSelected(menuItem);
-    }
-
-    // 实例化菜单并显示
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.user_title_menu, menu);
-        return super.onCreateOptionsMenu(menu);
     }
 }

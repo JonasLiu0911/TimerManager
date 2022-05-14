@@ -157,6 +157,9 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                         editor.putString("telephone", telephone);
                         editor.putString("encryptedPassword", encryptedPassword);
 
+                        editor.putBoolean("isLogin", true);
+                        editor.commit();
+
                         asyncGetUserInfoWithXHttp2(telephone);
 
                     }
@@ -164,6 +167,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     @Override
                     public void onError(ApiException e) {
                         Log.d(TAG, "请求Url失败：" + e.getMessage());
+                        editor.putBoolean("isLogin", false);
+                        editor.commit();
 //                        showToastInThread(LoginActivity.this, e.getMessage());
                     }
                 });

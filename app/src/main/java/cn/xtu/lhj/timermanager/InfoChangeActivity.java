@@ -4,6 +4,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -57,12 +58,6 @@ public class InfoChangeActivity extends BaseActivity {
     TextView genderToFill;
     TextView ageToFill;
 
-    RelativeLayout toHeadChange;
-    RelativeLayout toNameChange;
-    RelativeLayout toGenderChange;
-    RelativeLayout toAgeChange;
-    RelativeLayout toPwdChange;
-
     // 修改头像相关
     //权限请求
     private RxPermissions rxPermissions;
@@ -114,7 +109,6 @@ public class InfoChangeActivity extends BaseActivity {
         genderToFill.setText(sharedPreferences.getString("gender", ""));
         ageToFill.setText(sharedPreferences.getString("age", ""));
 
-
         checkVersion();
 
         initHead();
@@ -153,6 +147,7 @@ public class InfoChangeActivity extends BaseActivity {
                 });
     }
 
+    @SuppressLint("CheckResult")
     private void checkVersion() {
         // Android6.0及以上版本
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -236,12 +231,12 @@ public class InfoChangeActivity extends BaseActivity {
 
             asyncUpdateHeadWithXHttp2(telephone, imagePath);
 
-            //显示图片
+            // 显示图片
             Glide.with(this).load(imagePath).apply(requestOptions).into(headToFill);
 
-            //压缩图片
+            // 压缩图片
             orc_bitmap = CameraUtils.compression(BitmapFactory.decodeFile(imagePath));
-            //转Base64
+            // 转Base64
             base64Pic = BitmapUtils.bitmapToBase64(orc_bitmap);
 
         } else {

@@ -36,4 +36,23 @@
         <item name="android:windowExitAnimation">@anim/pop_hidden_anim</item>
         <!-- 指定消失的动画xml -->
     </style>
+
+    <declare-styleable name="PieChartView">
+        <!--最大的饼图是否显示在左上角第一个-->
+        <attr name="pie_chart_show_max_part_first" format="boolean" />
+        <!--起始绘制角度，-180~+180-->
+        <attr name="pie_chart_start_angle" format="float" />
+        <!--最大扇区与其他整体的偏移量-->
+        <attr name="pie_chart_max_spacing" format="dimension" />
+        <!--第一根标注引线的长度-->
+        <attr name="pie_chart_mark_line_one_length" format="dimension" />
+        <!--第二根标注引线的长度-->
+        <attr name="pie_chart_mark_line_two_length" format="dimension" />
+        <!--标注引线的颜色-->
+        <attr name="pie_chart_mark_line_color" format="color" />
+        <!--标注文本大小-->
+        <attr name="pie_chart_mark_text_size" format="dimension" />
+        <!--标注文本颜色-->
+        <attr name="pie_chart_mark_text_color" format="color" />
+    </declare-styleable>
 </resources>

@@ -47,14 +47,6 @@
                     android:layout_marginRight="10dp"
                     android:src="@drawable/list" />
 
-                <ImageView
-                    android:id="@+id/iv_to_backstage"
-                    android:layout_width="45dp"
-                    android:layout_height="45dp"
-                    android:layout_gravity="center"
-                    android:layout_marginRight="10dp"
-                    android:src="@drawable/to_back_stage" />
-
             </LinearLayout>
 
             <com.google.android.material.imageview.ShapeableImageView

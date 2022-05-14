@@ -42,6 +42,9 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
         account = intent.getStringExtra("account");
         registerBinding.etTelephone.setText(account);
 
+        sharedPreferences = getSharedPreferences(ModelConstant.LOGIN_INFO, MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+
         setOnClickListener();
 
         setOnFocusChangeErrMsg(registerBinding.etTelephone, "phone", "手机号码格式不正确");
@@ -200,25 +203,30 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                 .execute(new SimpleCallBack<Object>() {
                     @Override
                     public void onSuccess(Object data) throws Throwable {
-                        sharedPreferences = getSharedPreferences(ModelConstant.LOGIN_INFO, MODE_PRIVATE);
-                        editor = sharedPreferences.edit();
+
                         editor.putString("telephone", telephone);
                         editor.putString("name", username);
                         String encryptedPassword = ValidUtils.encodeByMD5(password1);
                         editor.putString("encryptedPassword", encryptedPassword);
 
                         if (editor.commit()) {
+                            editor.putBoolean("isLogin", true);
+                            editor.commit();
                             Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
                             startActivity(intent);
                             finish();
                         } else {
                             showToastInThread(RegisterActivity.this, "注册失败");
+                            editor.putBoolean("isLogin", false);
+                            editor.commit();
                         }
                     }
 
                     @Override
                     public void onError(ApiException e) {
                         Log.d(TAG, "请求Url异常：" + e.toString());
+                        editor.putBoolean("isLogin", false);
+                        editor.commit();
 //                        showToastInThread(RegisterActivity.this, e.getMessage());
                     }
                 });

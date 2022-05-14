@@ -24,6 +24,7 @@ import android.content.pm.PackageManager;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -82,8 +83,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import cn.xtu.lhj.timermanager.adapter.GridAdapter;
+import cn.xtu.lhj.timermanager.bean.Location;
 import cn.xtu.lhj.timermanager.bean.Schedule;
 import cn.xtu.lhj.timermanager.constant.NetConstant;
 import cn.xtu.lhj.timermanager.dialogs.AddDialog;
@@ -107,13 +111,11 @@ public class MainActivity extends BaseActivity {
     private Notification notification;
     // 是否首次定位
     public boolean isFirstLocated = true;
-    private boolean isEnableLocInForeground = false;
 
     // 相关按钮
     ShapeableImageView loginImg;            // 头像按钮
     ImageView newTrip;                      // 新建日程
     ImageView checkTrip;                    // 查看列表
-    ImageView toBackStage;
 
     PopupWindow popupWindow;
     View contentView;
@@ -138,11 +140,6 @@ public class MainActivity extends BaseActivity {
     private AlarmManager alarmManager;
 
     private BitmapDescriptor bitmapDescriptor;
-
-    private Gson gsonCurrent;
-    private String jsonCurSav;
-    private String jsonCurGet;
-    private Schedule currentSch;
 
     private Boolean isGetTime = false;
     private Boolean isGetAddress = false;
@@ -186,9 +183,6 @@ public class MainActivity extends BaseActivity {
 
     LatLng targetPoint;
 
-    private LatLng latLngInPick;
-    private String cityInPick;
-    private GeoCoder geoCoderInPick;
 
     private RequestOptions requestOptions = RequestOptions.circleCropTransform()
             .diskCacheStrategy(DiskCacheStrategy.NONE)//不做磁盘缓存
@@ -262,6 +256,63 @@ public class MainActivity extends BaseActivity {
             notification.defaults = Notification.DEFAULT_SOUND;             //设置为默认的声音
         }
 
+        Boolean isLogin = sharedPreferences.getBoolean("isLogin", false);
+        Boolean isGetLoc = sharedPreferences.getBoolean("isGetLoc", false);
+
+        if (isLogin && isGetLoc) {
+            Timer timer = new Timer();
+            TimerTask timerTask = new TimerTask() {
+                @Override
+                public void run() {
+
+                    Gson g = new Gson();
+                    Type type = new TypeToken<LatLng>() {}.getType();
+                    LatLng l = g.fromJson(sharedPreferences.getString("location_1_minute", ""), type);
+                    BigDecimal longitude1Minute = BigDecimal.valueOf(l.longitude);
+                    BigDecimal latitude1Minute = BigDecimal.valueOf(l.latitude);
+                    Log.d("kkk", longitude1Minute + " " + latitude1Minute);
+
+                    Date dateJudge = new Date(System.currentTimeMillis());
+                    SimpleDateFormat dateFormatJudge = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    Long timeS = DateUtils.getString2Time(dateFormatJudge.format(dateJudge), "yyyy-MM-dd HH:mm:ss");
+
+                    // 在这里将数据 位置数据、用户手机号码、当前时间 传回服务器 !!!!!
+
+                    Location location = new Location();
+                    location.setTel(sharedPreferences.getString("telephone", "11"));
+                    location.setLongitude(longitude1Minute);
+                    location.setLatitude(latitude1Minute);
+                    location.setTimeX(timeS);
+
+                    String s = g.toJson(location);
+//                    asyncPostLocationWithXHttp2(s);
+
+                    Log.d("kk", timeS + "ii");
+                    Log.d("kk", sharedPreferences.getString("telephone", "11"));
+                    Log.d("kkkk", s);
+                }
+            };
+            timer.schedule(timerTask, 0, 60000);
+        }
+
+    }
+
+    // 写将位置数据实时传给后端的方法
+    private void asyncPostLocationWithXHttp2(final String jsonStr) {
+        XHttp.post(NetConstant.getPostLocationURL())
+                .params("jsonStr", jsonStr)
+                .syncRequest(false)
+                .execute(new SimpleCallBack<Object>() {
+                    @Override
+                    public void onSuccess(Object response) {
+                        Log.d("post", jsonStr);
+                    }
+
+                    @Override
+                    public void onError(ApiException e) {
+                        Log.d(TAG, "请求Url异常：" + e.toString() + "iii");
+                    }
+                });
     }
 
     // 页面控件及其显示 初始化所有重要变量
@@ -284,12 +335,6 @@ public class MainActivity extends BaseActivity {
         OnClickLog onClickLog = new OnClickLog();
         newTrip.setOnClickListener(onClickLog);
 
-        // 跳转后台
-        toBackStage = findViewById(R.id.iv_to_backstage);
-        toBackStage.setVisibility(View.INVISIBLE);
-//        OnClickToBack onClickToBack = new OnClickToBack();
-//        toBackStage.setOnClickListener(onClickToBack);
-
         sharedPreferences = getSharedPreferences("login_info", MODE_PRIVATE);
         editor = sharedPreferences.edit();
 
@@ -307,29 +352,6 @@ public class MainActivity extends BaseActivity {
             loginImg.setImageResource(R.drawable.default_head);
         }
     }
-
-
-    // ========================================== 按钮相关 begin ==========================================
-    // 跳转后台
-    private class OnClickToBack implements View.OnClickListener {
-
-        @Override
-        public void onClick(View v) {
-            if (mLocationClient != null) {
-                if (isEnableLocInForeground) {
-                    // 关闭后台定位（true：通知栏消失；false：通知栏可手动划除）
-                    mLocationClient.disableLocInForeground(true);
-                    isEnableLocInForeground = false;
-                    mLocationClient.stop();
-                } else {
-                    mLocationClient.enableLocInForeground(1, notification);
-                    isEnableLocInForeground = true;
-                    mLocationClient.start();
-                }
-            }
-        }
-    }
-
 
     // 点击头像跳转登录页---------加拦截器
     private class OnClickHead implements View.OnClickListener {
@@ -385,9 +407,7 @@ public class MainActivity extends BaseActivity {
                 popupWindow.dismiss();
             });
         } else {
-            imageViewInPop.setOnClickListener(v -> {
-                popupWindow.dismiss();
-            });
+            imageViewInPop.setOnClickListener(v -> popupWindow.dismiss());
         }
 
         popupWindow = new PopupWindow(contentView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -434,7 +454,7 @@ public class MainActivity extends BaseActivity {
                                 .setContentTitle("适配android限制后台定位功能")                               // 设置下拉列表里的标题
                                 .setSmallIcon(R.drawable.logo)                                            // 设置状态栏内的小图标
                                 .setContentText("正在后台定位")                                             // 设置上下文内容
-                                .setWhen(System.currentTimeMillis());                                    // 设置该通知发生的时间
+                                .setWhen(System.currentTimeMillis());                                     // 设置该通知发生的时间
 
                         notification = builder.build();                             // 获取构建好的Notification
                     }
@@ -517,6 +537,7 @@ public class MainActivity extends BaseActivity {
                 LatLng centerPoint = mapStatus.target;
                 pointLongitude = centerPoint.longitude;
                 pointLatitude = centerPoint.latitude;
+                Log.d("to_save_data", "经度：" + pointLongitude + "  纬度：" + pointLatitude);
                 // 把选择好的位置信息存入sharedPreferences中
                 LatLng locationToStock = new LatLng(pointLatitude, pointLongitude);
                 jsonLocationToSave = gsonSaveLocation.toJson(locationToStock);
@@ -603,15 +624,6 @@ public class MainActivity extends BaseActivity {
 
         detailDialog.detailPoint.setVisibility(View.VISIBLE);
 
-//        baiduMapInDetail.setOnMapLoadedCallback(() -> {
-//                createMarker(point);
-//        });
-    }
-
-    private void createMarker(LatLng latLng) {
-        bitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.icon_mark);
-        MarkerOptions markerOptions = new MarkerOptions().position(latLng).icon(bitmapDescriptor);
-        baiduMapInDetail.addOverlay(markerOptions);
     }
 
     // 首页的位置监听，定位到当前位置 ccc
@@ -646,6 +658,13 @@ public class MainActivity extends BaseActivity {
             mBaiduMap.setMyLocationData(locationData);
             android.graphics.Point location = new android.graphics.Point(150, 300);
             mBaiduMap.setCompassPosition(location);
+
+            Gson gsonWatching = new Gson();
+
+            LatLng watchingLocation = new LatLng(bdLocation.getLatitude(), bdLocation.getLongitude());
+            editor.putString("location_1_minute", gsonWatching.toJson(watchingLocation));
+            editor.putBoolean("isGetLoc", true);
+            editor.commit();
 
             getFirstSchedule(bdLocation.getLongitude(), bdLocation.getLatitude());
         }
@@ -1326,8 +1345,6 @@ public class MainActivity extends BaseActivity {
                                 || !isGetTime
                                 || !isGetAddress) {
                             Toast.makeText(MainActivity.this, "日程设置不能为空", Toast.LENGTH_SHORT).show();
-                            isGetTime = false;
-                            isGetAddress = false;
                         } else {
 
                             isGetTime = false;
