@@ -285,7 +285,7 @@ public class MainActivity extends BaseActivity {
                     location.setTimeX(timeS);
 
                     String s = g.toJson(location);
-//                    asyncPostLocationWithXHttp2(s);
+                    asyncPostLocationWithXHttp2(s);
 
                     Log.d("kk", timeS + "ii");
                     Log.d("kk", sharedPreferences.getString("telephone", "11"));
